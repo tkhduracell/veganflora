@@ -3,7 +3,7 @@
 4 port
 
  - 2 dl pumpakärnor
- - 1 msk salt
+ - 1 tsk salt
  - 2 msk vatten
  - (ev. 1 tsk spiskummin eller fänkålsfrön för mer smak)
 
