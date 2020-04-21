@@ -3,7 +3,7 @@
 1 port
 
  - 2 msk chiafrön
- - 1 ¼ dl växtmjölk (t.ex. Kokos- hasselnöts- eller mandelmjölk)
+ - 2 dl växtmjölk (t.ex. Kokos- hasselnöts- eller mandelmjölk)
  - ½ tsk vaniljessens
  - ½ tsk malen kanel
  - 1 msk färska eller frysta bär
