@@ -1,4 +1,4 @@
-# No bake kokoschokladbar
+# Kokoschokladbar (no bake)
 
 12-16 bitar
 
