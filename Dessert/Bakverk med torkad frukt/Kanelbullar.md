@@ -6,8 +6,10 @@ Bulldeg:
  - 2 dl cashewnötter
  - 1 dl havregryn
  - 1 dl riven kokos
- - 1 nypa salt 8 färska dadlar (urkärnade)
+ - 1 nypa salt 
+ - 8 färska dadlar (urkärnade)
  - 3-4 tsk vatten
+
 Fyllning:
  - 1 dl sötmandel (gärna blötlagda)
  - 1 msk malen kanel
