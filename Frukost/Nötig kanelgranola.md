@@ -5,11 +5,11 @@
  - 100 g kokosolja
  - 100 g lönnsirap
  - 2 tsk malen kanel
- - (1 tsk kardemumma)
+ - 1 tsk kardemumma (valbar)
  - 1 msk vaniljessens eller vaniljpulver
  - 1 msk vatten
- - 100 g havregryn (glutenfria), ris- eller boveteflingor (eller en blandning av alla tre)
- - 240 g blandade nötter, t.ex. Valnötter, mandlar, hassel-, pekan-, eller cashewnötter, hackade
+ - 100 g havregryn, ris- eller boveteflingor (glutenfria)
+ - 240 g hackade blandade nötter (valnötter, mandlar, hassel-, pekan-, eller cashewnötter)
  - 80 g hela linfrön
  - 80 g solroskärnor
  - 80 g pumpakärnor

@@ -7,7 +7,7 @@
  - 1/2 tsk salt
  - 1 msk olivolja (plus 1-2 msk i pannan)
  - en nypa torkad timjan, oregano eller chili (valfritt)
- 
+
 Sätt ugnen på 220 grader.
 Blanda alla ingredienserna ordentligt i en skål. Låt stå i ca: 30 minuter.
 När ugnen nåt önskad temperatur. Ställ in gjutjärnspannan i ugnen i 5 minuter.

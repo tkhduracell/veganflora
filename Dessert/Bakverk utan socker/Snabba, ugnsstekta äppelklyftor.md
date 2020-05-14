@@ -2,7 +2,7 @@
 
 2 port
 
- - 1 msk smält kokosolja plus extra till smörjning
+ - 1 msk smält kokosolja
  - 3 stora söta äpplen
  - 1 rågad tsk malen kanel
  - 2 msk pistaschnötter
