@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "json-gen": "ts-node ./_script/json-gen.ts"
+    "lint": "eslint src/**/*.* test/**/*.spec.* --fix",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -17,10 +19,24 @@
   },
   "homepage": "https://github.com/tkhduracell/foodlist#readme",
   "dependencies": {
-    "fast-glob": "^3.2.2"
+    "fast-glob": "^3.2.2",
+    "firebase-admin": "^8.11.0"
   },
   "devDependencies": {
+    "@types/jest": "^25.2.1",
     "@types/node": "^13.11.1",
+    "@typescript-eslint/eslint-plugin": "^2.31.0",
+    "@typescript-eslint/parser": "^2.31.0",
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-jest": "^23.9.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "jest": "^25.5.4",
+    "standard": "^14.3.3",
+    "ts-jest": "^25.5.0",
     "ts-node": "^8.8.2",
     "typescript": "^3.8.3"
   }
