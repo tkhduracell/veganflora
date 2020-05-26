@@ -5,7 +5,7 @@
  - 400 g kokta, avrunna kikärtor
  - 2 schalottenlökar, skalade
  - 2 vitlöksklyftor, skalade
- - ½ fänkål
+ - 1 fänkål
  - 1 röd chili
  - 1 dl olivolja
  - 2 lagerblad
