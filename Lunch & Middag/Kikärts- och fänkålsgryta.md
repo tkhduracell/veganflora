@@ -2,7 +2,7 @@
 
 4 port
 
- - 400 g kokta, avrunna kikärtor
+ - 400 g kikärtor (kokta, avrunna)
  - 2 schalottenlökar, skalade
  - 2 vitlöksklyftor, skalade
  - 1 fänkål
