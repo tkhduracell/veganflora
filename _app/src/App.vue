@@ -1,10 +1,22 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+    <b-navbar type="dark" variant="primary">
+      <b-navbar-brand exact :to="{name: 'home'}">Veganflora</b-navbar-brand>
+
+      <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+
+      <b-collapse id="nav-collapse" is-nav>
+        <b-navbar-nav>
+          <b-nav-item exact :to="{name: 'home'}">Hem</b-nav-item>
+          <b-nav-item exact :to="{name: 'menu'}">Meny</b-nav-item>
+          <b-nav-item exact :to="{name: 'groceries'}">Handlalista</b-nav-item>
+        </b-navbar-nav>
+      </b-collapse>
+    </b-navbar>
+
+    <div class="content">
+      <router-view/>
     </div>
-    <router-view/>
   </div>
 </template>
 
@@ -15,18 +27,11 @@
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
 }
-
-#nav {
-  padding: 30px;
-  text-align: center;
+.content {
+  margin: 30px;
 }
-
-#nav a {
+.router-link-active {
   font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
+  color: white !important;
 }
 </style>

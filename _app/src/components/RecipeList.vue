@@ -1,6 +1,6 @@
 <template>
   <div class="recipes">
-    <ul v-for="l in recipes" :key="l.title">
+    <ul v-for="l in recipes" :key="l.title + l.category.join('/')">
         <li class="recipe">
           <RecipeItem :item="l" />
         </li>
@@ -9,7 +9,6 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
 import { PropType, defineComponent } from '@vue/composition-api'
 
 import RecipeItem from '@/components/RecipeItem.vue'

@@ -5,30 +5,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, PropType } from '@vue/composition-api'
+import { defineComponent, PropType } from '@vue/composition-api'
 
 import RecipieItem from '@/components/RecipeItem.vue'
 import { Recipe } from './types'
 
 export default defineComponent({
   props: {
-    recipes: Array as PropType<Recipe[]>,
-    displayed: Array as PropType<string[]>
+    items: Array as PropType<Recipe[]>
   },
   components: {
     RecipieItem
-  },
-  setup (props: { recipes: Recipe[]; displayed: string[] }) {
-    const items = computed(() => {
-      return props.displayed.map(title => {
-        return props.recipes.find(x => {
-          console.log(title, x.title)
-          return x.title === title
-        })
-      })
-    })
-
-    return { items }
   }
 })
 </script>

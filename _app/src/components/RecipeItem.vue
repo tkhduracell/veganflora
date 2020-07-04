@@ -1,11 +1,12 @@
 <template>
   <div class="recipe">
-    <a :name=item.title>
+    <router-link :name=item.title :to="{ name: 'edit', params: { key: item.key }}">
       <b>{{ item.title }}</b>
-    </a>
+    </router-link>
     <p>{{ item.size }}</p>
-    <ul v-for="i in item.ingredients" :key="i">
-      <li>{{ i }}</li>
+    <ul v-for="(i, idx) in item.ingredients" :key="item.key + i.name + i.amount + i.measure + idx">
+      <li v-if="i.measure && i.amount">{{ i.amount }} {{ i.measure }} {{ i.name }}</li>
+      <li v-else>{{ i.name }}</li>
     </ul>
     <p>
       {{ item.text }}
@@ -14,7 +15,6 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
 import { PropType, defineComponent } from '@vue/composition-api'
 import { Recipe } from './types'
 

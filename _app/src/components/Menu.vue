@@ -1,13 +1,13 @@
 <template>
   <div>
-    <div class="week" v-for="(week, weekidx) in weeks" :key="weekidx">
-      <div class="day" v-for="(day, dayidx) in week.days" :key="day.name">
+    <div class="week" v-for="(week, weekname) in menu" :key="'w-' + weekname">
+      <div class="day" v-for="(day, weekday) in week.days" :key="'w-' + weekname + '-d-' + weekday">
         <div class="name">
-          {{ day.name }}
+          {{ weekday }}
         </div>
-        <MenuItem @show-items="showItems(weekidx, dayidx, $event)" @remove-item="removeItem(weekidx, dayidx, $event)" :item="{key: 'breakfast', name:'Frukost', items: day.breakfast}" />
-        <MenuItem @show-items="showItems(weekidx, dayidx, $event)" @remove-item="removeItem(weekidx, dayidx, $event)" :item="{key: 'lunch', name:'Lunch', items: day.lunch}" />
-        <MenuItem @show-items="showItems(weekidx, dayidx, $event)" @remove-item="removeItem(weekidx, dayidx, $event)" :item="{key: 'dinner', name:'Middag', items: day.dinner}" />
+        <MenuItem :week="weekname" :weekday="weekday" meal="Frukost" :items=decorate(day.Frukost) @remove-item="removeItem(weekname, weekday, 'Frukost', $event)" />
+        <MenuItem :week="weekname" :weekday="weekday" meal="Lunch" :items=decorate(day.Lunch) @remove-item="removeItem(weekname, weekday, 'Lunch', $event)" />
+        <MenuItem :week="weekname" :weekday="weekday" meal="Middag" :items=decorate(day.Middag) @remove-item="removeItem(weekname, weekday, 'Middag', $event)" />
       </div>
     </div>
   </div>
@@ -17,36 +17,29 @@
 import { defineComponent, PropType } from '@vue/composition-api'
 
 import MenuItem from '@/components/MenuItem.vue'
-
-type Week = {
-  days: Day[];
-}
-
-type Day = {
-  name: string;
-  breakfast: string[];
-  lunch: string[];
-  dinner: string[];
-}
+import { Menu, WeekDay, Meal, Recipe } from './types'
+import { useRecipes } from '../modules/use/recipes'
 
 export default defineComponent({
   props: {
-    weeks: Array as PropType<Week[]>
+    menu: Object as PropType<Menu>
   },
   components: {
     MenuItem
   },
   setup (props, context) {
-    function removeItem (week: number, day: number, { type, item }: { type: string; item: string }) {
-      context.emit('remove-item', { week, day, type, item })
+    const { findRecipe } = useRecipes()
+    function removeItem (week: string, weekday: WeekDay, meal: Meal, item: string) {
+      context.emit('remove-item', { week, weekday, meal, item })
     }
-    function showItems (week: number, day: number, { type }: { type: string }) {
-      context.emit('show-items', { week, day, type })
+
+    function decorate (res: string[]): Recipe[] {
+      return res.map(findRecipe)
     }
 
     return {
       removeItem,
-      showItems
+      decorate
     }
   }
 })
@@ -55,7 +48,6 @@ export default defineComponent({
 <style>
 .menu {
   display: flex;
-  justify-content: center;
   flex-direction: column;
 }
 .day {
