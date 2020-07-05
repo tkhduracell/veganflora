@@ -6,7 +6,6 @@ import { PluginObject } from 'vue'
 export default {
   install () {
     const config = {
-      apiKey: 'AIzaSyB8Na9ZD8ZSfee7z_2TXjVRSMe5Q7CSXpM',
       authDomain: 'veganflora.firebaseapp.com',
       databaseURL: 'https://veganflora.firebaseio.com',
       projectId: 'veganflora',

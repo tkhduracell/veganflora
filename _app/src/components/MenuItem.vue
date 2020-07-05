@@ -5,7 +5,7 @@
       🔍
     </router-link>
     <div v-if="items && items.length > 0">
-      <div v-for="l in items" :key="l.key">
+      <div v-for="(l, idx) in items" :key="week + weekday + meal + l.key + idx">
         {{ l.title }}
         <b-button variant="link" size="sm" class="action p-0 m-0 ml-1" @click="$emit('remove-item', l.key)">🗑</b-button>
       </div>

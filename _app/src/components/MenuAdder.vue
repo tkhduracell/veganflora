@@ -8,7 +8,7 @@
       <div v-for="r in result" :key="r.key" @click="selected = r.key" :class="{'selected': r.key === selected}" >
         <span class="name">{{r.title}}</span>
         <div class="selects" v-if="r.key === selected">
-          <b-form @submit="add(r.key)" inline>
+          <b-form @submit.prevent="add(r.key)" inline>
             <b-form-select size=sm v-model="weekday" :options="weekdays" />
             <b-form-select size=sm v-model="meal" :options="meals" class="ml-1" />
             <b-button type="submit" variant="primary" size=sm class="ml-1">

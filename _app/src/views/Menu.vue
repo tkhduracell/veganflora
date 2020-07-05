@@ -24,7 +24,7 @@ import Menu from '@/components/Menu.vue'
 
 import { useRecipes } from '../modules/use/recipes'
 import { useMenu } from '../modules/use/menu'
-import { Recipe, WeekDay, Meal } from '../components/types'
+import { WeekDay, Meal } from '../components/types'
 
 const Component = defineComponent({
   components: {

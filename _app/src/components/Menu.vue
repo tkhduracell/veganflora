@@ -1,13 +1,13 @@
 <template>
   <div>
     <div class="week" v-for="(week, weekname) in menu" :key="'w-' + weekname">
-      <div class="day" v-for="(day, weekday) in week.days" :key="'w-' + weekname + '-d-' + weekday">
+      <div class="day" v-for="weekday in WeekDays" :key="'w-' + weekname + '-d-' + weekday">
         <div class="name">
           {{ weekday }}
         </div>
-        <MenuItem :week="weekname" :weekday="weekday" meal="Frukost" :items=decorate(day.Frukost) @remove-item="removeItem(weekname, weekday, 'Frukost', $event)" />
-        <MenuItem :week="weekname" :weekday="weekday" meal="Lunch" :items=decorate(day.Lunch) @remove-item="removeItem(weekname, weekday, 'Lunch', $event)" />
-        <MenuItem :week="weekname" :weekday="weekday" meal="Middag" :items=decorate(day.Middag) @remove-item="removeItem(weekname, weekday, 'Middag', $event)" />
+        <MenuItem :week="weekname" :weekday="weekday" meal="Frukost" :items=decorate(week.days[weekday].Frukost) @remove-item="removeItem(weekname, weekday, 'Frukost', $event)" />
+        <MenuItem :week="weekname" :weekday="weekday" meal="Lunch" :items=decorate(week.days[weekday].Lunch) @remove-item="removeItem(weekname, weekday, 'Lunch', $event)" />
+        <MenuItem :week="weekname" :weekday="weekday" meal="Middag" :items=decorate(week.days[weekday].Middag) @remove-item="removeItem(weekname, weekday, 'Middag', $event)" />
       </div>
     </div>
   </div>
@@ -17,7 +17,7 @@
 import { defineComponent, PropType } from '@vue/composition-api'
 
 import MenuItem from '@/components/MenuItem.vue'
-import { Menu, WeekDay, Meal, Recipe } from './types'
+import { Menu, WeekDay, Meal, Recipe, WeekDays } from './types'
 import { useRecipes } from '../modules/use/recipes'
 
 export default defineComponent({
@@ -39,7 +39,8 @@ export default defineComponent({
 
     return {
       removeItem,
-      decorate
+      decorate,
+      WeekDays
     }
   }
 })
