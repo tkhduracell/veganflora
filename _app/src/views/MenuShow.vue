@@ -35,11 +35,11 @@ const Component = defineComponent({
     const { menu } = useMenu()
     const { recipes, findRecipe } = useRecipes()
 
-    const items = computed<Recipe[] | undefined>(() => {
+    const items = computed<Recipe[]>(() => {
       const items = menu.value && menu.value[week]
         ? menu.value[week].days[weekday][meal] || []
         : []
-      return items.map(i => findRecipe(i))
+      return items.map(i => findRecipe(i)).filter(r => r) as Recipe[]
     })
 
     return {

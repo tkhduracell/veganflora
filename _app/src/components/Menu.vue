@@ -34,7 +34,7 @@ export default defineComponent({
     }
 
     function decorate (res: string[]): Recipe[] {
-      return res.map(findRecipe)
+      return res.map(findRecipe).filter(r => r) as Recipe[]
     }
 
     return {
