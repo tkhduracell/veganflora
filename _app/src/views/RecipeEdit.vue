@@ -39,7 +39,7 @@
           <b-button class="add" size=sm variant="success" @click="addIngredientRow()" :disabled=saving> ➕Lägg till</b-button>
         </b-alert>
         <b-button class="add" size=sm variant="success" @click="addIngredientRow()" :disabled=saving
-          v-if="recipe.ingredients && recipe.ingredients.lenght > 0"> ➕Lägg till</b-button>
+          v-if="recipe.ingredients && recipe.ingredients.length > 0"> ➕Lägg till</b-button>
       </b-form-group>
 
       <div class="loader d-flex" v-if="saving">
