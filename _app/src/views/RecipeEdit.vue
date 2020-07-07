@@ -1,6 +1,10 @@
 <template>
   <div class="edit">
-    <h1>{{ recipe && recipe.title || 'Nytt recept'  }}</h1>
+    <h1 v-if="key && recipe && recipe.title">{{recipe.title}}</h1>
+    <b-spinner v-if="key && (!recipe || !recipe.title)" class="mb-2" />
+    <h1 v-if="!key && recipe && recipe.title">{{recipe.title}}</h1>
+    <h1 v-if="!key && (!recipe || !recipe.title)">Nytt Recept</h1>
+
     <b-form @submit.prevent="save" v-if="recipe">
       <b-form-group id="input-group-1" label="Namn" label-for="input-1">
         <b-form-input  id="input-1" v-model.trim="recipe.title" type="text" required :disabled=saving />
@@ -64,18 +68,24 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, SetupContext, computed } from '@vue/composition-api'
+import { defineComponent, ref, SetupContext, computed, watch } from '@vue/composition-api'
 
 import { useRecipe } from '../modules/use/recipes'
 import { Recipe, Ingredient } from '../components/types'
 
 export default defineComponent({
   setup (props, context: SetupContext) {
-    const key = context.root.$router.currentRoute.params.key
+    const key = context.root.$router.currentRoute.params.key || false
     const isDebug = process.env.NODE_ENV !== 'production'
 
     const saving = ref(false)
-    const { recipe, onSave } = useRecipe(key)
+    const { recipe, onSave } = useRecipe(key || '')
+
+    if (!key) {
+      watch(recipe, (ne, old) => {
+        console.log(old, ne)
+      })
+    }
 
     function removeIngredientRow (index: number) {
       if (!recipe) return
@@ -122,7 +132,7 @@ export default defineComponent({
     }
 
     return {
-      name,
+      key,
       recipe,
       removeIngredientRow,
       addIngredientRow,

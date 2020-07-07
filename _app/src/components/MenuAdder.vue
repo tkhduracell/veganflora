@@ -4,7 +4,7 @@
       <b-input id="form-search" v-model="searchterm" placeholder="Filtrera..." size=sm />
     </b-form>
     <h5>Resultat</h5>
-    <div>
+    <div v-if="result">
       <div v-for="r in result" :key="r.key" @click="selected = r.key" :class="{'selected': r.key === selected}" >
         <span class="name">{{r.title}}</span>
         <div class="selects" v-if="r.key === selected">
@@ -17,6 +17,9 @@
           </b-form>
         </div>
       </div>
+    </div>
+    <div v-else>
+      <b-spinner />
     </div>
   </div>
 </template>
@@ -41,13 +44,14 @@ export default defineComponent({
 
     const searchterm = ref<string>('')
     const result = computed(() => {
-      return (props.recipes as Recipe[])
+      return props.recipes ? (props.recipes as Recipe[])
         .filter(r => {
           return !searchterm.value ||
             r.key.toLocaleLowerCase().includes(searchterm.value.toLocaleLowerCase()) ||
             r.title.toLocaleLowerCase().includes(searchterm.value.toLocaleLowerCase())
         })
         .slice(-20)
+        : null
     })
 
     return {

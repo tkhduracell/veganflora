@@ -9,6 +9,6 @@ localVue.use(BootstrapVue)
 describe('RecipeEdit.vue', () => {
   it('renders text', () => {
     const wrapper = shallowMount(RecipeEdit, { localVue })
-    expect(wrapper.text()).toContain('Nytt recept')
+    expect(wrapper.text()).toContain('Nytt Recept')
   })
 })
