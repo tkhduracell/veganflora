@@ -20,7 +20,7 @@
       </b-form-group>
 
       <b-form-group id="input-group-4" label="Text" label-for="input-4">
-        <b-form-textarea  id="input-4" v-model.trim="recipe.text" required :disabled=saving />
+        <b-form-textarea  id="input-4" v-model.trim="recipe.text" required :disabled=saving rows=20 />
       </b-form-group>
 
       <b-form-group id="input-group-5" label="Ingridienser (Namn, Mängd, Enhet)" >
@@ -112,7 +112,7 @@ export default defineComponent({
     async function save () {
       try {
         saving.value = true
-        onSave()
+        await onSave()
         if (context.parent) context.parent.$router.push('/')
       } catch (err) {
         console.error('Failed to save data')

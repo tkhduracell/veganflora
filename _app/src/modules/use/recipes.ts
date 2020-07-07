@@ -1,9 +1,9 @@
-import { ref, onMounted } from '@vue/composition-api'
+import { ref, onMounted, onUnmounted } from '@vue/composition-api'
 
 import * as firebase from 'firebase/app'
 import 'firebase/firestore'
 
-import { Recipe, Ingredient } from '@/components/types'
+import { Recipe } from '@/components/types'
 
 function asArray<V> (result: firebase.firestore.QuerySnapshot): { key: string; value: V }[] {
   const out: { key: string; value: V }[] = []
@@ -21,7 +21,7 @@ export function useRecipe (key: string) {
       .collection('recipies')
 
     console.log(`Loading recipe ${key} ...`)
-    const result = await recipes.doc(key || '').get()
+    const result = await recipes.doc(key || 'does-not-exist').get()
     if (result && result.exists) {
       recipe.value = result.data() as Recipe
     } else {
@@ -29,17 +29,30 @@ export function useRecipe (key: string) {
     }
   })
 
+  function safekey (title: string, cats: string[]): string {
+    const safe = (str: string) => str.replace(/\//gi, '\\')
+      .replace(/ö/gi, 'oe')
+      .replace(/ä/gi, 'ae')
+      .replace(/å/gi, 'aa')
+      .replace(/[\W]+/gi, '_')
+
+    const safename = safe(title)
+    const prefix = cats.map(s => safe(s).replace(/[^\wåäö]+/gi, '_')).join('\\')
+    return `${prefix}\\${safename}`
+  }
+
   async function onSave () {
     if (!recipe.value) return
-
     const copy = JSON.parse(JSON.stringify(recipe.value))
     delete copy.key
 
+    const savekey = key || safekey(copy.title, copy.category)
+    debugger
     await firebase.firestore()
       .collection('veganflora')
       .doc('root')
       .collection('recipies')
-      .doc(key)
+      .doc(savekey)
       .set(copy, { merge: false })
   }
 
@@ -47,8 +60,8 @@ export function useRecipe (key: string) {
 }
 
 export function useRecipes () {
-  const recipes = ref<(Recipe)[]>([])
-  const nul = { key: '', size: '', title: '', text: '', category: [] as string[], ingredients: [] as Ingredient[] } as Recipe
+  const recipes = ref<Recipe[] | undefined>(null)
+  const close = ref<() => void>()
 
   onMounted(async () => {
     const db = firebase.firestore()
@@ -56,14 +69,30 @@ export function useRecipes () {
       .doc('root')
       .collection('recipies')
 
-    console.log('Loading recipes ...')
-    recipes.value = asArray<Recipe>(await result.get())
-      .map(itm => ({ ...itm.value, key: itm.key }))
+    close.value = result.onSnapshot(async () => {
+      console.log('Loading recipes ...')
+      recipes.value = asArray<Recipe>(await result.get())
+        .map(itm => ({ ...itm.value, key: itm.key }))
+    })
   })
 
-  function findRecipe (key: string): Recipe {
-    return recipes.value.find(r => r.key === key) || nul
+  onUnmounted(() => {
+    if (close.value) close.value()
+  })
+
+  function findRecipe (key: string): Recipe | undefined {
+    return recipes.value ? recipes.value.find(r => r.key === key) : undefined
   }
 
-  return { recipes, findRecipe }
+  function remove (key: string) {
+    const db = firebase.firestore()
+    debugger
+    return db.collection('veganflora')
+      .doc('root')
+      .collection('recipies')
+      .doc(key)
+      .delete()
+  }
+
+  return { recipes, findRecipe, remove }
 }

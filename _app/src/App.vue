@@ -32,6 +32,5 @@
 }
 .router-link-active {
   font-weight: bold;
-  color: white !important;
 }
 </style>

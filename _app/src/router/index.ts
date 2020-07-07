@@ -5,6 +5,7 @@ import Home from '@/views/Home.vue'
 import Menu from '@/views/Menu.vue'
 import MenuShow from '@/views/MenuShow.vue'
 import RecipeEdit from '@/views/RecipeEdit.vue'
+import RecipeShow from '@/views/RecipeShow.vue'
 import Groceries from '@/views/Groceries.vue'
 
 Vue.use(VueRouter)
@@ -34,6 +35,11 @@ const routes: Array<RouteConfig> = [
     path: '/edit/:key',
     name: 'edit',
     component: RecipeEdit
+  },
+  {
+    path: '/show/:key',
+    name: 'show',
+    component: RecipeShow
   },
   {
     path: '/new',
