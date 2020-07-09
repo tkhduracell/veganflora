@@ -11,6 +11,16 @@ function asArray<V> (result: firebase.firestore.QuerySnapshot): { key: string; v
   return out
 }
 
+function remove (key: string) {
+  const db = firebase.firestore()
+  debugger
+  return db.collection('veganflora')
+    .doc('root')
+    .collection('recipies')
+    .doc(key)
+    .delete()
+}
+
 export function useRecipe (key: string) {
   const recipe = ref<Recipe>({})
 
@@ -56,7 +66,7 @@ export function useRecipe (key: string) {
       .set(copy, { merge: false })
   }
 
-  return { recipe, onSave }
+  return { recipe, onSave, remove: () => remove(key) }
 }
 
 export function useRecipes () {
@@ -82,16 +92,6 @@ export function useRecipes () {
 
   function findRecipe (key: string): Recipe | undefined {
     return recipes.value ? recipes.value.find(r => r.key === key) : undefined
-  }
-
-  function remove (key: string) {
-    const db = firebase.firestore()
-    debugger
-    return db.collection('veganflora')
-      .doc('root')
-      .collection('recipies')
-      .doc(key)
-      .delete()
   }
 
   return { recipes, findRecipe, remove }

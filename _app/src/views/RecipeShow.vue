@@ -1,11 +1,23 @@
 <template>
   <div class="show">
     <h1>{{ isLoaded ? recipe.title : 'Laddar...'  }}</h1>
-    <b-link v-if="isLoaded" :to="{ name: 'edit', params: {key}}">
-      Redigera
-    </b-link>
-    <RecipeItem :item="recipe" v-if="isLoaded" />
+    <div v-if="isLoaded">
+      <span v-b-modal.areyousure >
+        🗑
+      </span>
+      |
+      <b-link :to="{ name: 'edit', params: {key}}">
+        Redigera
+      </b-link>
+      <RecipeItem :item="recipe" />
+    </div>
     <b-spinner variant="primary" v-else />
+
+    <b-modal id="areyousure" centered title="Är du säker?" ok-variant="danger" button-size="sm" @ok="remove" v-if="recipe">
+      <p class="">
+        Är du säker på att du vill ta bort <strong>{{recipe.title}}</strong>?
+      </p>
+    </b-modal>
   </div>
 </template>
 
@@ -22,12 +34,13 @@ export default defineComponent({
   },
   setup (props, context: SetupContext) {
     const key = context.root.$router.currentRoute.params.key
-    const { recipe } = useRecipe(key)
+    const { recipe, remove } = useRecipe(key)
     const isLoaded = computed(() => recipe.value && recipe.value.title)
 
     return {
       key,
       recipe,
+      remove,
       isLoaded
     }
   }

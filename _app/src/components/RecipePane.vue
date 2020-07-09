@@ -1,6 +1,6 @@
 <template>
   <div class="pane">
-    <RecipeItem :item="item" v-for="item in items" :key="'pane-' + item.title" />
+    <RecipeItem :item="item" v-for="item in items" :key="'pane-' + item.title" showTitle/>
   </div>
 </template>
 

@@ -7,11 +7,11 @@
 
     <b-form @submit.prevent="save" v-if="recipe">
       <b-form-group id="input-group-1" label="Namn" label-for="input-1">
-        <b-form-input  id="input-1" v-model.trim="recipe.title" type="text" required :disabled=saving />
+        <b-form-input  id="input-1" v-model.trim="recipe.title" type="text" required :disabled=saving @keyup="onChange"/>
       </b-form-group>
 
       <b-form-group id="input-group-2" label="Category" label-for="input-2">
-        <b-form-input  id="input-2" :value="(recipe.category || []).join(' / ')" @change="setCategory($event)" type="text" required :disabled=saving />
+        <b-form-input id="input-2" :value="(recipe.category || []).join(' / ')" @change="setCategory($event)" type="text" required :disabled=saving @keyup="onChange" />
 
         <span v-for="(c, idx) in recipe.category" :key="c">
           <span class="separator" v-if="idx > 0">/</span>
@@ -20,18 +20,18 @@
       </b-form-group>
 
       <b-form-group id="input-group-3" label="Storlek" label-for="input-3">
-        <b-form-input  id="input-3" v-model.trim="recipe.size" type="text" required :disabled=saving />
+        <b-form-input  id="input-3" v-model.trim="recipe.size" type="text" required :disabled=saving @keyup="onChange" />
       </b-form-group>
 
       <b-form-group id="input-group-4" label="Text" label-for="input-4">
-        <b-form-textarea  id="input-4" v-model.trim="recipe.text" required :disabled=saving rows=20 />
+        <b-form-textarea  id="input-4" v-model.trim="recipe.text" required :disabled=saving rows=20 @keyup="onChange" />
       </b-form-group>
 
       <b-form-group id="input-group-5" label="Ingridienser (Namn, Mängd, Enhet)" >
         <b-input-group  v-for="(i, idx) in recipe.ingredients" :key="'ingredient-' + idx">
-          <b-form-input v-model="i.name" :id="'input-5-'+ idx + '-name' " type="text" required :disabled=saving />
-          <b-form-input v-model="i.amount" :id="'input-5-'+ idx + '-amount' " type="text" placeholder="1" :disabled=saving />
-          <b-form-input v-model="i.measure" :id="'input-5-'+ idx + '-measure' " type="text" placeholder="styck" :disabled=saving />
+          <b-form-input v-model="i.name" :id="'input-5-'+ idx + '-name' " type="text" required :disabled=saving @keyup="onChange" />
+          <b-form-input v-model="i.amount" :id="'input-5-'+ idx + '-amount' " type="text" placeholder="1" :disabled=saving @keyup="onChange" />
+          <b-form-input v-model="i.measure" :id="'input-5-'+ idx + '-measure' " type="text" placeholder="styck" :disabled=saving @keyup="onChange" />
           <b-button size="sm" variant="link" @click="removeIngredientRow(idx)"> 🗑</b-button>
         </b-input-group>
         <b-alert variant="warning" v-if="!recipe.ingredients || recipe.ingredients.lenght === 0" show>
@@ -59,6 +59,12 @@
       <span class="mt-1">Laddar...</span>
     </div>
 
+    <div v-if="savedStateAtPretty">
+      <small>
+        Sparat lokalt {{ savedStateAtPretty }}
+      </small>
+    </div>
+
     <div v-if="isDebug" class="mt-4">
       <hr>
       <strong>JSON representation</strong>
@@ -68,7 +74,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, SetupContext, computed, watch } from '@vue/composition-api'
+import { defineComponent, ref, SetupContext, computed, onMounted } from '@vue/composition-api'
+import debounce from 'lodash.debounce'
 
 import { useRecipe } from '../modules/use/recipes'
 import { Recipe, Ingredient } from '../components/types'
@@ -81,11 +88,28 @@ export default defineComponent({
     const saving = ref(false)
     const { recipe, onSave } = useRecipe(key || '')
 
-    if (!key) {
-      watch(recipe, (ne, old) => {
-        console.log(old, ne)
-      })
-    }
+    onMounted(() => {
+      if (!key) {
+        const state = localStorage.getItem('saveState')
+        recipe.value = state ? JSON.parse(state) as Recipe : {}
+      }
+    })
+
+    const savedStateAt = ref<Date>(undefined)
+    const savedStateAtPretty = computed(() => {
+      return savedStateAt.value
+        ? savedStateAt.value.toISOString()
+          .replace(/T/i, ' ')
+          .replace(/\.\d{3}Z/i, '')
+        : ''
+    })
+
+    const onChange = debounce(function () {
+      if (!key) {
+        localStorage.setItem('saveState', JSON.stringify(recipe.value))
+        savedStateAt.value = new Date()
+      }
+    }, 1000)
 
     function removeIngredientRow (index: number) {
       if (!recipe) return
@@ -123,6 +147,7 @@ export default defineComponent({
       try {
         saving.value = true
         await onSave()
+        localStorage.removeItem('saveState')
         if (context.parent) context.parent.$router.push('/')
       } catch (err) {
         console.error('Failed to save data')
@@ -140,7 +165,9 @@ export default defineComponent({
       save,
       saving,
       isEmpty,
-      isDebug
+      isDebug,
+      savedStateAtPretty,
+      onChange
     }
   }
 })

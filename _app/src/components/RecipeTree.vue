@@ -11,10 +11,12 @@
         </li>
       </ul>
     </div>
-    <b-modal id="areyousure" centered title="Är du säker?" button-size="sm" @ok="$emit('remove-item', deletesubject.key)" v-if="deletesubject">
-      <p class="my-4">
-        Är du säker på att du vill ta bort <strong>{{deletesubject.title}}</strong>?
-      </p>
+    <b-modal id="areyousure" centered
+      title="Är du säker?"
+      button-size="sm"
+      ok-variant="danger"
+      @ok="$emit('remove-item', deletesubject.key)" v-if="deletesubject">
+      <p>Är du säker på att du vill ta bort <strong>{{deletesubject.title}}</strong>?</p>
     </b-modal>
   </div>
 </template>
