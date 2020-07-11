@@ -70,7 +70,7 @@ export function useRecipe (key: string) {
 }
 
 export function useRecipes () {
-  const recipes = ref<Recipe[] | undefined>(null)
+  const recipes = ref<Recipe[] | undefined>(undefined)
   const close = ref<() => void>()
 
   onMounted(async () => {

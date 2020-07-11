@@ -91,7 +91,7 @@ export default defineComponent({
     onMounted(() => {
       if (!key) {
         const state = localStorage.getItem('saveState')
-        recipe.value = state ? JSON.parse(state) as Recipe : {}
+        recipe.value = state ? JSON.parse(state) as Recipe : {} as Recipe
       }
     })
 
