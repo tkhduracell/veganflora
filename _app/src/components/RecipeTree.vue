@@ -7,7 +7,7 @@
           <b-link class="link" :to="{ name: 'show', params: {key: r.key} }">
             {{ r.title.replace(/ - ej testat/gi, '') }}
           </b-link>
-          <b-badge v-if="r.title.replace(/ - ej testat/gi, '')"> Ej testad </b-badge>
+          <b-badge v-if="r.title.match(/ - ej testat/gi)"> Ej testad </b-badge>
           <span class="clickable p-0 m-0 ml-1 float-right" @click="areyousure(r)">🗑</span>
         </div>
 
