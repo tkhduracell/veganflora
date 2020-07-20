@@ -59,13 +59,6 @@ export function parseIngredient (x: string) {
   return out
 }
 
-export type Recipe = {
-  size: string;
-  text: string;
-  ingredients: string[];
-  title: string;
-}
-
 export type Ingredient = {
   name: string;
   amount?: string;

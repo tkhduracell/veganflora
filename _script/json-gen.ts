@@ -1,7 +1,6 @@
 import glob from 'fast-glob'
 import path from 'path'
 import admin from 'firebase-admin'
-import { createHash } from 'crypto'
 
 import { readFile, writeFile } from './src/fs'
 import { parseIngredient, noEmpty } from './src/ingredients'
@@ -13,7 +12,6 @@ admin.initializeApp({
 })
 
 const cwd = path.join(__dirname, '..')
-const md5 = (msg: string) => createHash('md5').update(msg).digest('hex')
 
 async function findFiles () {
   const files = await glob('./**/*.md', {
