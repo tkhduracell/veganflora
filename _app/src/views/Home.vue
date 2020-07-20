@@ -1,12 +1,16 @@
 <template>
   <div class="home">
     <h1>Alla Recept</h1>
-    <b-button :to="{name: 'new'}" variant="primary" class="mb-2" size="sm">
-      Nytt Recept
+    <b-button :to="{name: 'new'}" variant="primary" class="mb-2" :disabled="!recipes" small>
+      <b-spinner small v-if="!recipes" class="mr-1 mb-1" />
+      <span v-if="!recipes">Laddar...</span>
+      <span v-else>Nytt Recept</span>
     </b-button>
     <div>
       <RecipeTree :recipes="recipes" v-if="recipes" @remove-item="remove"/>
-      <b-spinner variant="primary" v-else />
+      <div class="text-center" v-else>
+        <b-spinner variant="primary" />
+      </div>
     </div>
   </div>
 </template>

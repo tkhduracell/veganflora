@@ -2,21 +2,22 @@
   <div class="recipe-tree">
     <div class="category" v-for="(recipes, category) in tree" :key="category">
       <strong>{{ category }}</strong>
-      <ul>
-        <li v-for="r in recipes" :key="category + r.key">
-          <div>
-            <b-link class="link" :to="{ name: 'show', params: {key: r.key} }">{{r.title}}</b-link>
-            <span class="clickable p-0 m-0 ml-1" @click="areyousure(r)">🗑</span>
-          </div>
-        </li>
-      </ul>
+
+        <div v-for="r in recipes" :key="category + r.key" class="recipe clearfix ml-2 mt-1 mb-1">
+          <b-link class="link" :to="{ name: 'show', params: {key: r.key} }">
+            {{ r.title.replace(/ - ej testat/gi, '') }}
+          </b-link>
+          <b-badge v-if="r.title.replace(/ - ej testat/gi, '')"> Ej testad </b-badge>
+          <span class="clickable p-0 m-0 ml-1 float-right" @click="areyousure(r)">🗑</span>
+        </div>
+
     </div>
     <b-modal id="areyousure" centered
       title="Är du säker?"
       button-size="sm"
       ok-variant="danger"
-      @ok="$emit('remove-item', deletesubject.key)" v-if="deletesubject">
-      <p>Är du säker på att du vill ta bort <strong>{{deletesubject.title}}</strong>?</p>
+      @ok="$emit('remove-item', deletesubject.key)">
+      <p v-if="deletesubject">Är du säker på att du vill ta bort <strong>{{deletesubject.title}}</strong>?</p>
     </b-modal>
   </div>
 </template>
@@ -69,5 +70,8 @@ h3 {
 }
 .clickable:hover {
   cursor: pointer;
+}
+.recipe:hover {
+  text-decoration: underline;
 }
 </style>

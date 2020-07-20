@@ -27,8 +27,16 @@
         <b-form-textarea  id="input-4" v-model.trim="recipe.text" required :disabled=saving rows=20 @keyup="onChange" />
       </b-form-group>
 
-      <b-form-group id="input-group-5" label="Ingridienser (Namn, Mängd, Enhet)" >
-        <b-input-group  v-for="(i, idx) in recipe.ingredients" :key="'ingredient-' + idx">
+      <b-modal id="modal-paste-list" title="Klista in lista" @ok="onPasteList">
+        <b-form-group class="">
+            Klista in ingredienslista
+          <b-textarea v-model.trim="pasteList" rows=20></b-textarea>
+        </b-form-group>
+      </b-modal>
+
+      <b-form-group id="input-group-5" class="position-relative" label="Ingridienser (Namn, Mängd, Enhet)" >
+        <b-button class="right-top" variant="link" v-b-modal.modal-paste-list size="sm">Klista in</b-button>
+        <b-input-group  size="sm" v-for="(i, idx) in recipe.ingredients" :key="'ingredient-' + idx">
           <b-form-input v-model="i.name" :id="'input-5-'+ idx + '-name' " type="text" required :disabled=saving @keyup="onChange" />
           <b-form-input v-model="i.amount" :id="'input-5-'+ idx + '-amount' " type="text" placeholder="1" :disabled=saving @keyup="onChange" />
           <b-form-input v-model="i.measure" :id="'input-5-'+ idx + '-measure' " type="text" placeholder="styck" :disabled=saving @keyup="onChange" />
@@ -78,6 +86,7 @@ import { defineComponent, ref, SetupContext, computed, onMounted } from '@vue/co
 import debounce from 'lodash.debounce'
 
 import { useRecipe } from '../modules/use/recipes'
+import { parseIngredient } from '../modules/ingredients'
 import { Recipe, Ingredient } from '../components/types'
 
 export default defineComponent({
@@ -140,7 +149,7 @@ export default defineComponent({
 
     const isEmpty = computed(() => {
       const r = recipe.value || {}
-      return !r || (r.ingredients || []).length === 0 || r.title.trim().length === 0
+      return !r || (r.ingredients || []).length === 0 || (r.title || '').trim().length === 0
     })
 
     async function save () {
@@ -156,6 +165,16 @@ export default defineComponent({
       }
     }
 
+    const pasteList = ref('')
+    function onPasteList () {
+      const ingredients = pasteList.value
+        .split(/\n/gi)
+        .map(parseIngredient)
+      recipe.value = { ...(recipe.value || {}), ingredients: [...(recipe.value.ingredients || []), ...ingredients] }
+      onChange()
+      pasteList.value = ''
+    }
+
     return {
       key,
       recipe,
@@ -167,7 +186,9 @@ export default defineComponent({
       isEmpty,
       isDebug,
       savedStateAtPretty,
-      onChange
+      onChange,
+      pasteList,
+      onPasteList
     }
   }
 })
@@ -184,5 +205,8 @@ export default defineComponent({
   }
   .btn.add {
     margin-top: 10px;
+  }
+  .btn.right-top {
+    position: absolute; right:0; top:0;
   }
 </style>
