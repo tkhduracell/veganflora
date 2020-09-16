@@ -1,18 +1,17 @@
 <template>
-  <div class="home">
+  <b-container class="home">
     <h1>Alla Recept</h1>
-    <b-button :to="{name: 'new'}" variant="primary" class="mb-2" :disabled="!recipes" small>
-      <b-spinner small v-if="!recipes" class="mr-1 mb-1" />
-      <span v-if="!recipes">Laddar...</span>
-      <span v-else>Nytt Recept</span>
+    <b-button :to="{name: 'new'}" variant="primary" class="mb-2" :disabled="!recipes" small v-if="recipes">
+      <span>Nytt Recept</span>
     </b-button>
     <div>
       <RecipeTree :recipes="recipes" v-if="recipes" @remove-item="remove"/>
       <div class="text-center" v-else>
-        <b-spinner variant="primary" />
+        <b-spinner variant="primary" class="mr-2" />
+        Hämtar kokboken...
       </div>
     </div>
-  </div>
+  </b-container>
 </template>
 
 <script lang="ts">

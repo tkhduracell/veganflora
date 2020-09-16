@@ -3,6 +3,7 @@ export type Recipe = {
   size: string;
   text: string;
   category: string[];
+  tags?: string[];
   ingredients: Ingredient[];
   title: string;
   key: string;

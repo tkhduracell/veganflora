@@ -1,5 +1,5 @@
 <template>
-  <div class="show">
+  <b-container class="show">
     <h1>{{ isLoaded ? recipe.title : 'Laddar...'  }}</h1>
     <div v-if="isLoaded">
       <span v-b-modal.areyousure >
@@ -18,7 +18,7 @@
         Är du säker på att du vill ta bort <strong>{{recipe.title}}</strong>?
       </p>
     </b-modal>
-  </div>
+  </b-container>
 </template>
 
 <script lang="ts">

@@ -5,9 +5,11 @@
 
         <div v-for="r in recipes" :key="category + r.key" class="recipe clearfix ml-2 mt-1 mb-1">
           <b-link class="link" :to="{ name: 'show', params: {key: r.key} }">
-            {{ r.title.replace(/ - ej testat/gi, '') }}
+            {{ r.title }}
           </b-link>
-          <b-badge v-if="r.title.match(/ - ej testat/gi)"> Ej testad </b-badge>
+
+          <b-badge v-for="t in r.tags" :key="t">{{t}}</b-badge>
+
           <span class="clickable p-0 m-0 ml-1 float-right" @click="areyousure(r)">🗑</span>
         </div>
 
@@ -39,10 +41,10 @@ export default defineComponent({
   setup ({ recipes }: {recipes: Recipe[]}, context) {
     const categories = recipes.map(r => r.category)
 
-    const tree = {} as { [key: string]: {key: string; title: string}[] }
+    const tree = {} as { [key: string]: {key: string; title: string; tags?: string[] }[] }
     categories.forEach(c => {
       tree[c.join(' / ')] = recipes.filter(r => r.category.join('') === c.join(''))
-        .map(({ title, key }) => ({ key, title }))
+        .map(({ title, key, tags }) => ({ key, title, tags }))
     })
 
     const deletesubject = ref<{key: string; title: string}>(undefined)

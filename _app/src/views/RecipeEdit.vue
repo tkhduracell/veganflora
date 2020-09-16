@@ -10,13 +10,12 @@
         <b-form-input  id="input-1" v-model.trim="recipe.title" type="text" required :disabled=saving @keyup="onChange"/>
       </b-form-group>
 
-      <b-form-group id="input-group-2" label="Category" label-for="input-2">
-        <b-form-input id="input-2" :value="(recipe.category || []).join(' / ')" @change="setCategory($event)" type="text" required :disabled=saving @keyup="onChange" />
+      <b-form-group id="input-group-21" label="Kategori" label-for="input-21">
+        <Tagger id="input-21" variant="primary" separator=" / " v-model="recipe.category" :suggestions="categories" :disabled=saving @keyup="onChange" />
+      </b-form-group>
 
-        <span v-for="(c, idx) in recipe.category" :key="c">
-          <span class="separator" v-if="idx > 0">/</span>
-          <b-badge variant="primary" >{{ c }}</b-badge>
-        </span>
+      <b-form-group id="input-group-5" label="Taggar" label-for="input-5">
+        <Tagger id="input-5" variant="secondary" v-model="recipe.tags" :suggestions="tags" :disabled=saving @keyup="onChange" />
       </b-form-group>
 
       <b-form-group id="input-group-3" label="Storlek" label-for="input-3">
@@ -82,20 +81,37 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, SetupContext, computed, onMounted } from '@vue/composition-api'
+import { defineComponent, ref, SetupContext, computed, onMounted, Ref, watchEffect } from '@vue/composition-api'
 import debounce from 'lodash.debounce'
 
+import Tagger from '@/components/Tagger.vue'
+
+import Suggest from '../modules/suggestions'
 import { useRecipe } from '../modules/use/recipes'
+import { usePrefill } from '../modules/use/prefill'
 import { parseIngredient } from '../modules/ingredients'
 import { Recipe, Ingredient } from '../components/types'
 
 export default defineComponent({
+  components: { Tagger },
   setup (props, context: SetupContext) {
     const key = context.root.$router.currentRoute.params.key || false
     const isDebug = process.env.NODE_ENV !== 'production'
 
     const saving = ref(false)
-    const { recipe, onSave } = useRecipe(key || '')
+    const { recipe, onSave } = useRecipe(key || '') as {recipe: Ref<Recipe>; onSave: () => void }
+    const prefill = usePrefill()
+
+    const tags = computed(() => {
+      return Suggest.tags(prefill.tags.value, recipe.value.tags)
+    })
+    const categories = computed(() => {
+      return Suggest.categories(prefill.categories.value, recipe.value.category)
+    })
+
+    watchEffect(() => {
+      console.log('watch', tags.value, categories.value)
+    })
 
     onMounted(() => {
       if (!key) {
@@ -142,13 +158,8 @@ export default defineComponent({
       recipe.value = r
     }
 
-    function setCategory (text: string) {
-      if (!recipe) return
-      recipe.value = { ...recipe.value, category: text.split('/').map(s => s.trim()) }
-    }
-
     const isEmpty = computed(() => {
-      const r = recipe.value || {}
+      const r = recipe.value || {} as Recipe
       return !r || (r.ingredients || []).length === 0 || (r.title || '').trim().length === 0
     })
 
@@ -170,7 +181,10 @@ export default defineComponent({
       const ingredients = pasteList.value
         .split(/\n/gi)
         .map(parseIngredient)
-      recipe.value = { ...(recipe.value || {}), ingredients: [...(recipe.value.ingredients || []), ...ingredients] }
+      recipe.value = {
+        ...(recipe.value || {}),
+        ingredients: [...(recipe.value.ingredients || []), ...ingredients]
+      } as Recipe
       onChange()
       pasteList.value = ''
     }
@@ -180,7 +194,6 @@ export default defineComponent({
       recipe,
       removeIngredientRow,
       addIngredientRow,
-      setCategory,
       save,
       saving,
       isEmpty,
@@ -188,7 +201,9 @@ export default defineComponent({
       savedStateAtPretty,
       onChange,
       pasteList,
-      onPasteList
+      onPasteList,
+      tags,
+      categories
     }
   }
 })
