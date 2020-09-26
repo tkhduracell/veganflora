@@ -1,17 +1,25 @@
 <template>
   <div>
-      <div v-for="key in Object.keys(items).sort()" :key="key">
-        <strong>{{ titleCase(key) }}</strong>
-        <ul class="mb-0">
-          <li v-for="(item, idx) in items[key]" :key="key + idx">
-            <router-link :to="{ name: 'edit', params: { key: item.source.key }}" v-slot="{ href }">
-              <span v-b-tooltip.hover.topright.html="tooltip(item, href)">
-                  {{ item.amount || '1' }} {{ item.measure || 'styck' }}
-              </span>
+    <div v-for="key in Object.keys(items).sort()" :key="key">
+      <strong>{{ titleCase(key) }}</strong>
+      <ul class="mb-0">
+        <li v-for="(item, idx) in items[key]" :key="key + idx">
+          <router-link
+            :to="{ name: 'show', params: { key: item.source.key }}"
+            v-slot="{ href: openUrl }"
+          >
+            <router-link
+              :to="{ name: 'edit', params: { key: item.source.key }}"
+              v-slot="{ href: editUrl }"
+            >
+              <span
+                v-b-tooltip.hover.topright.html="tooltip(item, editUrl, openUrl)"
+              >{{ item.amount || '1' }} {{ item.measure || 'styck' }}</span>
             </router-link>
-          </li>
-        </ul>
-      </div>
+          </router-link>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -25,15 +33,16 @@ export default defineComponent({
     menu: Object as PropType<Menu>,
     findRecipe: Function as PropType<(r: string) => Recipe>
   },
-  setup (props: { recipes: Recipe[]; menu: Menu; findRecipe: (r: string) => Recipe }) {
-    function flatmap<T, K> (arr: T[], fn: (t: T, idx: number) => K[]): K[] {
+  setup(props: { recipes: Recipe[]; menu: Menu; findRecipe: (r: string) => Recipe }) {
+    function flatmap<T, K>(arr: T[], fn: (t: T, idx: number) => K[]): K[] {
       return arr.reduce((acc: K[], x, idx) => acc.concat(fn(x, idx)), [])
     }
 
-    function toIngredientWithContext (key: string, week: number, weekday: WeekDay, meal: Meal): IngredientWithContext[] {
+    function toIngredientWithContext(key: string, week: number, weekday: WeekDay, meal: Meal): IngredientWithContext[] {
       const source = props.findRecipe(key)
-
-      return source.ingredients.map(i => ({ week, weekday, meal, source, ...i }))
+      return source
+        ? source.ingredients.map(i => ({ week, weekday, meal, source, ...i }))
+        : []
     }
 
     const itemsRaw = computed<IngredientWithContext[]>(() => {
@@ -51,7 +60,7 @@ export default defineComponent({
     })
 
     const items = computed(() => {
-      return itemsRaw.value.reduce((acc: { [key: string]: ({measure?: string; amount?: string} & Context<Recipe>)[] }, x) => {
+      return itemsRaw.value.reduce((acc: { [key: string]: ({ measure?: string; amount?: string } & Context<Recipe>)[] }, x) => {
         const { name, measure, amount, week, weekday, meal, source } = x
 
         acc[name] = [...(acc[name] || []), { measure, amount, week, weekday, meal, source: { ...source, ingredients: [], text: '' } }]
@@ -59,12 +68,17 @@ export default defineComponent({
       }, {})
     })
 
-    function tooltip (item: {measure?: string; amount?: string} & Context<Recipe>, editUrl: string) {
+    function tooltip(item: { measure?: string; amount?: string } & Context<Recipe>, editUrl: string, openUrl: string) {
       const r = props.recipes.find(r => r.key === item.source.key)
-      return `${r ? r.title : '...'}<br>${item.weekday}, ${item.meal}<br><a href="${editUrl}">Redigera</a>`
+      return `
+        ${r ? r.title : '...'}<br>
+        ${item.weekday}, ${item.meal}<br>
+        <a href="${openUrl}">Öppna</a>
+        <a href="${editUrl}">Redigera</a>
+      `
     }
 
-    function titleCase (str: string): string {
+    function titleCase(str: string): string {
       return str.toLowerCase().split(' ').map(function (word) {
         return word.replace(word[0], word[0].toUpperCase())
       }).join(' ')

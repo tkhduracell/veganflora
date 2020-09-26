@@ -7,50 +7,127 @@
 
     <b-form @submit.prevent="save" v-if="recipe">
       <b-form-group id="input-group-1" label="Namn" label-for="input-1">
-        <b-form-input  id="input-1" v-model.trim="recipe.title" type="text" required :disabled=saving @keyup="onChange"/>
+        <b-form-input
+          id="input-1"
+          v-model.trim="recipe.title"
+          type="text"
+          required
+          :disabled="saving"
+          @keyup="onChange"
+        />
       </b-form-group>
 
       <b-form-group id="input-group-21" label="Kategori" label-for="input-21">
-        <Tagger id="input-21" variant="primary" separator=" / " v-model="recipe.category" :suggestions="categories" :disabled=saving @keyup="onChange" />
+        <Tagger
+          id="input-21"
+          variant="primary"
+          separator=" / "
+          v-model="recipe.category"
+          :suggestions="categories"
+          :disabled="saving"
+          @keyup="onChange"
+        />
       </b-form-group>
 
       <b-form-group id="input-group-5" label="Taggar" label-for="input-5">
-        <Tagger id="input-5" variant="secondary" v-model="recipe.tags" :suggestions="tags" :disabled=saving @keyup="onChange" />
+        <Tagger
+          id="input-5"
+          variant="secondary"
+          v-model="recipe.tags"
+          :suggestions="tags"
+          :disabled="saving"
+          @keyup="onChange"
+        />
       </b-form-group>
 
       <b-form-group id="input-group-3" label="Storlek" label-for="input-3">
-        <b-form-input  id="input-3" v-model.trim="recipe.size" type="text" required :disabled=saving @keyup="onChange" />
+        <b-form-input
+          id="input-3"
+          v-model.trim="recipe.size"
+          type="text"
+          required
+          :disabled="saving"
+          @keyup="onChange"
+        />
       </b-form-group>
 
       <b-form-group id="input-group-4" label="Text" label-for="input-4">
-        <b-form-textarea  id="input-4" v-model.trim="recipe.text" required :disabled=saving rows=20 @keyup="onChange" />
+        <b-form-textarea
+          id="input-4"
+          v-model.trim="recipe.text"
+          required
+          :disabled="saving"
+          rows="20"
+          @keyup="onChange"
+        />
       </b-form-group>
 
       <b-modal id="modal-paste-list" title="Klista in lista" @ok="onPasteList">
-        <b-form-group class="">
-            Klista in ingredienslista
-          <b-textarea v-model.trim="pasteList" rows=20></b-textarea>
+        <b-form-group class>
+          Klista in ingredienslista
+          <b-textarea v-model.trim="pasteList" rows="20"></b-textarea>
         </b-form-group>
       </b-modal>
 
-      <b-form-group id="input-group-5" class="position-relative" label="Ingridienser (Namn, Mängd, Enhet)" >
+      <b-form-group
+        id="input-group-5"
+        class="position-relative"
+        label="Ingridienser (Namn, Mängd, Enhet)"
+      >
         <b-button class="right-top" variant="link" v-b-modal.modal-paste-list size="sm">Klista in</b-button>
-        <b-input-group  size="sm" v-for="(i, idx) in recipe.ingredients" :key="'ingredient-' + idx">
-          <b-form-input v-model="i.name" :id="'input-5-'+ idx + '-name' " type="text" required :disabled=saving @keyup="onChange" />
-          <b-form-input v-model="i.amount" :id="'input-5-'+ idx + '-amount' " type="text" placeholder="1" :disabled=saving @keyup="onChange" />
-          <b-form-input v-model="i.measure" :id="'input-5-'+ idx + '-measure' " type="text" placeholder="styck" :disabled=saving @keyup="onChange" />
-          <b-button size="sm" variant="link" @click="removeIngredientRow(idx)"> 🗑</b-button>
+        <b-input-group size="sm" v-for="(i, idx) in recipe.ingredients" :key="'ingredient-' + idx">
+          <b-form-input
+            v-model="i.name"
+            :id="'input-5-'+ idx + '-name' "
+            type="text"
+            required
+            :disabled="saving"
+            @keyup="onChange"
+          />
+          <b-form-input
+            v-model="i.amount"
+            :id="'input-5-'+ idx + '-amount' "
+            type="text"
+            placeholder="1"
+            :disabled="saving"
+            @keyup="onChange"
+          />
+          <b-form-input
+            v-model="i.measure"
+            :id="'input-5-'+ idx + '-measure' "
+            type="text"
+            placeholder="styck"
+            :disabled="saving"
+            @keyup="onChange"
+          />
+          <b-button size="sm" variant="link" @click="removeIngredientRow(idx)">🗑</b-button>
         </b-input-group>
-        <b-alert variant="warning" v-if="!recipe.ingredients || recipe.ingredients.lenght === 0" show>
+        <b-alert
+          variant="warning"
+          v-if="!recipe.ingredients || recipe.ingredients.length === 0"
+          show
+        >
           <div>Inga ingredienser tillagda. Använd knappen nedan för att lägga till.</div>
-          <b-button class="add" size=sm variant="success" @click="addIngredientRow()" :disabled=saving> ➕Lägg till</b-button>
+          <b-button
+            class="add"
+            size="sm"
+            variant="success"
+            @click="addIngredientRow()"
+            :disabled="saving"
+          >➕Lägg till</b-button>
         </b-alert>
-        <b-button class="add" size=sm variant="success" @click="addIngredientRow()" :disabled=saving
-          v-if="recipe.ingredients && recipe.ingredients.length > 0"> ➕Lägg till</b-button>
+        <b-button
+          class="add"
+          size="sm"
+          variant="success"
+          @click="addIngredientRow()"
+          :disabled="saving"
+          v-if="recipe.ingredients && recipe.ingredients.length > 0"
+        >➕Lägg till</b-button>
       </b-form-group>
 
       <div class="loader d-flex" v-if="saving">
-        <b-spinner variant="primary" class="mr-2"/>
+        <b-spinner variant="primary" class="mr-2" />
         <span class="mt-1">Sparar till databas</span>
       </div>
 
@@ -58,22 +135,19 @@
         <b-button type="submit" size="lg" variant="primary" :disabled="isEmpty">Spara</b-button>
         <b-button variant="link" @click="$router.go(-1)">Tillbaka</b-button>
       </div>
-
     </b-form>
 
     <div class="loader d-flex" v-else>
-      <b-spinner variant="primary" class="mr-2"/>
+      <b-spinner variant="primary" class="mr-2" />
       <span class="mt-1">Laddar...</span>
     </div>
 
     <div v-if="savedStateAtPretty">
-      <small>
-        Sparat lokalt {{ savedStateAtPretty }}
-      </small>
+      <small>Sparat lokalt {{ savedStateAtPretty }}</small>
     </div>
 
     <div v-if="isDebug" class="mt-4">
-      <hr>
+      <hr />
       <strong>JSON representation</strong>
       <pre>{{ JSON.stringify(recipe, null, 2) }}</pre>
     </div>
@@ -81,7 +155,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, SetupContext, computed, onMounted, Ref, watchEffect } from '@vue/composition-api'
+import { defineComponent, ref, computed, onMounted, Ref } from '@vue/composition-api'
 import debounce from 'lodash.debounce'
 
 import Tagger from '@/components/Tagger.vue'
@@ -94,12 +168,12 @@ import { Recipe, Ingredient } from '../components/types'
 
 export default defineComponent({
   components: { Tagger },
-  setup (props, {root: { $router }}) {
+  setup(props, { root: { $router } }) {
     const key = $router.currentRoute.params.key || false
     const isDebug = process.env.NODE_ENV !== 'production'
 
     const saving = ref(false)
-    const { recipe, onSave }: { recipe: Ref<Recipe>, onSave: () => Promise<void> } = useRecipe(key || '')
+    const { recipe, onSave }: { recipe: Ref<Recipe>; onSave: () => Promise<void> } = useRecipe(key || '')
     const prefill = usePrefill()
 
     const tags = computed(() => {
@@ -132,7 +206,7 @@ export default defineComponent({
       }
     }, 1000)
 
-    function removeIngredientRow (index: number) {
+    function removeIngredientRow(index: number) {
       if (!recipe) return
       const r: Recipe = {
         ...recipe.value,
@@ -143,7 +217,7 @@ export default defineComponent({
       recipe.value = r
     }
 
-    function addIngredientRow () {
+    function addIngredientRow() {
       if (!recipe) return
       const r: Recipe = {
         ...recipe.value,
@@ -159,7 +233,7 @@ export default defineComponent({
       return !r || (r.ingredients || []).length === 0 || (r.title || '').trim().length === 0
     })
 
-    async function save () {
+    async function save() {
       try {
         saving.value = true
         await onSave()
@@ -173,7 +247,7 @@ export default defineComponent({
     }
 
     const pasteList = ref('')
-    function onPasteList () {
+    function onPasteList() {
       const ingredients = pasteList.value
         .split(/\n/gi)
         .map(parseIngredient)
@@ -206,18 +280,20 @@ export default defineComponent({
 </script>
 
 <style scoped>
-  .separator {
-    margin-left: 2px;
-    margin-right: 2px;
-    padding: 0.25em 0.4em;
-    font-size: 75%;
-    font-weight: 700;
-    line-height: 1;
-  }
-  .btn.add {
-    margin-top: 10px;
-  }
-  .btn.right-top {
-    position: absolute; right:0; top:0;
-  }
+.separator {
+  margin-left: 2px;
+  margin-right: 2px;
+  padding: 0.25em 0.4em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+}
+.btn.add {
+  margin-top: 10px;
+}
+.btn.right-top {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
 </style>

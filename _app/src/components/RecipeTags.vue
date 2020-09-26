@@ -1,13 +1,12 @@
 <template>
   <div class="recipe-tags">
     <b-form-checkbox-group
-      size="sm"
+      size="lg"
       :value="value"
       :options="values.map(s => ({ text: s, value: s }))"
       @input="$emit('input', $event)"
       name="recipe-tags"
-      buttons />
-
+    />
   </div>
 </template>
 

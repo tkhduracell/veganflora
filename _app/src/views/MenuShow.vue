@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, SetupContext } from '@vue/composition-api'
+import { defineComponent, computed } from '@vue/composition-api'
 
 import RecipePane from '@/components/RecipePane.vue'
 
