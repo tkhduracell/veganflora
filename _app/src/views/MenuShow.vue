@@ -26,8 +26,8 @@ const Component = defineComponent({
   components: {
     RecipePane
   },
-  setup (props, context: SetupContext) {
-    const params = context.root.$router.currentRoute.params
+  setup (props, { root: { $root: { $router } } }) {
+    const params = $router.currentRoute.params
     const week = params.week
     const weekday = params.weekday as WeekDay
     const meal = params.meal as Meal

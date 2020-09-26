@@ -2,17 +2,14 @@
   <div class="recipe-tree">
     <div class="category" v-for="(recipes, category) in tree" :key="category">
       <strong>{{ category }}</strong>
+      <div v-for="r in recipes" :key="category + r.key" class="recipe clearfix ml-2 mt-1 mb-1">
+        <b-link class="link" :to="{ name: 'show', params: {key: r.key} }">
+          {{ r.title }}
+        </b-link>
 
-        <div v-for="r in recipes" :key="category + r.key" class="recipe clearfix ml-2 mt-1 mb-1">
-          <b-link class="link" :to="{ name: 'show', params: {key: r.key} }">
-            {{ r.title }}
-          </b-link>
-
-          <b-badge v-for="t in r.tags" :key="t">{{t}}</b-badge>
-
-          <span class="clickable p-0 m-0 ml-1 float-right" @click="areyousure(r)">🗑</span>
-        </div>
-
+        <b-badge v-for="t in r.tags" :key="t">{{t}}</b-badge>
+        <span class="clickable p-0 m-0 ml-1 float-right" @click="areyousure(r)">🗑</span>
+      </div>
     </div>
     <b-modal id="areyousure" centered
       title="Är du säker?"
@@ -25,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent, ref } from '@vue/composition-api'
+import { PropType, defineComponent, ref, computed } from '@vue/composition-api'
 
 import RecipeItem from '@/components/RecipeItem.vue'
 
@@ -38,13 +35,14 @@ export default defineComponent({
   components: {
     RecipeItem
   },
-  setup ({ recipes }: {recipes: Recipe[]}, context) {
-    const categories = recipes.map(r => r.category)
-
-    const tree = {} as { [key: string]: {key: string; title: string; tags?: string[] }[] }
-    categories.forEach(c => {
-      tree[c.join(' / ')] = recipes.filter(r => r.category.join('') === c.join(''))
-        .map(({ title, key, tags }) => ({ key, title, tags }))
+  setup (props: { recipes: Recipe[]}, context) {
+    const tree = computed(() => {
+      const tree = {} as { [key: string]: {key: string; title: string; tags?: string[] }[] }
+      props.recipes.map(r => r.category).forEach(c => {
+        tree[c.join(' / ')] = props.recipes.filter(r => r.category.join('') === c.join(''))
+          .map(({ title, key, tags }) => ({ key, title, tags }))
+      })
+      return tree
     })
 
     const deletesubject = ref<{key: string; title: string}>(undefined)

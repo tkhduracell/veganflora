@@ -32,8 +32,8 @@ export default defineComponent({
   components: {
     RecipeItem
   },
-  setup (props, context: SetupContext) {
-    const key = context.root.$router.currentRoute.params.key
+  setup (props, { root: { $router } }: SetupContext) {
+    const key = $router.currentRoute.params.key
     const { recipe, remove } = useRecipe(key)
     const isLoaded = computed(() => recipe.value && recipe.value.title)
 

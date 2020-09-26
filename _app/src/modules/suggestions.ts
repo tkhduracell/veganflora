@@ -1,6 +1,7 @@
+import { unique } from './common/set'
 
-// ['A / B', 'A / C']
-// ['A']
+// Given: ['A / B', 'A / C'], ['A']
+// Returns: ['B', 'C']
 function categories (categories: string[], current?: string[], delim = ' / ') {
   if (!categories) return []
 
@@ -19,16 +20,14 @@ function categories (categories: string[], current?: string[], delim = ' / ') {
   const onlyFirstName = onlyChilds.map(c => c.split(delim).slice(0, 1).join(delim))
 
   // Get only unique output
-  const unique = new Set(onlyFirstName)
-
-  return [...unique]
+  return unique(onlyFirstName)
 }
 
 function tags (tags: string[], current?: string[]) {
   return current ? tags.filter(s => !current.includes(s)) : tags
 }
 
-export default class Suggest {
+export class Suggest {
   static tags = tags
   static categories = categories
 }

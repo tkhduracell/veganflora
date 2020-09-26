@@ -9,8 +9,8 @@ type Prefill = {
 }
 
 export function usePrefill () {
-  const tags = ref<string[]>([])
   const categories = ref<string[]>([])
+  const tags = ref<string[]>([])
 
   onMounted(async () => {
     const db = firebase.firestore()

@@ -1,7 +1,6 @@
-import Suggest from '../../../src/modules/suggestions'
+import { Suggest } from '../../../src/modules/suggestions'
 
 describe('Suggest.categories', () => {
-
   it('gives empty if input is empty', () => {
     expect(Suggest.categories([], [])).toHaveLength(0)
   })
@@ -37,11 +36,9 @@ describe('Suggest.categories', () => {
   it('gives suggestion for third level', () => {
     expect(Suggest.categories(['A / A / A', 'A / A / B'], [])).toEqual(['A'])
   })
-
 })
 
 describe('Suggest.tags', () => {
-
   it('should not give same tag', () => {
     expect(Suggest.tags(['A', 'B'], ['B', 'C'])).toEqual(['A'])
   })

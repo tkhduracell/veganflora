@@ -86,7 +86,7 @@ import debounce from 'lodash.debounce'
 
 import Tagger from '@/components/Tagger.vue'
 
-import Suggest from '../modules/suggestions'
+import { Suggest } from '../modules/suggestions'
 import { useRecipe } from '../modules/use/recipes'
 import { usePrefill } from '../modules/use/prefill'
 import { parseIngredient } from '../modules/ingredients'
@@ -94,12 +94,12 @@ import { Recipe, Ingredient } from '../components/types'
 
 export default defineComponent({
   components: { Tagger },
-  setup (props, context: SetupContext) {
-    const key = context.root.$router.currentRoute.params.key || false
+  setup (props, {root: { $router }}) {
+    const key = $router.currentRoute.params.key || false
     const isDebug = process.env.NODE_ENV !== 'production'
 
     const saving = ref(false)
-    const { recipe, onSave } = useRecipe(key || '') as {recipe: Ref<Recipe>; onSave: () => void }
+    const { recipe, onSave }: { recipe: Ref<Recipe>, onSave: () => Promise<void> } = useRecipe(key || '')
     const prefill = usePrefill()
 
     const tags = computed(() => {
@@ -107,10 +107,6 @@ export default defineComponent({
     })
     const categories = computed(() => {
       return Suggest.categories(prefill.categories.value, recipe.value.category)
-    })
-
-    watchEffect(() => {
-      console.log('watch', tags.value, categories.value)
     })
 
     onMounted(() => {
@@ -168,7 +164,7 @@ export default defineComponent({
         saving.value = true
         await onSave()
         localStorage.removeItem('saveState')
-        if (context.parent) context.parent.$router.push('/')
+        $router.push('/')
       } catch (err) {
         console.error('Failed to save data')
       } finally {
