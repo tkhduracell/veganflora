@@ -56,9 +56,11 @@ export function useRecipe (key: string) {
     const copy = JSON.parse(JSON.stringify(recipe.value))
 
     delete copy.key
-    if (!copy.created_at) {
-      copy.created_at = firebase.firestore.FieldValue.serverTimestamp()
-    }
+
+    // Timestamp need reconstruct after json clone
+    copy.created_at = !copy.created_at
+      ? firebase.firestore.FieldValue.serverTimestamp()
+      : new firebase.firestore.Timestamp(copy.created_at.seconds, copy.created_at.nanoseconds)
 
     const savekey = key || safekey(copy.title, copy.category)
 

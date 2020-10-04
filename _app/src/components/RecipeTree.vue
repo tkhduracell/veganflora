@@ -6,8 +6,8 @@
         <b-link class="link" :to="{ name: 'show', params: {key: r.key} }">{{ r.title }}</b-link>
 
         <b-badge
-          v-for="t in r.tags"
-          :key="t"
+          v-for="(t, ti) in r.tags"
+          :key="r.key + '-tag-' + ti"
           class="ml-2"
           :style="[ typeof t === 'object' ? {'background-color': t.color} : '']"
         >{{ typeof t === 'object' ? t.text : t}}</b-badge>
