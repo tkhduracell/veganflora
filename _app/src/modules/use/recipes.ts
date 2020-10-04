@@ -54,16 +54,23 @@ export function useRecipe (key: string) {
   async function onSave () {
     if (!recipe.value) return
     const copy = JSON.parse(JSON.stringify(recipe.value))
+
     delete copy.key
+    if (!copy.created_at) {
+      copy.created_at = firebase.firestore.FieldValue.serverTimestamp()
+    }
 
     const savekey = key || safekey(copy.title, copy.category)
-    debugger
+
     await firebase.firestore()
       .collection('veganflora')
       .doc('root')
       .collection('recipies')
       .doc(savekey)
-      .set(copy, { merge: false })
+      .set({
+        ...copy,
+        updated_at: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: false })
   }
 
   return { recipe, onSave, remove: () => remove(key) }

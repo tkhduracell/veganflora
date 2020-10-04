@@ -177,7 +177,10 @@ export default defineComponent({
     const prefill = usePrefill()
 
     const tags = computed(() => {
-      return Suggest.tags(prefill.tags.value, recipe.value.tags)
+      return Suggest.tags(
+        prefill.tags.value,
+        (recipe.value.tags || []).map(t => typeof t === 'object' ? t.text : t)
+      )
     })
     const categories = computed(() => {
       return Suggest.categories(prefill.categories.value, recipe.value.category)

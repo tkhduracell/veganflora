@@ -1,12 +1,19 @@
+export type Tag = {
+  text: string;
+  color: string;
+}
+export type Tags = (string | Tag)[]
 
 export type Recipe = {
   size: string;
   text: string;
   category: string[];
-  tags?: string[];
+  tags?: Tags;
   ingredients: Ingredient[];
   title: string;
   key: string;
+  created_at?: firebase.firestore.Timestamp;
+  updated_at?: firebase.firestore.Timestamp;
 }
 
 export type Menu = {

@@ -43,12 +43,16 @@ const Component = defineComponent({
     RecipeTags
   },
   setup() {
+    function flatTags(r: Recipe): string[] {
+      return (r.tags || []).map(t => typeof t === 'object' ? t.text : t)
+    }
+
     const { recipes, remove } = useRecipes() as Recipes
     const {
       tags: tagValues,
       filter: tagFilter,
       filtered
-    } = useTagFilter<Recipe>(recipes, r => r.tags || [])
+    } = useTagFilter<Recipe>(recipes, flatTags)
 
     return {
       recipes: filtered,

@@ -14,6 +14,7 @@
 import { PropType, defineComponent } from '@vue/composition-api'
 
 export default defineComponent({
+  name: 'RecipieTags',
   props: {
     value: Array as PropType<string[]>,
     values: Array as PropType<string[]>
