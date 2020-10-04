@@ -76,7 +76,7 @@ export function useRecipe (key: string) {
   return { recipe, onSave, remove: () => remove(key) }
 }
 
-export type Recipes = {recipes: Ref<Recipe[] | undefined>, findRecipe: (key: string) => Recipe | undefined , remove: (key: string) => void}
+export type Recipes = {recipes: Ref<Recipe[] | undefined>; findRecipe: (key: string) => Recipe | undefined; remove: (key: string) => void}
 export function useRecipes (): Recipes {
   const recipes = ref<Recipe[] | undefined>(undefined)
   const close = ref<() => void>()

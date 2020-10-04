@@ -15,7 +15,7 @@
     </b-navbar>
 
     <div class="content">
-      <router-view/>
+      <router-view />
     </div>
   </div>
 </template>
@@ -28,7 +28,7 @@
   color: #2c3e50;
 }
 .content {
-  margin: 30px;
+  margin: 30px 0;
 }
 .router-link-active {
   font-weight: bold;

@@ -19,7 +19,7 @@ module.exports = {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'space-before-function-paren': 'off',
-    '@typescript-eslint/camelcase': ["error", { properties: "never", ignoreDestructuring: true }]
+    '@typescript-eslint/camelcase': ['error', { properties: 'never', ignoreDestructuring: true }]
   },
 
   overrides: [
