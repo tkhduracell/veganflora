@@ -5,6 +5,8 @@ import 'firebase/firestore'
 
 import { Recipe } from '@/components/types'
 
+import { autoTag } from '../../modules/tags'
+
 function asArray<V> (result: firebase.firestore.QuerySnapshot): { key: string; value: V }[] {
   const out: { key: string; value: V }[] = []
   result.forEach(itm => out.push({ key: itm.id, value: itm.data() as V }))
@@ -93,6 +95,7 @@ export function useRecipes (): Recipes {
       console.log('Loading recipes ...')
       recipes.value = asArray<Recipe>(await result.get())
         .map(itm => ({ ...itm.value, key: itm.key }))
+        .map(autoTag)
     })
   })
 

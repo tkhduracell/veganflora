@@ -1,10 +1,13 @@
 <template>
-  <div class="groceries">
+  <b-container class="groceries">
     <h1>Handlalista</h1>
     <p>Enligt in lagda recept behöver följande hadlas:</p>
-    <Groceries :recipes="recipes" :menu="menu" :findRecipe="findRecipe" v-if="menu"/>
-    <div v-else>Inga varor, eftersom <router-link :to="{ name: 'menu' }">menyn</router-link> är tom.</div>
-  </div>
+    <Groceries :recipes="recipes" :menu="menu" :findRecipe="findRecipe" v-if="menu" />
+    <div v-else>
+      Inga varor, eftersom
+      <router-link :to="{ name: 'menu' }">menyn</router-link>är tom.
+    </div>
+  </b-container>
 </template>
 
 <script lang="ts">
@@ -19,7 +22,7 @@ const Component = defineComponent({
   components: {
     Groceries
   },
-  setup () {
+  setup() {
     const { menu } = useMenu()
     const { recipes, findRecipe } = useRecipes()
 

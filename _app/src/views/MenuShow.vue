@@ -1,16 +1,17 @@
 <template>
-  <div class="home">
+  <b-container class="home">
     <h1>Meny {{ week }} / {{ weekday }} / {{ meal }}</h1>
     <div v-if="items && items.length === 0">
       Inga recept inlagda!
-      Lägg in recept i <router-link class="strong" :to="{ name: 'menu' }">menyn</router-link> först!
+      Lägg in recept i
+      <router-link class="strong" :to="{ name: 'menu' }">menyn</router-link>först!
     </div>
     <RecipePane v-else-if="items" :items="items"></RecipePane>
     <div class="loader" v-else>
       <b-spinner class="mr-2" variant="primary"></b-spinner>
       <span class="mb-1">Laddar...</span>
     </div>
-  </div>
+  </b-container>
 </template>
 
 <script lang="ts">
@@ -26,7 +27,7 @@ const Component = defineComponent({
   components: {
     RecipePane
   },
-  setup (props, { root: { $root: { $router } } }) {
+  setup(props, { root: { $root: { $router } } }) {
     const params = $router.currentRoute.params
     const week = params.week
     const weekday = params.weekday as WeekDay

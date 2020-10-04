@@ -1,5 +1,5 @@
 <template>
-  <div class="edit">
+  <b-container class="edit">
     <h1 v-if="key && recipe && recipe.title">{{recipe.title}}</h1>
     <b-spinner v-if="key && (!recipe || !recipe.title)" class="mb-2" />
     <h1 v-if="!key && recipe && recipe.title">{{recipe.title}}</h1>
@@ -151,7 +151,7 @@
       <strong>JSON representation</strong>
       <pre>{{ JSON.stringify(recipe, null, 2) }}</pre>
     </div>
-  </div>
+  </b-container>
 </template>
 
 <script lang="ts">

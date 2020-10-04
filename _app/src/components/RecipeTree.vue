@@ -36,27 +36,7 @@ import { PropType, defineComponent, ref, computed } from '@vue/composition-api'
 import RecipeItem from '@/components/RecipeItem.vue'
 
 import { Recipe, Tags } from './types'
-import { firestore } from 'firebase'
-
-function uniq<T>(t: T[]) {
-  return new Set([...t])
-}
-
-function autoTag(r: Recipe): Recipe {
-  function lastNDays(ts: firestore.Timestamp, n: number) {
-    return new Date().getTime() - ts.toDate().getTime() < 1000 * 3600 * n
-  }
-  const created = r.created_at && lastNDays(r.created_at, 14)
-    ? { text: '✦ Nytt', color: '#FF650D' }
-    : null
-  const updated = r.updated_at && lastNDays(r.updated_at, 14)
-    ? { text: '✐ Uppdaterad', color: '#B39812' }
-    : null
-  return {
-    ...r,
-    tags: [...(r.tags || []), created, updated].filter(t => t !== null) as Tags
-  }
-}
+import { unique } from '../modules/common/set'
 
 export default defineComponent({
   name: 'RecipieTree',
@@ -69,9 +49,8 @@ export default defineComponent({
   setup(props: { recipes: Recipe[] }, context) {
     const tree = computed(() => {
       const tree = {} as Record<string, { key: string; title: string; tags: Tags }[]>
-      uniq(props.recipes.map(r => r.category)).forEach(c => {
+      unique(props.recipes.map(r => r.category)).forEach(c => {
         tree[c.join(' / ')] = props.recipes.filter(r => r.category.join('') === c.join(''))
-          .map(autoTag)
           .map(({ title, key, tags }) => ({ key, title, tags: tags as Tags }))
       })
       return tree

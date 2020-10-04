@@ -1,19 +1,17 @@
 <template>
-  <div class="home">
+  <b-container class="home">
     <h1>Skapa veckans meny</h1>
     <p>Här skapar du veckans meny.</p>
     <div class="splitpane">
       <div class="list">
-        <MenuAdder class="list" :recipes="recipes"
-          @add-item="add" />
+        <MenuAdder class="list" :recipes="recipes" @add-item="add" />
       </div>
       <div class="menu">
         <b-form-select v-model="week" :options="weeks" />
-        <Menu :menu="menu"
-          @remove-item="remove" />
+        <Menu :menu="menu" @remove-item="remove" />
       </div>
     </div>
-  </div>
+  </b-container>
 </template>
 
 <script lang="ts">
@@ -31,7 +29,7 @@ const Component = defineComponent({
     MenuAdder,
     Menu
   },
-  setup () {
+  setup() {
     const { recipes } = useRecipes()
     const { menu, removeMenuItem, addMenuItem } = useMenu()
 
@@ -46,12 +44,12 @@ const Component = defineComponent({
 
     const weeks = computed(() => Object.keys(menu.value))
 
-    function add ({ item, weekday, meal }: {item: string; weekday: WeekDay; meal: Meal}) {
+    function add({ item, weekday, meal }: { item: string; weekday: WeekDay; meal: Meal }) {
       const recipe = (recipes.value || []).find(r => r.key === item)
       if (recipe) addMenuItem(week.value, recipe.key, weekday, meal)
     }
 
-    function remove ({ item, weekday, meal }: {item: string; weekday: WeekDay; meal: Meal}) {
+    function remove({ item, weekday, meal }: { item: string; weekday: WeekDay; meal: Meal }) {
       const recipe = (recipes.value || []).find(r => r.key === item)
       if (recipe) removeMenuItem(week.value, recipe.key, weekday, meal)
     }
