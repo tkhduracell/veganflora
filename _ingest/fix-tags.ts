@@ -1,19 +1,48 @@
-#!/usr/bin/env ts-node-script
-
 import admin from 'firebase-admin'
 
 admin.initializeApp({
-  credential: admin.credential.applicationDefault(),
   projectId: 'veganflora',
   databaseURL: 'https://veganflora.firebaseio.com'
 })
 
+type Input = {
+  created_at: admin.firestore.Timestamp,
+  updated_at: admin.firestore.Timestamp
+}
+
 async function main () {
   const db = admin.firestore()
 
-  const col = await db.collection('veganflora').doc('root').collection('recipies').get()
+  const col = db.collection('veganflora').doc('root').collection('recipies')
+  const result = await col.get()
 
-  for (const doc of col.docs) {
+  for (const doc of result.docs) {
+    const { created_at, updated_at } = doc.data() as Input
+
+    const now = admin.firestore.Timestamp.now()
+    const mypoch = new admin.firestore.Timestamp(now.seconds - 3600 * 24 * 30, now.nanoseconds)
+
+    if (!created_at && !updated_at) {
+      await doc.ref.update({
+        created_at: mypoch,
+        updated_at: mypoch
+      })
+      console.log('Updated recipie', { id: doc.id })
+    }
+  }
+
+  console.log('Completed!')
+
+  // console.log(' ---------------- OUTPUT ---------------- ')
+  // console.log(json)
+}
+
+main()
+
+/**
+ *
+
+for (const doc of col.docs) {
     const { title: oldTitle, tags: oldTags } = doc.data() as {title: string, tags?: string[]}
 
     let title = oldTitle
@@ -38,10 +67,5 @@ async function main () {
     console.log(`Updated recipie`, {title, tags: [...tags], path: doc.ref.path})
   }
 
-  console.log('Completed!')
-
-  // console.log(' ---------------- OUTPUT ---------------- ')
-  // console.log(json)
-}
-
-main()
+ *
+ */

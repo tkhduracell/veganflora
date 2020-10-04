@@ -19,6 +19,7 @@ module.exports = {
     '@typescript-eslint'
   ],
   rules: {
+    camelcase: 'off'
   },
   overrides: [{
     files: ['test/**/*.spec.*'],

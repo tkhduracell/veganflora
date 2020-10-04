@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  
   "scripts": {
     "lint": "eslint src/**/*.* test/**/*.spec.* --fix",
-    "test": "jest"
+    "test": "jest",
+    "script:fixtags": "ts-node-script fix-tags.ts"
   },
   "repository": {
     "type": "git",
