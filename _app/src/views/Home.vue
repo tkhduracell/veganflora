@@ -1,20 +1,19 @@
 <template>
   <b-container class="home">
-    <b-button
-      :to="{name: 'new'}"
-      variant="primary"
-      class="mb-2 float-md-right"
-      :disabled="!recipes"
-      small
-      v-if="recipes"
-    >
-      <span>Nytt Recept</span>
-    </b-button>
-    <h1>Kokboken</h1>
+    <div class="clearfix">
+      <b-button
+        :to="{name: 'new'}"
+        variant="primary"
+        class="mb-2 float-right"
+        :disabled="!recipes"
+        small
+        v-if="recipes"
+      >Nytt Recept</b-button>
+      <h1 class="float-left">Recept</h1>
+    </div>
     <div>
       <b>Filter</b>
       <RecipeTags :value="tagFilter" :values="tagValues" v-on:input="tagFilter = $event" />
-      <h2 class="mt-2">Recept</h2>
       <RecipeTree :recipes="recipes" v-if="recipes && recipes.length > 0" @remove-item="remove" />
       <div v-else-if="recipes">
         Inga recept har taggarna:

@@ -1,7 +1,6 @@
 <template>
   <div class="recipe-tags">
     <b-form-checkbox-group
-      size="lg"
       :value="value"
       :options="options"
       @input="$emit('input', $event)"

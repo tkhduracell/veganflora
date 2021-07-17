@@ -1,13 +1,13 @@
 import { Recipe, Tags } from '@/components/types'
 import { firestore } from 'firebase'
 
-export enum Category {
+export enum AutoTag {
   New = '✦ Nytt',
   Updated = '✐ Uppdaterad'
 }
-export const Categories = [
-  Category.New,
-  Category.Updated
+export const AutoTags = [
+  AutoTag.New,
+  AutoTag.Updated
 ]
 
 export function autoTag(r: Recipe): Recipe {
@@ -15,14 +15,21 @@ export function autoTag(r: Recipe): Recipe {
     return new Date().getTime() - ts.toDate().getTime() < 1000 * 3600 * n
   }
   const created = r.created_at && lastNDays(r.created_at, 14)
-    ? { text: Category.New, color: '#FF650D' }
+    ? { text: AutoTag.New, color: '#FF650D' }
     : null
   const updated = r.updated_at && lastNDays(r.updated_at, 14)
-    ? { text: Category.Updated, color: '#B39812' }
+    ? { text: AutoTag.Updated, color: '#B39812' }
     : null
+
+  const tags = (r.tags || []) as Tags
+  if (created) {
+    tags.push(created)
+  } else if (updated) {
+    tags.push(updated)
+  }
 
   return {
     ...r,
-    tags: [...(r.tags || []), created, updated].filter(t => t !== null) as Tags
+    tags
   }
 }

@@ -69,12 +69,14 @@
         </b-form-group>
       </b-modal>
 
-      <b-form-group
-        id="input-group-5"
-        class="position-relative"
-        label="Ingridienser (Namn, Mängd, Enhet)"
-      >
-        <b-button class="right-top" variant="link" v-b-modal.modal-paste-list size="sm">Klista in</b-button>
+      <b-form-group id="input-group-5" class="position-relative">
+        <template #label>
+          Ingredienser (Namn, Mängd, Enhet)
+          <b-link v-b-modal.modal-paste-list class="ml-2">
+            <b-icon-clipboard />
+          </b-link>
+        </template>
+
         <b-input-group size="sm" v-for="(i, idx) in recipe.ingredients" :key="'ingredient-' + idx">
           <b-form-input
             v-model="i.name"
@@ -158,8 +160,11 @@
 import { defineComponent, ref, computed, onMounted, Ref } from '@vue/composition-api'
 import debounce from 'lodash.debounce'
 
-import Tagger from '@/components/Tagger.vue'
+import { BIconClipboard } from 'bootstrap-vue'
 
+import Tagger from '../components/Tagger.vue'
+
+import { AutoTag, AutoTags } from '../modules/tags'
 import { Suggest } from '../modules/suggestions'
 import { useRecipe } from '../modules/use/recipes'
 import { usePrefill } from '../modules/use/prefill'
@@ -167,7 +172,7 @@ import { parseIngredient } from '../modules/ingredients'
 import { Recipe, Ingredient } from '../components/types'
 
 export default defineComponent({
-  components: { Tagger },
+  components: { Tagger, BIconClipboard },
   setup(props, { root: { $router } }) {
     const key = $router.currentRoute.params.key || false
     const isDebug = process.env.NODE_ENV !== 'production'
@@ -180,7 +185,7 @@ export default defineComponent({
       return Suggest.tags(
         prefill.tags.value,
         (recipe.value.tags || []).map(t => typeof t === 'object' ? t.text : t)
-      )
+      ).filter(s => !AutoTags.includes(s as AutoTag))
     })
     const categories = computed(() => {
       return Suggest.categories(prefill.categories.value, recipe.value.category)
@@ -297,6 +302,6 @@ export default defineComponent({
 .btn.right-top {
   position: absolute;
   right: 0;
-  top: 0;
+  top: -2em;
 }
 </style>
