@@ -33,6 +33,11 @@
         "source.fixAll.eslint": true
     },
     "vetur.experimental.templateInterpolationService": true,
+    "vetur.underline.refValue": true,
+    "vetur.languageFeatures.codeActions": true,
+    "vetur.languageFeatures.semanticTokens": true,
+    "vetur.validation.template": true,
+    "vetur.validation.templateProps": true,
     "[vue]": {
         "editor.defaultFormatter": "octref.vetur",
     },
