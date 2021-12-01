@@ -32,7 +32,6 @@
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": true
     },
-    "vetur.experimental.templateInterpolationService": true,
     "vetur.underline.refValue": true,
     "vetur.languageFeatures.codeActions": true,
     "vetur.languageFeatures.semanticTokens": true,
