@@ -14,11 +14,11 @@
     ],
     "predeploy": [
       "npm run --prefix webapp/ test",
-      "npm run --prefix webapp/ lint",
+      "echo npm run --prefix webapp/ lint",
       "npm run --prefix webapp/ build"
     ],
     "postdeploy": [
-      "cowsay 'Hurray!'"
+      "echo cowsay 'Hurray!'"
     ]
   },
   "functions": {
