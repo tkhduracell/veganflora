@@ -6,10 +6,30 @@
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
       <b-collapse id="nav-collapse" is-nav>
-        <b-navbar-nav>
+        <b-navbar-nav class="navbar-left">
           <b-nav-item exact :to="{name: 'home'}">Hem</b-nav-item>
           <b-nav-item exact :to="{name: 'menu'}">Meny</b-nav-item>
           <b-nav-item exact :to="{name: 'groceries'}">Handlalista</b-nav-item>
+        </b-navbar-nav>
+        <b-navbar-nav class="ml-auto" v-if="isSupported">
+          <b-nav-form>
+            <b-button variant="primary" @click="toggle">
+              <b-icon icon="fullscreen-exit" v-if="isFullscreen" />
+              <b-icon icon="arrows-fullscreen" v-else />
+            </b-button>
+            <b-button-group>
+              <b-button
+                :variant="!isActive ? 'success' : 'secondary'"
+                :pressed="!isActive"
+                @click="release()"
+              >Off</b-button>
+              <b-button
+                :variant="isActive ? 'success' : 'secondary'"
+                :pressed="isActive"
+                @click="request('screen')"
+              >Awake</b-button>
+            </b-button-group>
+          </b-nav-form>
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
@@ -21,8 +41,17 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-export default Vue.extend({})
+import { defineComponent } from '@vue/composition-api'
+import { useWakeLock, useFullscreen } from '@vueuse/core'
+
+export default defineComponent({
+  setup() {
+    const { isActive, isSupported, release, request } = useWakeLock()
+    const { isFullscreen, enter, exit, toggle } = useFullscreen()
+
+    return { isActive, isSupported, release, request, toggle, isFullscreen }
+  }
+})
 </script>
 
 <style>

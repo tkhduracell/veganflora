@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueCompositionApi from '@vue/composition-api'
-import { BootstrapVue } from 'bootstrap-vue'
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 
 import router from './router'
 
@@ -13,6 +13,7 @@ import VueFirebase from './firebase-plugin'
 Vue.use(VueFirebase)
 Vue.use(VueCompositionApi)
 Vue.use(BootstrapVue)
+Vue.use(IconsPlugin)
 
 Vue.config.productionTip = false
 
