@@ -40,7 +40,7 @@ export default defineComponent({
 
     function toIngredientWithContext(key: string, week: number, weekday: WeekDay, meal: Meal): IngredientWithContext[] {
       const source = props.findRecipe(key)
-      return source
+      return source && source.ingredients
         ? source.ingredients.map(i => ({ week, weekday, meal, source, ...i }))
         : []
     }

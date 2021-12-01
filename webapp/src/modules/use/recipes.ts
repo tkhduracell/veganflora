@@ -24,7 +24,14 @@ function remove (key: string) {
 }
 
 export function useRecipe (key: string) {
-  const recipe = ref<Recipe>({})
+  const recipe = ref<Recipe>({
+    title: '',
+    category: [],
+    ingredients: [],
+    key: '',
+    size: '',
+    text: ''
+  })
 
   onMounted(async () => {
     const db = firebase.firestore()
@@ -54,7 +61,6 @@ export function useRecipe (key: string) {
   }
 
   async function onSave () {
-    if (!recipe.value) return
     const copy = JSON.parse(JSON.stringify(recipe.value))
 
     delete copy.key

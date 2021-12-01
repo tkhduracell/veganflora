@@ -9,10 +9,12 @@
       </span>
     </h4>
 
-    <h6 class="mt-2" v-for="(t, idx) in item.tags" :key="t">
-      <span class="separator" v-if="idx > 0">,</span>
-      <b-badge variant="secondary">{{ t }}</b-badge>
-    </h6>
+    <div v-if="item.tags">
+      <h6 class="mt-2" v-for="(t, idx) in item.tags" :key="t">
+        <span class="separator" v-if="idx > 0">,</span>
+        <b-badge variant="secondary">{{ t }}</b-badge>
+      </h6>
+    </div>
 
     <p>{{ item.size }}</p>
     <ul class="ingredients">

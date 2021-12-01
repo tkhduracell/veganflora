@@ -20,7 +20,7 @@
       title="Är du säker?"
       button-size="sm"
       ok-variant="danger"
-      @ok="$emit('remove-item', deletesubject.key)"
+      @ok="$emit('remove-item', deletesubject ? deletesubject.key : '')"
     >
       <p v-if="deletesubject">
         Är du säker på att du vill ta bort
@@ -56,7 +56,7 @@ export default defineComponent({
       return tree
     })
 
-    const deletesubject = ref<{ key: string; title: string }>(undefined)
+    const deletesubject = ref<{ key: string; title: string }>()
 
     async function areyousure(r: { key: string; title: string }) {
       deletesubject.value = r

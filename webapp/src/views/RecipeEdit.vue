@@ -147,17 +147,11 @@
     <div v-if="savedStateAtPretty">
       <small>Sparat lokalt {{ savedStateAtPretty }}</small>
     </div>
-
-    <div v-if="isDebug" class="mt-4">
-      <hr />
-      <strong>JSON representation</strong>
-      <pre>{{ JSON.stringify(recipe, null, 2) }}</pre>
-    </div>
   </b-container>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted, Ref } from '@vue/composition-api'
+import { defineComponent, ref, computed, onMounted } from '@vue/composition-api'
 import debounce from 'lodash.debounce'
 
 import { BIconClipboard } from 'bootstrap-vue'
@@ -170,15 +164,15 @@ import { useRecipe } from '../modules/use/recipes'
 import { usePrefill } from '../modules/use/prefill'
 import { parseIngredient } from '../modules/ingredients'
 import { Recipe, Ingredient } from '../components/types'
+import VueRouter from 'vue-router'
 
 export default defineComponent({
   components: { Tagger, BIconClipboard },
-  setup(props, { root: { $router } }) {
+  setup(props: {}, { root: { $router } }: { root: { $router: VueRouter } }) {
     const key = $router.currentRoute.params.key || false
-    const isDebug = process.env.NODE_ENV !== 'production'
 
     const saving = ref(false)
-    const { recipe, onSave }: { recipe: Ref<Recipe>; onSave: () => Promise<void> } = useRecipe(key || '')
+    const { recipe, onSave } = useRecipe(key || '')
     const prefill = usePrefill()
 
     const tags = computed(() => {
@@ -198,7 +192,7 @@ export default defineComponent({
       }
     })
 
-    const savedStateAt = ref<Date>(undefined)
+    const savedStateAt = ref<Date>()
     const savedStateAtPretty = computed(() => {
       return savedStateAt.value
         ? savedStateAt.value.toISOString()
@@ -215,25 +209,21 @@ export default defineComponent({
     }, 1000)
 
     function removeIngredientRow(index: number) {
-      if (!recipe) return
-      const r: Recipe = {
-        ...recipe.value,
-        ingredients: [
-          ...recipe.value.ingredients.filter((itm, idx) => idx !== index)
-        ]
+      const { ingredients, ...rest } = recipe.value
+      recipe.value = {
+        ...rest,
+        ingredients: ingredients.filter((itm, idx) => idx !== index)
       }
-      recipe.value = r
     }
 
     function addIngredientRow() {
-      if (!recipe) return
-      const r: Recipe = {
-        ...recipe.value,
+      const { ingredients, ...rest } = recipe.value
+      recipe.value = {
+        ...rest,
         ingredients: [
-          ...(recipe.value.ingredients || []), { name: '' } as Ingredient
+          ...ingredients, { name: '' } as Ingredient
         ]
       }
-      recipe.value = r
     }
 
     const isEmpty = computed(() => {
@@ -256,13 +246,14 @@ export default defineComponent({
 
     const pasteList = ref('')
     function onPasteList() {
-      const ingredients = pasteList.value
+      const ingredientsAdd = pasteList.value
         .split(/\n/gi)
         .map(parseIngredient)
+      const { ingredients, ...rest } = recipe.value
       recipe.value = {
-        ...(recipe.value || {}),
-        ingredients: [...(recipe.value.ingredients || []), ...ingredients]
-      } as Recipe
+        ...rest,
+        ingredients: ingredients ? [...ingredients, ...ingredientsAdd] : [...ingredientsAdd]
+      }
       onChange()
       pasteList.value = ''
     }
@@ -275,7 +266,6 @@ export default defineComponent({
       save,
       saving,
       isEmpty,
-      isDebug,
       savedStateAtPretty,
       onChange,
       pasteList,
