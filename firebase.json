@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "_app/dist",
+    "public": "webapp/dist",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -13,9 +13,9 @@
       }
     ],
     "predeploy": [
-      "npm run --prefix _app/ test",
-      "npm run --prefix _app/ lint",
-      "npm run --prefix _app/ build"
+      "npm run --prefix webapp/ test",
+      "npm run --prefix webapp/ lint",
+      "npm run --prefix webapp/ build"
     ],
     "postdeploy": [
       "cowsay 'Hurray!'"

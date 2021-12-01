@@ -11,8 +11,8 @@
         }
     },
     "eslint.workingDirectories": [
-        "./_app",
-        "./_ingest"
+        "./webapp",
+        "./ingest"
     ],
     "javascript.preferences.quoteStyle": "single",
     "typescript.preferences.quoteStyle": "single",
