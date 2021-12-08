@@ -7,9 +7,9 @@
 
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav class="navbar-left">
-          <b-nav-item exact :to="{name: 'home'}">Hem</b-nav-item>
-          <b-nav-item exact :to="{name: 'menu'}">Meny</b-nav-item>
-          <b-nav-item exact :to="{name: 'groceries'}">Handlalista</b-nav-item>
+          <b-nav-item class="d-none d-sm-block" exact :to="{name: 'home'}">Hem</b-nav-item>
+          <b-nav-item class="d-none d-sm-block" exact :to="{name: 'menu'}">Meny</b-nav-item>
+          <b-nav-item class="d-none d-sm-block" exact :to="{name: 'groceries'}">Handlalista</b-nav-item>
         </b-navbar-nav>
         <b-navbar-nav class="ml-auto" v-if="isSupported">
           <b-nav-form>
@@ -19,11 +19,13 @@
             </b-button>
             <b-button-group>
               <b-button
+                size="sm"
                 :variant="!isActive ? 'success' : 'secondary'"
                 :pressed="!isActive"
                 @click="release()"
               >Off</b-button>
               <b-button
+                size="sm"
                 :variant="isActive ? 'success' : 'secondary'"
                 :pressed="isActive"
                 @click="request('screen')"

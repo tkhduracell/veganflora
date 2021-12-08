@@ -11,7 +11,7 @@
           class="ml-2"
           :style="[ typeof t === 'object' ? {'background-color': t.color} : '']"
         >{{ typeof t === 'object' ? t.text : t}}</b-badge>
-        <span class="clickable p-0 m-0 ml-1 float-right" @click="areyousure(r)">🗑</span>
+        <span class="clickable p-0 m-0 ml-1 float-right d-none d-sm-block" @click="areyousure(r)">🗑</span>
       </div>
     </div>
     <b-modal
