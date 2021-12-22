@@ -16,14 +16,25 @@
       </h6>
     </div>
 
-    <p>{{ item.size }}</p>
+    <div>
+      {{ item.size }}
+      •
+      <div class="multiplier">
+        <span class="value">{{ multiplier }}x</span>
+        <b-button class="button" variant="secondary" size="sm" @click="plus">+</b-button>
+        <b-button class="button" variant="secondary" size="sm" @click="minus">-</b-button>
+      </div>
+    </div>
+
     <ul class="ingredients">
       <div
         v-for="(i, idx) in item.ingredients"
         :key="item.key + i.name + i.amount + i.measure + idx"
       >
-        <li v-if="i.measure && i.amount">{{ i.amount }} {{ i.measure }} {{ i.name }}</li>
-        <li v-else-if="i.amount">{{ i.amount }} {{ i.name }}</li>
+        <li
+          v-if="i.measure && i.amount"
+        >{{ prettyMulti(i.amount, multiplier) }} {{ i.measure }} {{ i.name }}</li>
+        <li v-else-if="i.amount">{{ prettyMulti(i.amount, multiplier) }} {{ i.name }}</li>
         <li v-else>{{ i.name }}</li>
       </div>
     </ul>
@@ -32,7 +43,7 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent } from '@vue/composition-api'
+import { PropType, defineComponent, ref } from '@vue/composition-api'
 import { Recipe } from './types'
 
 export default defineComponent({
@@ -41,7 +52,33 @@ export default defineComponent({
     showTitle: Boolean
   },
   setup(props: { item: Recipe; showTitle: boolean }) {
-    return { ...props }
+    type Multi = 1 | 2 | 0.5
+    const multiplier = ref<Multi>(1)
+    function plus() {
+      if (multiplier.value === 1) {
+        multiplier.value = 2
+      }
+      if (multiplier.value === 0.5) {
+        multiplier.value = 1
+      }
+    }
+    function minus() {
+      if (multiplier.value === 1) {
+        multiplier.value = 0.5
+      }
+      if (multiplier.value === 2) {
+        multiplier.value = 1
+      }
+    }
+    function prettyMulti(amount: any, multiplier: Multi) {
+      const out = amount * multiplier
+      if (isNaN(out)) {
+        return `${multiplier} x ${amount}`
+      }
+      return out
+    }
+
+    return { multiplier, plus, minus, prettyMulti }
   }
 })
 </script>
@@ -59,5 +96,17 @@ h3 {
   line-height: 1.2;
   text-align: center;
   vertical-align: bottom;
+}
+.multiplier {
+  display: inline-block;
+}
+.multiplier .button {
+  width: 2.6em;
+  margin-left: 0.2em;
+  display: inline-block;
+}
+.multiplier .value {
+  width: 2em;
+  display: inline-block;
 }
 </style>
