@@ -101,6 +101,7 @@ h3 {
   display: inline-block;
 }
 .multiplier .button {
+  scale: 0.6;
   width: 2.6em;
   margin-left: 0.2em;
   display: inline-block;
