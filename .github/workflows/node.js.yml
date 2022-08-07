@@ -28,5 +28,9 @@ jobs:
         working-directory: webapp
       - name: install firebase
         run: npm i firebase-tools -g
+      - name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v0"
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_KEY }}
       - name: deploy
-        run: firebase deploy --token ${{ secrets.GCLOUD_TOKEN }} --only hosting
+        run: firebase deploy --only hosting
