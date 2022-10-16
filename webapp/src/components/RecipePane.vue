@@ -1,6 +1,6 @@
 <template>
   <div class="pane">
-    <RecipeItem :item="item" v-for="item in items" :key="'pane-' + item.title" showTitle/>
+    <RecipeItem :item="item" v-for="item in items" :key="'pane-' + item.title" show-title />
   </div>
 </template>
 
@@ -11,8 +11,9 @@ import RecipeItem from '@/components/RecipeItem.vue'
 import { Recipe } from './types'
 
 export default defineComponent({
+  naem: 'RecipePane',
   props: {
-    items: Array as PropType<Recipe[]>
+    items: { type: Array as PropType<Recipe[]>, required: true }
   },
   components: {
     RecipeItem

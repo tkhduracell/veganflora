@@ -1,5 +1,5 @@
 <template>
-  <div class="recipe">
+  <div class="recipe" v-if="item">
     <b v-if="showTitle">{{ item.title }}</b>
 
     <h4>
@@ -16,14 +16,15 @@
       </h6>
     </div>
 
-    <div>
-      {{ item.size }}
-      •
+    <div class="size">
+      <div>{{ item.size }}</div>
+      <div class="m-2">•</div>
       <div class="multiplier">
         <span class="value">{{ multiplier }}x</span>
         <b-button class="button" variant="secondary" size="sm" @click="plus">+</b-button>
         <b-button class="button" variant="secondary" size="sm" @click="minus">-</b-button>
       </div>
+      <b-checkbox switch v-model="convertEnabled" class="convert">Prefer weight</b-checkbox>
     </div>
 
     <ul class="ingredients">
@@ -31,54 +32,34 @@
         v-for="(i, idx) in item.ingredients"
         :key="item.key + i.name + i.amount + i.measure + idx"
       >
-        <li
-          v-if="i.measure && i.amount"
-        >{{ prettyMulti(i.amount, multiplier) }} {{ i.measure }} {{ i.name }}</li>
-        <li v-else-if="i.amount">{{ prettyMulti(i.amount, multiplier) }} {{ i.name }}</li>
-        <li v-else>{{ i.name }}</li>
+        <RecipeIngredient :i="convertEnabled ? convert(i) : i" :multiplier="multiplier" />
       </div>
     </ul>
     <p class="breaking">{{ item.text }}</p>
   </div>
+  <div v-else>No Item</div>
 </template>
 
 <script lang="ts">
 import { PropType, defineComponent, ref } from '@vue/composition-api'
+
+import { useAutoConvert } from '../modules/use/auto-convert'
+import { useMulti } from '../modules/use/multi'
+import RecipeIngredient from './RecipeIngredient.vue'
 import { Recipe } from './types'
 
 export default defineComponent({
+  components: { RecipeIngredient },
   props: {
-    item: Object as PropType<Recipe>,
+    item: { type: Object as PropType<Recipe>, required: true },
     showTitle: Boolean
   },
   setup(props: { item: Recipe; showTitle: boolean }) {
-    type Multi = 1 | 2 | 3 | 4 | 0.5
-    const multiplier = ref<Multi>(1)
-    function plus() {
-      if (multiplier.value >= 1) {
-        multiplier.value = Math.min(4, Math.floor(multiplier.value + 1)) as Multi
-      }
-      if (multiplier.value === 0.5) {
-        multiplier.value = 1
-      }
-    }
-    function minus() {
-      if (multiplier.value > 1) {
-        multiplier.value = Math.floor(multiplier.value - 1) as Multi
-      }
-      if (multiplier.value === 1) {
-        multiplier.value = 0.5
-      }
-    }
-    function prettyMulti(amount: any, multiplier: Multi) {
-      const out = amount * multiplier
-      if (isNaN(out)) {
-        return `${multiplier} x ${amount}`
-      }
-      return out
-    }
 
-    return { multiplier, plus, minus, prettyMulti }
+    const { enabled: convertEnabled, convert } = useAutoConvert()
+    const multi = useMulti()
+
+    return { ...multi, convertEnabled, convert }
   }
 })
 </script>
@@ -96,6 +77,17 @@ h3 {
   line-height: 1.2;
   text-align: center;
   vertical-align: bottom;
+}
+.size {
+  display: flex !important;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+.convert {
+  align-self: center;
+  flex-grow: 1;
+  text-align: end;
 }
 .multiplier {
   display: inline-block;
