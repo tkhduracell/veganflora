@@ -45,9 +45,9 @@ export function useAutoConvert() {
 function tryMultiply(weight: number | string | undefined, amount: number | string | undefined): string {
   try {
     return '' + (
-      (typeof weight === 'number' ? weight : parseInt(weight ?? '')) *
-      (typeof amount === 'number' ? amount : parseInt(amount ?? ''))
-    )
+      (typeof weight === 'number' ? weight : parseFloat(weight ?? '')) *
+      (typeof amount === 'number' ? amount : parseFloat(amount ?? ''))
+    ).toFixed(1)
   } catch (e) {
     return `${weight} x ${amount}`
   }
