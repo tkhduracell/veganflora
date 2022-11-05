@@ -1,26 +1,21 @@
-import { ref, onMounted, onUnmounted, Ref } from '@vue/composition-api'
+import { ref, onMounted, onUnmounted, Ref } from 'vue'
 
-import * as firebase from 'firebase/app'
-import 'firebase/firestore'
+import { collection, deleteDoc, doc, FieldValue, getDoc, getFirestore, onSnapshot, QuerySnapshot, serverTimestamp, setDoc, Timestamp } from 'firebase/firestore'
 
-import { Recipe } from '@/components/types'
+import { Category, Recipe, Tag } from '@/components/types'
 
 import { autoTag } from '../../modules/tags'
 
-function asArray<V> (result: firebase.firestore.QuerySnapshot): { key: string; value: V }[] {
+function asArray<V> (result: QuerySnapshot): { key: string; value: V }[] {
   const out: { key: string; value: V }[] = []
   result.forEach(itm => out.push({ key: itm.id, value: itm.data() as V }))
   return out
 }
 
 function remove (key: string) {
-  const db = firebase.firestore()
-  debugger
-  return db.collection('veganflora')
-    .doc('root')
-    .collection('recipies')
-    .doc(key)
-    .delete()
+  const db = getFirestore()
+  const recipe = doc(db, 'veganflora', 'root', 'recipies', key)
+  deleteDoc(recipe)
 }
 
 export function useRecipe (key: string) {
@@ -34,14 +29,13 @@ export function useRecipe (key: string) {
   })
 
   onMounted(async () => {
-    const db = firebase.firestore()
-    const recipes = db.collection('veganflora')
-      .doc('root')
-      .collection('recipies')
+    const store = getFirestore()
+
 
     console.log(`Loading recipe ${key} ...`)
-    const result = await recipes.doc(key || 'does-not-exist').get()
-    if (result && result.exists) {
+    const ref = doc(store, 'veganflora', 'root', 'recipies', key ?? 'does-not-exist')
+    const result = await getDoc(ref)
+    if (result && result.exists()) {
       recipe.value = result.data() as Recipe
     } else {
       console.log('Recpie not found, starting with clean slate')
@@ -67,19 +61,16 @@ export function useRecipe (key: string) {
 
     // Timestamp need reconstruct after json clone
     copy.created_at = !copy.created_at
-      ? firebase.firestore.FieldValue.serverTimestamp()
-      : new firebase.firestore.Timestamp(copy.created_at.seconds, copy.created_at.nanoseconds)
+      ? serverTimestamp()
+      : new Timestamp(copy.created_at.seconds, copy.created_at.nanoseconds)
 
     const savekey = key || safekey(copy.title, copy.category)
 
-    await firebase.firestore()
-      .collection('veganflora')
-      .doc('root')
-      .collection('recipies')
-      .doc(savekey)
-      .set({
+    const store = getFirestore()
+    const document = doc(store, 'veganflora', 'root', 'recipies', savekey)
+    await setDoc(document, {
         ...copy,
-        updated_at: firebase.firestore.FieldValue.serverTimestamp()
+        updated_at: serverTimestamp()
       }, { merge: false })
   }
 
@@ -92,15 +83,21 @@ export function useRecipes (): Recipes {
   const close = ref<() => void>()
 
   onMounted(async () => {
-    const db = firebase.firestore()
-    const result = db.collection('veganflora')
-      .doc('root')
-      .collection('recipies')
+    const store = getFirestore()
+    const col = collection(store, 'veganflora', 'root', 'recipies')
 
-    close.value = result.onSnapshot(async () => {
+    type StoreRecipie = Omit<Recipe, 'tags'> & { tags: (string | Tag)[] }
+    function stringToBadge<T extends { text: string }>(x: T | string): T {
+      return typeof x === 'string' ? { text: x } as T : x
+    }
+
+    const fancyTag = ({tags, ...rest}: StoreRecipie) => ({...rest, tags: tags?.map(stringToBadge) })
+
+    close.value = onSnapshot(col, async (result) => {
       console.log('Loading recipes ...')
-      recipes.value = asArray<Recipe>(await result.get())
+      recipes.value = asArray<StoreRecipie>(result)
         .map(itm => ({ ...itm.value, key: itm.key }))
+        .map(fancyTag)
         .map(autoTag)
     })
   })

@@ -1,5 +1,5 @@
-import { Recipe, Tags } from '@/components/types'
-import { firestore } from 'firebase'
+import { Recipe, Tag } from '@/components/types'
+import { Timestamp } from 'firebase/firestore'
 
 export enum AutoTag {
   New = '✦ Nytt',
@@ -11,7 +11,7 @@ export const AutoTags = [
 ]
 
 export function autoTag(r: Recipe): Recipe {
-  function lastNDays(ts: firestore.Timestamp, n: number) {
+  function lastNDays(ts: Timestamp, n: number) {
     return new Date().getTime() - ts.toDate().getTime() < 1000 * 3600 * n
   }
   const created = r.created_at && lastNDays(r.created_at, 14)
@@ -21,7 +21,7 @@ export function autoTag(r: Recipe): Recipe {
     ? { text: AutoTag.Updated, color: '#B39812' }
     : null
 
-  const tags = (r.tags || []) as Tags
+  const tags = (r.tags || []) as Tag[]
   if (created) {
     tags.push(created)
   } else if (updated) {

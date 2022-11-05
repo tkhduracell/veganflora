@@ -1,8 +1,6 @@
-import { ref, onMounted } from '@vue/composition-api'
-
-import * as firebase from 'firebase/app'
-import 'firebase/firestore'
+import { ref, onMounted } from 'vue'
 import { AutoTags } from '../tags'
+import { doc, getDoc, getFirestore, onSnapshot } from 'firebase/firestore'
 
 type Prefill = {
   tags: string[];
@@ -14,18 +12,15 @@ export function usePrefill () {
   const tags = ref<string[]>([...AutoTags])
 
   onMounted(async () => {
-    const db = firebase.firestore()
+    const store = getFirestore()
 
-    const document = await db.collection('veganflora')
-      .doc('root')
-      .get()
+    onSnapshot(doc(store, 'veganflora', 'root'), result => {
+      const {prefill} = result.data() as { prefill: Prefill }
+      console.log('Loaded prefill: ', prefill)
 
-    const { prefill } = document.data() as { prefill: Prefill }
-
-    tags.value = [...AutoTags, ...prefill.tags]
-    categories.value = prefill.categories
-
-    console.log('Loaded prefill: ', prefill)
+      tags.value = [...AutoTags, ...prefill.tags]
+      categories.value = prefill.categories
+    })
   })
 
   return { tags, categories }

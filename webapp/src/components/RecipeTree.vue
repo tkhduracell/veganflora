@@ -31,36 +31,40 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent, ref, computed } from '@vue/composition-api'
+import { PropType, defineComponent, ref, computed, getCurrentInstance } from 'vue'
 
 import RecipeItem from '@/components/RecipeItem.vue'
 
-import { Recipe, Tags } from './types'
+import { Recipe, Tag } from './types'
 import { unique } from '../modules/common/set'
 
 export default defineComponent({
   name: 'RecipieTree',
   props: {
-    recipes: Array as PropType<Recipe[]>
+    recipes: { required: true, type: Array as PropType<Recipe[]> }
   },
   components: {
     RecipeItem
   },
-  setup(props: { recipes: Recipe[] }, context) {
+  setup(props) {
     const tree = computed(() => {
-      const tree = {} as Record<string, { key: string; title: string; tags: Tags }[]>
+      const tree = {} as Record<string, { key: string; title: string; tags: Tag[] }[]>
       unique(props.recipes.map(r => r.category)).forEach(c => {
-        tree[c.join(' / ')] = props.recipes.filter(r => r.category.join('') === c.join(''))
-          .map(({ title, key, tags }) => ({ key, title, tags: tags as Tags }))
+        tree[c.join(' / ')] = props.recipes
+          .filter(r => {
+            return r.category.join('') === c.join('')
+          })
+          .map(({ title, key, tags }) => ({ key, title, tags: tags as Tag[] }))
       })
       return tree
     })
 
     const deletesubject = ref<{ key: string; title: string }>()
 
+    const $bvModal = getCurrentInstance()?.proxy.$bvModal
     async function areyousure(r: { key: string; title: string }) {
       deletesubject.value = r
-      context.root.$bvModal.show('areyousure')
+      $bvModal?.show('areyousure')
     }
 
     return {

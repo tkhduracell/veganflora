@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api'
+import { defineComponent } from 'vue'
 
 import RecipeTree from '@/components/RecipeTree.vue'
 import RecipeTags from '@/components/RecipeTags.vue'

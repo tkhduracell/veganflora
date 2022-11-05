@@ -10,13 +10,13 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent, computed } from '@vue/composition-api'
+import { PropType, defineComponent, computed } from 'vue'
 
 export default defineComponent({
   name: 'RecipieTags',
   props: {
-    value: Array as PropType<string[]>,
-    values: Array as PropType<string[]>
+    value: { type: Array as PropType<string[]>, required: true },
+    values: { type: Array as PropType<string[]>, required: true },
   },
   setup(props: { values: string[] }) {
     return {

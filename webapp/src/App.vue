@@ -43,7 +43,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api'
+import { defineComponent } from 'vue'
 import { useWakeLock, useFullscreen } from '@vueuse/core'
 
 export default defineComponent({

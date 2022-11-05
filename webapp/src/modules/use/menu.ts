@@ -1,8 +1,8 @@
 import { Menu, Meal, WeekDay } from '../../components/types'
-import { ref, onMounted } from '@vue/composition-api'
+import { ref, onMounted } from 'vue'
 
-import * as firebase from 'firebase/app'
-import 'firebase/firestore'
+
+import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore'
 
 const dayTemplate = {
   [Meal.breakfast]: [],
@@ -24,16 +24,17 @@ const template = {
 } as Menu
 
 async function set (menu: Menu) {
-  const db = firebase.firestore()
-  const doc = db.collection('veganflora').doc('root').collection('menus').doc('root')
-  return doc.set(menu)
+  const store = getFirestore()
+  const root = doc(store, 'veganflora','root', 'menus','root')
+  return setDoc(root, menu)
 }
 
 async function get (): Promise<Menu | undefined> {
-  const db = firebase.firestore()
-  const doc = db.collection('veganflora').doc('root').collection('menus').doc('root')
-  const result = await doc.get()
-  return result && result.exists
+  const store = getFirestore()
+  const root = doc(store, 'veganflora','root', 'menus','root')
+
+  const result = await getDoc(root)
+  return result && result.exists()
     ? result.data() as Menu
     : undefined
 }

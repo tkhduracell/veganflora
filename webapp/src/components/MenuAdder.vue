@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref, computed } from '@vue/composition-api'
+import { defineComponent, PropType, ref, computed } from 'vue'
 import { Meal, Meals, WeekDay, WeekDays, Recipe } from './types'
 
 export default defineComponent({

@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch } from '@vue/composition-api'
+import { defineComponent, ref, computed, watch } from 'vue'
 
 import MenuAdder from '@/components/MenuAdder.vue'
 import Menu from '@/components/Menu.vue'
