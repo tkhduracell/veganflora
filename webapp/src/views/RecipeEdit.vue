@@ -181,7 +181,7 @@ export default defineComponent({
 
     const tags = computed(() => {
       return Suggest.tags(
-        prefill.tags.value,
+        prefill.tags.value.map(x => x.text),
         (recipe.value.tags || []).map(t => typeof t === 'object' ? t.text : t)
       ).filter(s => !AutoTags.includes(s as AutoTag))
     })
@@ -238,9 +238,9 @@ export default defineComponent({
     async function save() {
       try {
         saving.value = true
-        await onSave()
+        const { savekey } =  await onSave()
         localStorage.removeItem('saveState')
-        router.push('/')
+        router.push({ name: 'show', params: { key: savekey } })
       } catch (err) {
         console.error('Failed to save data')
       } finally {

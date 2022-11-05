@@ -1,26 +1,23 @@
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
-export type Multi = 1 | 2 | 3 | 4 | 0.5
+type Unpacked<T> = T extends (infer U)[] ? U : T;
+export const MultiValue = [0.25, 0.5, 1, 2, 3, 4, 5,6, 8, 10, 12, 15, 20]
+export type Multi = Unpacked<typeof MultiValue>
+
+
 export function useMulti() {
-  const multiplier = ref<Multi>(1)
+  const idx = ref(1)
+  const multiplier = computed(() => MultiValue[idx.value])
+
   function plus() {
-    if (multiplier.value >= 1) {
-      multiplier.value = Math.min(4, Math.floor(multiplier.value + 1)) as Multi
-    }
-    if (multiplier.value === 0.5) {
-      multiplier.value = 1
-    }
+    idx.value = Math.max(Math.min(idx.value + 1, MultiValue.length - 1), 0)
   }
   function minus() {
-    if (multiplier.value > 1) {
-      multiplier.value = Math.floor(multiplier.value - 1) as Multi
-    }
-    if (multiplier.value === 1) {
-      multiplier.value = 0.5
-    }
+    idx.value = Math.max(Math.min(idx.value - 1, MultiValue.length - 1), 0)
   }
+
   function prettyMulti(amount: any, multiplier: Multi) {
-    const out = amount * multiplier
+    const out = (typeof amount === 'string' ? parseFloat(amount.replace(',', '.')) : amount) * multiplier
     if (isNaN(out)) {
       return multiplier > 1 ? `${multiplier} x ${amount}` : amount
     }

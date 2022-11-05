@@ -4,11 +4,17 @@ import { useLocalStorage } from '@vueuse/core';
 import { doc, getFirestore, onSnapshot } from 'firebase/firestore'
 
 import { Ingredient } from '@/components/types'
+import { normalizeValue } from '../ingredients';
+
+
+export type ConvertLine = { measure: string, weight: number, weight_measure?: string }
+export type Convert = { name: string, lines: { [key :string]: ConvertLine } }
+export type Converts = { [key :string]: Convert }
 
 export function useAutoConvert() {
   const store = getFirestore()
   const enabled = useLocalStorage('convert-weight', false)
-  const weights = ref<Record<string, { measure: string, weight: number, weight_measure?: string }[]>>({})
+  const weights = ref<Converts>({})
   const listeners = reactive({
     weights: () => {}
   })
@@ -25,14 +31,36 @@ export function useAutoConvert() {
   function convert(ingredient: Ingredient): Ingredient {
     const tbl = weights.value
     if (Object.keys(tbl).length === 0) return ingredient
-    const key = ingredient.name.toLowerCase()
-    if (key in tbl) {
-      const item = tbl[key]
-      for (const row of item) {
-        if (row.measure == ingredient.measure) {
-          return { ...ingredient, amount: tryMultiply(row.weight, ingredient.amount), measure: row.weight_measure ?? 'g' }
+    for (const {lines, name} of Object.values(tbl)) {
+      // Prefer exact match
+      if (name === ingredient.name) {
+        for (const {measure, weight, weight_measure} of Object.values(lines)) {
+          // Prefer exact match
+          if (measure === ingredient.measure) {
+            return { ...ingredient, amount: tryMultiply(weight, ingredient.amount), measure: weight_measure ?? 'g' }
+          }
+        }
+        for (const {measure, weight, weight_measure} of Object.values(lines)) {
+          if (ingredient.measure?.match(measure)) {
+            return { ...ingredient, amount: tryMultiply(weight, ingredient.amount), measure: weight_measure ?? 'g' }
+          }
         }
       }
+
+      if (ingredient.name.match(name)) {
+        for (const {measure, weight, weight_measure} of Object.values(lines)) {
+          // Prefer exact match
+          if (measure === ingredient.measure) {
+            return { ...ingredient, amount: tryMultiply(weight, ingredient.amount), measure: weight_measure ?? 'g' }
+          }
+        }
+        for (const {measure, weight, weight_measure} of Object.values(lines)) {
+          if (ingredient.measure?.match(measure)) {
+            return { ...ingredient, amount: tryMultiply(weight, ingredient.amount), measure: weight_measure ?? 'g' }
+          }
+        }
+      }
+
     }
     return ingredient
   }
@@ -40,9 +68,10 @@ export function useAutoConvert() {
 }
 function tryMultiply(weight: number | string | undefined, amount: number | string | undefined): string {
   try {
+    const nomalized = normalizeValue(amount ?? '')
     return '' + (
       (typeof weight === 'number' ? weight : parseFloat(weight ?? '')) *
-      (typeof amount === 'number' ? amount : parseFloat(amount ?? ''))
+      (typeof nomalized === 'number' ? nomalized : parseFloat(nomalized.replace(',', '.')))
     ).toFixed(1)
   } catch (e) {
     return `${weight} x ${amount}`
