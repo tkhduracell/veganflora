@@ -2,7 +2,7 @@
   <b-container class="converts">
     <h1>Måttenheter</h1>
     <b-row class="clearfix" v-if="data">
-      <b-col cols=12 v-for="[key, item] in sortBy(Object.entries(data), ([k,]) => k)">
+      <b-col cols=12 v-for="[key, item] in sortBy(Object.entries(data), ([k,]) => k)" :key="key">
         <b-row no-gutters class="mb-2 mt-2">
           <b-col cols="10">
             <b-form-input size="lg" :value="item.name" @input="update(key, 'name', $event)" :state="isValidPattern(item.name)" />
@@ -11,7 +11,7 @@
             <b-icon-trash-fill scale="1.4" class=""/>
           </b-col>
         </b-row>
-        <div v-for="([subkey, line], idx) in sortBy(Object.entries(item.lines), ([k,]) => k)">
+        <div v-for="([subkey, line], idx) in sortBy(Object.entries(item.lines), ([k,]) => k)" :key="key+subkey">
           <b-row no-gutters class="">
             <b-col cols=auto class="line icon plus show" @click="addLine(key)" v-if="idx === Object.keys(item.lines).length - 1">
               <b-icon-plus-circle-fill scale="1.4" class=""/>
