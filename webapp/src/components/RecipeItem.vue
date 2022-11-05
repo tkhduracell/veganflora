@@ -10,10 +10,10 @@
     </div>
 
     <div class="tags">
-      <dpan class="mt-2" v-for="(t, idx) in item.tags" :key="JSON.stringify(t)">
+      <span class="mt-2" v-for="(t, idx) in item.tags" :key="JSON.stringify(t)">
         <span class="separator" v-if="idx > 0">,</span>
         <b-badge :variant="typeof t === 'string' ? 'secondary' : t.color">{{ typeof t === 'string' ? t : t.text }}</b-badge>
-      </dpan>
+      </span>
     </div>
 
     <div class="size">

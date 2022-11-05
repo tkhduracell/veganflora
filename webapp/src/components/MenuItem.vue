@@ -27,7 +27,7 @@ export default defineComponent({
 })
 </script>
 
-<style>
+<style scoped>
   .item {
     border: 0.5px solid grey;
     border-radius: 5px;
