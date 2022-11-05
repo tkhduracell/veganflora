@@ -1,15 +1,4 @@
 {
-    "vetur.format.defaultFormatterOptions": {
-        "js-beautify-html": {
-            "wrap_attributes": "force-expand-multiline"
-        },
-        "prettyhtml": {
-            "printWidth": 100,
-            "singleQuote": false,
-            "wrapAttributes": false,
-            "sortAttributes": false
-        }
-    },
     "eslint.workingDirectories": [
         "./webapp",
         "./ingest"
@@ -19,10 +8,6 @@
     "javascript.suggest.completeFunctionCalls": true,
     "typescript.referencesCodeLens.enabled": true,
     "typescript.suggest.completeFunctionCalls": true,
-    "vetur.format.defaultFormatter.ts": "vscode-typescript",
-    "vetur.format.defaultFormatter.js": "vscode-typescript",
-    "vetur.format.defaultFormatter.stylus": "none",
-    "vetur.format.defaultFormatter.html": "prettyhtml",
     "javascript.format.enable": false,
     "javascript.format.insertSpaceBeforeFunctionParenthesis": true,
     "javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": true,
@@ -31,14 +16,6 @@
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": true
-    },
-    "vetur.underline.refValue": true,
-    "vetur.languageFeatures.codeActions": true,
-    "vetur.languageFeatures.semanticTokens": true,
-    "vetur.validation.template": true,
-    "vetur.validation.templateProps": true,
-    "[vue]": {
-        "editor.defaultFormatter": "octref.vetur",
     },
     "[javascript]": {
         "editor.defaultFormatter": "dbaeumer.vscode-eslint"
