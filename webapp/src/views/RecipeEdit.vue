@@ -18,12 +18,12 @@
       </b-form-group>
 
       <b-form-group id="input-group-21" label="Kategori" label-for="input-21">
-        <Tagger
+        <SelectCategory
           id="input-21"
           variant="primary"
           separator=" / "
           :category="recipe.category"
-          @update:category="recipe.category = $event"
+          @update:category="updateCategory($event)"
           :suggestions="categories"
           :disabled="saving"
           @keyup="onChange"
@@ -31,11 +31,11 @@
       </b-form-group>
 
       <b-form-group id="input-group-5" label="Taggar" label-for="input-5">
-        <Tagger
+        <SelectTags
           id="input-5"
           variant="secondary"
           :tags="recipe.tags"
-          @update:tags="recipe.tags = $event"
+          @update:tags="updateTags($event)"
           :suggestions="tags"
           :disabled="saving"
           @keyup="onChange"
@@ -158,18 +158,20 @@ import debounce from 'lodash.debounce'
 
 import { BIconClipboard } from 'bootstrap-vue'
 
-import Tagger from '../components/Tagger.vue'
+import SelectTags from '../components/SelectTags.vue'
+import SelectCategory from '../components/SelectCategory.vue'
 
 import { AutoTag, AutoTags } from '../modules/tags'
 import { Suggest } from '../modules/suggestions'
 import { useRecipe } from '../modules/use/recipes'
 import { usePrefill } from '../modules/use/prefill'
 import { parseIngredient } from '../modules/ingredients'
-import { Recipe, Ingredient } from '../components/types'
+import { Recipe, Ingredient, Tag, Category } from '../components/types'
 import { useRoute, useRouter } from 'vue-router/composables'
 
 export default defineComponent({
-  components: { Tagger, BIconClipboard },
+  name: 'RecipieEdit',
+  components: { SelectTags, BIconClipboard, SelectCategory },
   setup() {
     const { params } = useRoute()
     const router = useRouter()
@@ -179,12 +181,13 @@ export default defineComponent({
     const { recipe, onSave } = useRecipe(key || '')
     const prefill = usePrefill()
 
-    const tags = computed(() => {
+    const tags = computed<Tag[]>(() => {
       return Suggest.tags(
         prefill.tags.value.map(x => x.text),
         (recipe.value.tags || []).map(t => typeof t === 'object' ? t.text : t)
-      ).filter(s => !AutoTags.includes(s as AutoTag))
+      ).filter(s => !AutoTags.includes(s as AutoTag)).map(x => ({ text: x, color: '' }))
     })
+
     const categories = computed(() => {
       return Suggest.categories(prefill.categories.value, recipe.value.category)
     })
@@ -192,7 +195,9 @@ export default defineComponent({
     onMounted(() => {
       if (!key) {
         const state = localStorage.getItem('saveState')
-        recipe.value = state ? JSON.parse(state) as Recipe : {} as Recipe
+        if (state) {
+          recipe.value = JSON.parse(state) as Recipe
+        }
       }
     })
 
@@ -228,6 +233,14 @@ export default defineComponent({
           ...ingredients, { name: '' } as Ingredient
         ]
       }
+    }
+
+    function updateCategory(update: Recipe['category']) {
+      recipe.value = { ...recipe.value, category: update }
+    }
+
+    function updateTags(update: Recipe['tags']) {
+      recipe.value = { ...recipe.value, tags: update }
     }
 
     const isEmpty = computed(() => {
@@ -274,6 +287,8 @@ export default defineComponent({
       onChange,
       pasteList,
       onPasteList,
+      updateCategory,
+      updateTags,
       tags,
       categories
     }

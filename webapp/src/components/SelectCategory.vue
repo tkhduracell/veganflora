@@ -1,14 +1,14 @@
 <template>
   <div>
-    <span v-for="(c, idx) in tags || category" :key="JSON.stringify(c)" class="">
+    <span v-for="(c, idx) in category" :key="JSON.stringify(c)" class="">
       <span class="separator" v-if="idx > 0">{{separator}}</span>
-      <b-form-tag small :variant="variant" @remove="remove(idx)" class="div">{{ typeof c === 'string' ? c : c.text }}</b-form-tag>
+      <b-form-tag small :variant="variant" @remove="remove(idx)" class="div">{{ c }}</b-form-tag>
     </span>
-    <span v-if="category && category.length > 0 || tags && tags.length > 0" class="separator">{{separator}}</span>
+    <span v-if="category && category.length > 0" class="separator">{{separator}}</span>
 
     <input
       v-if="custom"
-      v-model="newTag"
+      v-model="newValue"
       class="ml-1"
       @blur="complete()"
       @keypress.enter="complete()"
@@ -28,52 +28,37 @@ import { defineComponent, PropType, ref } from 'vue'
 import { Category, Tag } from './types'
 
 export default defineComponent({
-  name: 'Tagger',
+  name: 'SelectCategory',
   props: {
     category: { type: Array as PropType<string[]> },
-    tags: { type: Array as PropType<Tag[]> },
     separator: { type: String, default: ' , ' },
     suggestions: { required: true, type: Array as PropType<string[]> },
     variant: { type: String, default: 'primary' }
   },
   setup(props, { emit }) {
     const custom = ref<boolean>(false)
-    const newTag = ref<string>('')
+    const newValue = ref<string>('')
     const suggestion = ref<string>('')
 
-    if (props.category && props.tags) throw Error('Can not use both tags and category')
-
     function complete() {
-      const addition = custom.value ? newTag.value : suggestion.value
+      const addition = custom.value ? newValue.value : suggestion.value
       if (!addition || addition.trim().length === 0) return
       custom.value = false
 
-      if (props.category) {
-        const newValue: Category[] = [...(props.category ?? []), addition]
-        emit('update:category', newValue)
-      }
-      if (props.tags) {
-        const newValue: Tag[] = [...(props.tags ?? []), { text: addition, color: '' }]
-        emit('update:tags', newValue)
-      }
-      newTag.value = ''
+      const out: Category[] = [...(props.category ?? []), addition]
+      emit('update:category', out)
+
+      newValue.value = ''
       suggestion.value = ''
     }
 
     function remove(idx: number) {
-      if (props.category) {
-        const newValue = props.category?.filter((itm, i) => i !== idx) ?? []
-        emit('update:category', newValue)
-      }
-      if (props.tags) {
-        const newValue: Tag[] = props.tags?.filter((itm, i) => i !== idx) ?? []
-        emit('update:tags', newValue)
-      }
-
+      const newValue = props.category?.filter((itm, i) => i !== idx) ?? []
+      emit('update:category', newValue)
     }
 
     return {
-      custom, complete, newTag, suggestion, remove
+      custom, complete, newValue, suggestion, remove
     }
   }
 })

@@ -15,5 +15,5 @@ export function useTagFilter<T>(input: Ref<T[] | undefined>, provider: (t: T) =>
       : input.value
     filtered.value = out
   })
-  return { tags, filter, filtered }
+  return { tags: tags.value, filter, filtered }
 }
