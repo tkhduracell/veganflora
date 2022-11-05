@@ -13,12 +13,12 @@
 import { PropType, defineComponent, computed } from 'vue'
 
 export default defineComponent({
-  name: 'RecipieTags',
+  name: 'RecipeTags',
   props: {
     value: { type: Array as PropType<string[]>, required: true },
     values: { type: Array as PropType<string[]>, required: true },
   },
-  setup(props: { values: string[] }) {
+  setup(props) {
     return {
       options: computed(() => {
         return props.values.map(text => {

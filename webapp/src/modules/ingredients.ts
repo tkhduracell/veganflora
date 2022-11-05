@@ -24,6 +24,28 @@ export function normalize (x: string) {
     .replace(/1\s*[\\/]\s*9/gi, '⅑')
     .replace(/1\s*[\\/]\s*10/gi, '⅒')
 }
+export function normalizeValue (x: string |number): string | number {
+  if (typeof x === 'number') return x
+  if (x.match(/½|1\s*[\\/]\s*2/gi)) return 1/2
+  if (x.match(/⅓|1\s*[\\/]\s*3/gi)) return 1/3
+  if (x.match(/⅔|2\s*[\\/]\s*3/gi)) return 2/3
+  if (x.match(/¼|1\s*[\\/]\s*4/gi)) return 1/4
+  if (x.match(/¾|3\s*[\\/]\s*4/gi)) return 3/4
+  if (x.match(/⅕|1\s*[\\/]\s*5/gi)) return 1/5
+  if (x.match(/⅖|2\s*[\\/]\s*5/gi)) return 2/5
+  if (x.match(/⅗|3\s*[\\/]\s*5/gi)) return 3/5
+  if (x.match(/⅘|4\s*[\\/]\s*5/gi)) return 4/5
+  if (x.match(/⅙|1\s*[\\/]\s*6/gi)) return 1/6
+  if (x.match(/⅚|5\s*[\\/]\s*6/gi)) return 5/6
+  if (x.match(/⅐|1\s*[\\/]\s*7/gi)) return 1/7
+  if (x.match(/⅛|1\s*[\\/]\s*8/gi)) return 1/8
+  if (x.match(/⅜|3\s*[\\/]\s*8/gi)) return 3/8
+  if (x.match(/⅝|5\s*[\\/]\s*8/gi)) return 5/8
+  if (x.match(/⅞|7\s*[\\/]\s*8/gi)) return 7/8
+  if (x.match(/⅑|1\s*[\\/]\s*9/gi)) return 1/9
+  if (x.match(/⅒|1\s*[\\/]\s*10/gi)) return 1/10
+  return x
+}
 
 export function parseIngredient (x: string) {
   const regex = /\s*(?:(?<amount>[\d¼½¾,.]+(?:\s+[\d¼½¾])?(?:\s*-\s*[\d¼½¾]+)?)\s*)?(?:(?<measure>st|g|gram|krm|tsk|msk|ml|dl|liten\snäve|stora?|medelstor)\s+)?(?<name>.+)?/gu
