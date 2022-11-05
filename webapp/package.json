@@ -24,7 +24,7 @@
     "vue-router": "^3.6.5"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.19",
+    "@types/jest": "^27.0.0",
     "@types/lodash.debounce": "^4.0.6",
     "@types/node": "^13.13.52",
     "@types/webpack-env": "^1.16.3",
@@ -35,6 +35,11 @@
     "@vue/cli-plugin-vuex": "~5.0.8",
     "@vue/cli-service": "~5.0.8",
     "@vue/test-utils": "^1.3.3",
+    "@vue/vue2-jest": "^27.0.0",
+    "ts-jest": "^27.1.4",
     "typescript": "^4.3.5"
+  },
+  "overrides": {
+    "vue-template-compiler": "2.7.13"
   }
 }
