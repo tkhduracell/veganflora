@@ -10,10 +10,10 @@
 
 <script lang="ts">
 import { useMulti, Multi } from '@/modules/use/multi'
-import { PropType, defineComponent, ref } from '@vue/composition-api'
+import { PropType, defineComponent, ref } from 'vue'
 
 
-import { Ingredient, Recipe } from './types'
+import { Ingredient } from './types'
 
 export default defineComponent({
   props: {

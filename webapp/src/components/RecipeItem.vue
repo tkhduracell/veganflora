@@ -2,18 +2,18 @@
   <div class="recipe" v-if="item">
     <b v-if="showTitle">{{ item.title }}</b>
 
-    <h4>
-      <span class="mt-2" v-for="(c, idx) in item.category" :key="c">
+    <div class="categories">
+      <span class="mt-2" v-for="(c, idx) in item.category" :key="JSON.stringify(c)">
         <span class="separator" v-if="idx > 0">/</span>
         <b-badge variant="primary">{{ c }}</b-badge>
       </span>
-    </h4>
+    </div>
 
-    <div v-if="item.tags">
-      <h6 class="mt-2" v-for="(t, idx) in item.tags" :key="t">
+    <div class="tags">
+      <dpan class="mt-2" v-for="(t, idx) in item.tags" :key="JSON.stringify(t)">
         <span class="separator" v-if="idx > 0">,</span>
-        <b-badge variant="secondary">{{ t }}</b-badge>
-      </h6>
+        <b-badge :variant="typeof t === 'string' ? 'secondary' : t.color">{{ typeof t === 'string' ? t : t.text }}</b-badge>
+      </dpan>
     </div>
 
     <div class="size">
@@ -21,8 +21,8 @@
       <div class="m-2">•</div>
       <div class="multiplier">
         <span class="value">{{ multiplier }}x</span>
-        <b-button class="button" variant="secondary" size="sm" @click="plus">+</b-button>
-        <b-button class="button" variant="secondary" size="sm" @click="minus">-</b-button>
+        <b-button class="button" variant="primary" @click="plus">+</b-button>
+        <b-button class="button" variant="primary" @click="minus">﹣</b-button>
       </div>
       <b-checkbox switch v-model="convertEnabled" class="convert">Prefer weight</b-checkbox>
     </div>
@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent, ref } from '@vue/composition-api'
+import { PropType, defineComponent, ref } from 'vue'
 
 import { useAutoConvert } from '../modules/use/auto-convert'
 import { useMulti } from '../modules/use/multi'
@@ -68,6 +68,12 @@ export default defineComponent({
 h3 {
   margin: 40px 0 0;
 }
+.categories {
+  font-size: 140%;
+}
+.tags {
+
+}
 .breaking {
   white-space: pre-line;
 }
@@ -93,8 +99,10 @@ h3 {
   display: inline-block;
 }
 .multiplier .button {
-  scale: 0.6;
-  width: 2.6em;
+  scale: 0.8;
+  font-size: 160%;
+  width: 1.6em;
+  padding: 0;
   margin-left: 0.2em;
   display: inline-block;
 }

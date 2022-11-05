@@ -1,26 +1,22 @@
-import { onMounted, onUnmounted, reactive, ref, UnwrapRef } from '@vue/composition-api';
+import { onMounted, onUnmounted, reactive, ref, UnwrapRef } from 'vue';
 import { useLocalStorage } from '@vueuse/core';
 
-import * as firebase from 'firebase/app'
-import 'firebase/firestore'
+import { doc, getFirestore, onSnapshot } from 'firebase/firestore'
 
 import { Ingredient } from '@/components/types'
 
 export function useAutoConvert() {
+  const store = getFirestore()
   const enabled = useLocalStorage('convert-weight', false)
   const weights = ref<Record<string, { measure: string, weight: number, weight_measure?: string }[]>>({})
   const listeners = reactive({
     weights: () => {}
   })
   onMounted(async () => {
-    const db = firebase.firestore()
-    listeners.weights = db.collection('veganflora')
-      .doc('root')
-      .collection('converts')
-      .doc('weight')
-      .onSnapshot((result) => {
-        weights.value = result.data() as UnwrapRef<typeof weights> ?? {}
-      })
+    const ref = doc(store, 'veganflora', 'root', 'converts', 'weight')
+    listeners.weights = onSnapshot(ref, result => {
+      weights.value = result.data() as UnwrapRef<typeof weights> ?? {}
+    })
   })
   onUnmounted(() => {
     listeners.weights()

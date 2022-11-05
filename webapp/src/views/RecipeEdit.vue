@@ -22,7 +22,8 @@
           id="input-21"
           variant="primary"
           separator=" / "
-          v-model="recipe.category"
+          :category="recipe.category"
+          @update:category="recipe.category = $event"
           :suggestions="categories"
           :disabled="saving"
           @keyup="onChange"
@@ -33,7 +34,8 @@
         <Tagger
           id="input-5"
           variant="secondary"
-          v-model="recipe.tags"
+          :tags="recipe.tags"
+          @update:tags="recipe.tags = $event"
           :suggestions="tags"
           :disabled="saving"
           @keyup="onChange"
@@ -151,7 +153,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted } from '@vue/composition-api'
+import { defineComponent, ref, computed, onMounted } from 'vue'
 import debounce from 'lodash.debounce'
 
 import { BIconClipboard } from 'bootstrap-vue'
@@ -164,12 +166,14 @@ import { useRecipe } from '../modules/use/recipes'
 import { usePrefill } from '../modules/use/prefill'
 import { parseIngredient } from '../modules/ingredients'
 import { Recipe, Ingredient } from '../components/types'
-import VueRouter from 'vue-router'
+import { useRoute, useRouter } from 'vue-router/composables'
 
 export default defineComponent({
   components: { Tagger, BIconClipboard },
-  setup(props: {}, { root: { $router } }: { root: { $router: VueRouter } }) {
-    const key = $router.currentRoute.params.key || false
+  setup() {
+    const { params } = useRoute()
+    const router = useRouter()
+    const key = params.key || false
 
     const saving = ref(false)
     const { recipe, onSave } = useRecipe(key || '')
@@ -236,7 +240,7 @@ export default defineComponent({
         saving.value = true
         await onSave()
         localStorage.removeItem('saveState')
-        $router.push('/')
+        router.push('/')
       } catch (err) {
         console.error('Failed to save data')
       } finally {

@@ -1,5 +1,4 @@
 import Vue from 'vue'
-import VueCompositionApi from '@vue/composition-api'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 
 import router from './router'
@@ -11,7 +10,6 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import VueFirebase from './firebase-plugin'
 
 Vue.use(VueFirebase)
-Vue.use(VueCompositionApi)
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 

@@ -24,16 +24,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, computed } from '@vue/composition-api'
+import { defineComponent, PropType, computed } from 'vue'
 import { Recipe, Meal, IngredientWithContext, Context, WeekDay, Menu, Day } from './types'
 
 export default defineComponent({
   props: {
-    recipes: Array as PropType<Recipe[]>,
-    menu: Object as PropType<Menu>,
-    findRecipe: Function as PropType<(r: string) => Recipe>
+    recipes: { required: true, type: Array as PropType<Recipe[]> },
+    menu: { required: true, type: Object as PropType<Menu> },
+    findRecipe: { required: true, type: Function as PropType<(r: string) => Recipe>}
   },
-  setup(props: { recipes: Recipe[]; menu: Menu; findRecipe: (r: string) => Recipe }) {
+  setup(props) {
     function flatmap<T, K>(arr: T[], fn: (t: T, idx: number) => K[]): K[] {
       return arr.reduce((acc: K[], x, idx) => acc.concat(fn(x, idx)), [])
     }

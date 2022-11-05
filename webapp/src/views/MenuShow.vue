@@ -15,20 +15,21 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from '@vue/composition-api'
+import { defineComponent, computed } from 'vue'
 
 import RecipePane from '@/components/RecipePane.vue'
 
 import { useRecipes } from '../modules/use/recipes'
 import { useMenu } from '../modules/use/menu'
 import { WeekDay, Meal, Recipe } from '../components/types'
+import { useRoute } from 'vue-router/composables'
 
 const Component = defineComponent({
   components: {
     RecipePane
   },
-  setup(props, { root: { $root: { $router } } }) {
-    const params = $router.currentRoute.params
+  setup() {
+    const { params } = useRoute()
     const week = params.week
     const weekday = params.weekday as WeekDay
     const meal = params.meal as Meal

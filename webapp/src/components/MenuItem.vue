@@ -14,15 +14,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from '@vue/composition-api'
+import { defineComponent, PropType } from 'vue'
 import { Recipe } from './types'
 
 export default defineComponent({
   props: {
-    items: Array as PropType<Recipe[]>,
-    meal: String,
-    week: String,
-    weekday: String
+    items: { required: true, type: Array as PropType<Recipe[]> },
+    meal: { required: true, type: String },
+    week: { required: true, type: String },
+    weekday: { required: true, type: String },
   }
 })
 </script>

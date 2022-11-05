@@ -1,4 +1,4 @@
-import { ref } from '@vue/composition-api'
+import { ref } from 'vue'
 
 export type Multi = 1 | 2 | 3 | 4 | 0.5
 export function useMulti() {
@@ -22,7 +22,7 @@ export function useMulti() {
   function prettyMulti(amount: any, multiplier: Multi) {
     const out = amount * multiplier
     if (isNaN(out)) {
-      return `${multiplier} x ${amount}`
+      return multiplier > 1 ? `${multiplier} x ${amount}` : amount
     }
     return out
   }

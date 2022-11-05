@@ -1,6 +1,4 @@
-import * as firebase from 'firebase/app'
-import 'firebase/firestore'
-
+import { initializeApp } from 'firebase/app'
 import { PluginObject } from 'vue'
 
 export default {
@@ -14,10 +12,6 @@ export default {
       appId: '1:520915943790:web:fb1165582d009784ddc17f'
     }
     console.log('Initializing firebase app...')
-    firebase.initializeApp(config)
-
-    /* Enable offline */
-    const db = firebase.firestore()
-    db.enablePersistence()
+    initializeApp(config)
   }
 } as PluginObject<never>

@@ -1,19 +1,24 @@
+import { Timestamp } from 'firebase/firestore';
+
+
+
 export type Tag = {
   text: string;
   color: string;
 }
-export type Tags = (string | Tag)[]
+export type Category = string
+
 
 export type Recipe = {
   size: string;
   text: string;
-  category: string[];
-  tags?: Tags;
+  category: Category[];
+  tags?: Tag[];
   ingredients: Ingredient[];
   title: string;
   key: string;
-  created_at?: firebase.firestore.Timestamp;
-  updated_at?: firebase.firestore.Timestamp;
+  created_at?: Timestamp;
+  updated_at?: Timestamp;
 }
 
 export type Menu = {

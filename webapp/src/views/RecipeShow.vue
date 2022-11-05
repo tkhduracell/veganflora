@@ -22,20 +22,23 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, SetupContext, computed } from '@vue/composition-api'
+import { defineComponent, SetupContext, computed } from 'vue'
 
 import { useRecipe } from '../modules/use/recipes'
 
 import RecipeItem from '@/components/RecipeItem.vue'
+import { useRoute } from 'vue-router/composables'
 
 export default defineComponent({
+  name: 'RecipeShow',
   components: {
     RecipeItem
   },
-  setup (props, { root: { $router } }: SetupContext) {
-    const key = $router.currentRoute.params.key
+  setup () {
+    const { params } = useRoute()
+    const key = params.key
     const { recipe, remove } = useRecipe(key)
-    const isLoaded = computed(() => recipe.value && recipe.value.title)
+    const isLoaded = computed(() => !!(recipe.value && recipe.value.title))
 
     return {
       key,
