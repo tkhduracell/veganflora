@@ -1,8 +1,8 @@
-import { ref, onMounted, onUnmounted, Ref } from 'vue'
+import { ref, onMounted, onUnmounted, Ref, reactive } from 'vue'
 
-import { collection, deleteDoc, doc, FieldValue, getDoc, getFirestore, onSnapshot, QuerySnapshot, serverTimestamp, setDoc, Timestamp } from 'firebase/firestore'
+import { collection, deleteDoc, doc, getDoc, getFirestore, onSnapshot, QuerySnapshot, serverTimestamp, setDoc, Timestamp } from 'firebase/firestore'
 
-import { Category, Recipe, Tag } from '@/components/types'
+import { Recipe, Tag } from '@/components/types'
 
 import { autoTag } from '../../modules/tags'
 
@@ -12,33 +12,36 @@ function asArray<V> (result: QuerySnapshot): { key: string; value: V }[] {
   return out
 }
 
-function remove (key: string) {
+async function remove (key: string) {
   const db = getFirestore()
   const recipe = doc(db, 'veganflora', 'root', 'recipies', key)
-  deleteDoc(recipe)
+  await deleteDoc(recipe)
 }
 
 export function useRecipe (key: string) {
-  const recipe = ref<Recipe>({
+  const empty = {
     title: '',
     category: [],
+    tags: [],
     ingredients: [],
     key: '',
     size: '',
     text: ''
-  })
+  }
+  const recipe = ref<Recipe>(empty)
 
   onMounted(async () => {
     const store = getFirestore()
 
-
-    console.log(`Loading recipe ${key} ...`)
-    const ref = doc(store, 'veganflora', 'root', 'recipies', key ?? 'does-not-exist')
-    const result = await getDoc(ref)
-    if (result && result.exists()) {
-      recipe.value = result.data() as Recipe
-    } else {
-      console.log('Recpie not found, starting with clean slate')
+    if (key) {
+      console.log(`Loading recipe ${key} ...`)
+      const ref = doc(store, 'veganflora', 'root', 'recipies', key ?? 'does-not-exist')
+      const result = await getDoc(ref)
+      if (result && result.exists()) {
+        recipe.value = result.data() as Recipe
+      } else {
+        console.log('Recpie not found, starting with clean slate')
+      }
     }
   })
 
@@ -66,12 +69,14 @@ export function useRecipe (key: string) {
 
     const savekey = key || safekey(copy.title, copy.category)
 
-    const store = getFirestore()
-    const document = doc(store, 'veganflora', 'root', 'recipies', savekey)
-    await setDoc(document, {
-        ...copy,
-        updated_at: serverTimestamp()
-      }, { merge: false })
+    if (savekey) {
+      const store = getFirestore()
+      const document = doc(store, 'veganflora', 'root', 'recipies', savekey)
+      await setDoc(document, {
+          ...copy,
+          updated_at: serverTimestamp()
+        }, { merge: false })
+    }
     return { savekey }
   }
 

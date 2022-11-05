@@ -30,7 +30,7 @@ import { defineComponent, SetupContext, computed } from 'vue'
 import { useRecipe } from '../modules/use/recipes'
 
 import RecipeItem from '@/components/RecipeItem.vue'
-import { useRoute } from 'vue-router/composables'
+import { useRoute, useRouter } from 'vue-router/composables'
 
 export default defineComponent({
   name: 'RecipeShow',
@@ -42,11 +42,11 @@ export default defineComponent({
     const key = params.key
     const { recipe, remove } = useRecipe(key)
     const isLoaded = computed(() => !!(recipe.value && recipe.value.title))
-
+    const router = useRouter()
     return {
       key,
       recipe,
-      remove,
+      remove: () => remove().then(x => router.push('/')),
       isLoaded
     }
   }

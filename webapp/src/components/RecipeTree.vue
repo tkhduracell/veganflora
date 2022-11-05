@@ -1,33 +1,20 @@
 <template>
-  <div class="recipe-tree">
-    <div class="category" v-for="(recipes, category) in tree" :key="category">
+  <b-row class="recipe-tree">
+    <b-col md=4 xl=3 class="category mt-4" v-for="(recipes, category) in tree" :key="category">
       <strong>{{ category }}</strong>
       <div v-for="r in recipes" :key="category + r.key" class="recipe clearfix ml-2 mt-1 mb-1">
         <b-link class="link" :to="{ name: 'show', params: {key: r.key} }">{{ r.title }}</b-link>
 
+        <div class="d-none d-md-block"></div>
         <b-badge
           v-for="(t, ti) in r.tags"
           :key="r.key + '-tag-' + ti"
-          class="ml-2"
+          class="ml-2 ml-md-0  mr-1 ml-md-0"
           :style="[ typeof t === 'object' ? {'background-color': t.color} : '']"
         >{{ typeof t === 'object' ? t.text : t}}</b-badge>
-        <span class="clickable p-0 m-0 ml-1 float-right d-none d-sm-block" @click="areyousure(r)">🗑</span>
       </div>
-    </div>
-    <b-modal
-      id="areyousure"
-      centered
-      title="Är du säker?"
-      button-size="sm"
-      ok-variant="danger"
-      @ok="$emit('remove-item', deletesubject ? deletesubject.key : '')"
-    >
-      <p v-if="deletesubject">
-        Är du säker på att du vill ta bort
-        <strong>{{deletesubject.title}}</strong>?
-      </p>
-    </b-modal>
-  </div>
+    </b-col>
+  </b-row>
 </template>
 
 <script lang="ts">
@@ -58,19 +45,8 @@ export default defineComponent({
       })
       return tree
     })
-
-    const deletesubject = ref<{ key: string; title: string }>()
-
-    const $bvModal = getCurrentInstance()?.proxy.$bvModal
-    async function areyousure(r: { key: string; title: string }) {
-      deletesubject.value = r
-      $bvModal?.show('areyousure')
-    }
-
     return {
       tree,
-      areyousure,
-      deletesubject
     }
   }
 })
@@ -82,9 +58,6 @@ h3 {
 }
 .link {
   font-weight: bold;
-}
-.clickable:hover {
-  cursor: pointer;
 }
 .recipe:hover {
   text-decoration: underline;
