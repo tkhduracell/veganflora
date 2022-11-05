@@ -8,6 +8,7 @@
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav class="navbar-left">
           <b-nav-item class="d-none d-sm-block" exact :to="{name: 'home'}">Hem</b-nav-item>
+          <b-nav-item class="d-none d-sm-block" exact :to="{name: 'units'}">Mått</b-nav-item>
           <b-nav-item class="d-none d-sm-block" exact :to="{name: 'menu'}">Meny</b-nav-item>
           <b-nav-item class="d-none d-sm-block" exact :to="{name: 'groceries'}">Handlalista</b-nav-item>
         </b-navbar-nav>
@@ -43,13 +44,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, onMounted } from 'vue'
 import { useWakeLock, useFullscreen } from '@vueuse/core'
 
 export default defineComponent({
   setup() {
     const { isActive, isSupported, release, request } = useWakeLock()
-    const { isFullscreen, enter, exit, toggle } = useFullscreen()
+    const { isFullscreen, toggle } = useFullscreen()
+
+    onMounted(() => request('screen').catch(() => console.warn('Unable active wakelock')))
 
     return { isActive, isSupported, release, request, toggle, isFullscreen }
   }

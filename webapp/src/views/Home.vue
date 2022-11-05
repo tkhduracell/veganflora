@@ -13,7 +13,7 @@
     </div>
     <div>
       <b>Filter</b>
-      <RecipeTags :value="tagFilter" :values="tagValues" v-on:input="tagFilter = $event" />
+      <RecipeTags :value="tagFilter" :values="tagValues.map(x => x.text)" v-on:input="tagFilter = $event" />
       <RecipeTree :recipes="recipes" v-if="recipes && recipes.length > 0" @remove-item="remove" />
       <div v-else-if="recipes">
         Inga recept har taggarna:

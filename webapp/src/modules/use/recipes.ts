@@ -72,6 +72,7 @@ export function useRecipe (key: string) {
         ...copy,
         updated_at: serverTimestamp()
       }, { merge: false })
+    return { savekey }
   }
 
   return { recipe, onSave, remove: () => remove(key) }

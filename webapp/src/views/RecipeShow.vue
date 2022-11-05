@@ -1,15 +1,18 @@
 <template>
   <b-container class="show">
-    <h1>{{ isLoaded ? recipe.title : 'Laddar...'  }}</h1>
-    <div v-if="isLoaded">
+    <div class="float-right" v-if="isLoaded">
       <span v-b-modal.areyousure >
         🗑
       </span>
-      |
-      <b-link :to="{ name: 'edit', params: {key}}">
+    </div>
+    <h1>{{ isLoaded ? recipe.title : 'Laddar...'  }}
+    </h1>
+    <div v-if="isLoaded" class="position-relative">
+      <b-button variant="primary" :to="{ name: 'edit', params: {key}}" class="edit">
+        <b-icon-pencil scale="0.8" style="margin-bottom: 2px;"/>
         Redigera
-      </b-link>
-      <RecipeItem :item="recipe" />
+      </b-button>
+      <RecipeItem :item="recipe" class="mt-2" />
     </div>
     <b-spinner variant="primary" v-else />
 
@@ -61,5 +64,10 @@ export default defineComponent({
   }
   .btn.add {
     margin-top: 10px;
+  }
+  .btn.edit {
+    position: absolute;
+    right: 0;
+    margin-top: -6px;
   }
 </style>

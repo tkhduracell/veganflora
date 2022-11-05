@@ -7,6 +7,7 @@ import MenuShow from '@/views/MenuShow.vue'
 import RecipeEdit from '@/views/RecipeEdit.vue'
 import RecipeShow from '@/views/RecipeShow.vue'
 import Groceries from '@/views/Groceries.vue'
+import Units from '@/views/Units.vue'
 
 Vue.use(VueRouter)
 
@@ -45,11 +46,17 @@ const routes: Array<RouteConfig> = [
     path: '/new',
     name: 'new',
     component: RecipeEdit
+  },
+  {
+    path: '/units',
+    name: 'units',
+    component: Units
   }
 ]
 
 const router = new VueRouter({
-  routes
+  routes,
+  mode: 'history'
 })
 
 export default router
