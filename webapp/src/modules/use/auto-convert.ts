@@ -31,36 +31,17 @@ export function useAutoConvert() {
   function convert(ingredient: Ingredient): Ingredient {
     const tbl = weights.value
     if (Object.keys(tbl).length === 0) return ingredient
+    const norml = (s?: string) => (s ?? '').toLocaleLowerCase().trim()
     for (const {lines, name} of Object.values(tbl)) {
       // Prefer exact match
-      if (name === ingredient.name) {
+      if (norml(name) === norml(ingredient.name)) {
         for (const {measure, weight, weight_measure} of Object.values(lines)) {
           // Prefer exact match
-          if (measure === ingredient.measure) {
-            return { ...ingredient, amount: tryMultiply(weight, ingredient.amount), measure: weight_measure ?? 'g' }
-          }
-        }
-        for (const {measure, weight, weight_measure} of Object.values(lines)) {
-          if (ingredient.measure?.match(measure)) {
+          if (norml(measure) === norml(ingredient.measure)) {
             return { ...ingredient, amount: tryMultiply(weight, ingredient.amount), measure: weight_measure ?? 'g' }
           }
         }
       }
-
-      if (ingredient.name.match(name)) {
-        for (const {measure, weight, weight_measure} of Object.values(lines)) {
-          // Prefer exact match
-          if (measure === ingredient.measure) {
-            return { ...ingredient, amount: tryMultiply(weight, ingredient.amount), measure: weight_measure ?? 'g' }
-          }
-        }
-        for (const {measure, weight, weight_measure} of Object.values(lines)) {
-          if (ingredient.measure?.match(measure)) {
-            return { ...ingredient, amount: tryMultiply(weight, ingredient.amount), measure: weight_measure ?? 'g' }
-          }
-        }
-      }
-
     }
     return ingredient
   }

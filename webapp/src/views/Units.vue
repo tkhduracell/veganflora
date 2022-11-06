@@ -86,8 +86,8 @@ const Component = defineComponent({
     function remove(key: string) {
       updateDoc(weightsRef, { [key]: deleteField() })
     }
-    function isValidPattern(regex: string) {
-      try { return !!new RegExp(regex) ? null : null } catch { return false }
+    function isValidPattern(name?: string) {
+      (name ?? '').trim().length > 0
     }
 
     return {
