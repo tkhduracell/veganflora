@@ -16,12 +16,13 @@ jobs:
         node-version: [16]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
+          cache-dependency-path: functions/package-lock.json
       - name: install deps
         run: npm ci
         working-directory: functions
@@ -43,12 +44,13 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "npm"
+          cache: npm
+          cache-dependency-path: webapp/package-lock.json
       - name: install deps
         run: npm ci
         working-directory: webapp
