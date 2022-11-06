@@ -8,7 +8,33 @@ on:
     branches: [master]
 
 jobs:
-  build:
+  deploy-functions:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - name: install deps
+        run: npm ci
+        working-directory: functions
+      - name: install firebase
+        run: npm i firebase-tools -g
+      - name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v0"
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_KEY }}
+      - name: Firebase Deploy (functions)
+        run: firebase deploy --only functions
+
+  deploy-webapp:
     runs-on: ubuntu-latest
 
     strategy:
@@ -32,5 +58,5 @@ jobs:
         uses: "google-github-actions/auth@v0"
         with:
           credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_KEY }}
-      - name: deploy
+      - name: Firebase Deploy (hosting)
         run: firebase deploy --only hosting
