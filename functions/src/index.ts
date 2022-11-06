@@ -1,28 +1,30 @@
-import * as functions from 'firebase-functions';
+import {region, logger} from 'firebase-functions';
 
-import * as admin from 'firebase-admin';
+import { initializeApp, firestore } from 'firebase-admin'
 
-admin.initializeApp();
+initializeApp();
 
-const db = admin.firestore();
+const db = firestore();
 const root = db.collection('veganflora').doc('root')
 
-export const prefillUpdate = functions.region('europe-west3')
+export const prefillUpdate = region('europe-west3')
     .firestore
     .document('/veganflora/root/recipies/{id}')
     .onWrite(async (_, ctx) => {
-        functions.logger.info(`${ctx.params.id}:onWrite()`);
+        logger.info(`${ctx.params.id}:onWrite()`);
         
         const cursor = await root.collection('recipies').get()
         
-        const tagSet = new Set<string>()
+        const tagSet = new Set<{ text: string }>()
         const categorySet = new Set<string>()
 
         cursor.forEach(doc => {
-            const data = doc.data() as { tags?: string[], category?: string[] }
+            const data = doc.data() as { tags?: (string | { text: string })[], category?: string[] }
 
             if (data.tags) {
-                data.tags.forEach(t => tagSet.add(t))
+                data.tags
+                    .map(t => typeof t === 'string' ? { text: t, color: '' } : t)
+                    .forEach(t => tagSet.add(t))
             }
 
             if (data.category) {
@@ -33,7 +35,7 @@ export const prefillUpdate = functions.region('europe-west3')
         const tags = [...tagSet.values()].sort()
         const categories = [...categorySet.values()].sort()
 
-        functions.logger.info(`Updating prefill`, { tags, categories });
+        logger.info(`Updating prefill`, { tags, categories });
         
         await root.update({ prefill: { tags, categories } })
     });
