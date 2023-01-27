@@ -6,7 +6,7 @@ export type Multi = Unpacked<typeof MultiValue>
 
 
 export function useMulti() {
-  const idx = ref(1)
+  const idx = ref(MultiValue.findIndex(p => p === 1))
   const multiplier = computed(() => MultiValue[idx.value])
 
   function plus() {
