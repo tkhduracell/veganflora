@@ -11,7 +11,7 @@
           <b-form @submit.prevent="add(r.key)" inline>
             <b-form-select size=sm v-model="weekday" :options="weekdays" />
             <b-form-select size=sm v-model="meal" :options="meals" class="ml-1" />
-            <b-button type="submit" variant="primary" size=sm class="ml-1">
+            <b-button type="submit" variant="primary" size=sm class="ml-1" :disabled="!canEdit">
               Lägg till ➡️
             </b-button>
           </b-form>
@@ -30,7 +30,8 @@ import { Meal, Meals, WeekDay, WeekDays, Recipe } from './types'
 
 export default defineComponent({
   props: {
-    recipes: Array as PropType<Recipe[]>
+    recipes: Array as PropType<Recipe[]>,
+    canEdit: Boolean
   },
   setup (props, context) {
     const selected = ref<string>('Ölmjöl')

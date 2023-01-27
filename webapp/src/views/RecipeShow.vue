@@ -1,14 +1,13 @@
 <template>
   <b-container class="show">
-    <div class="float-right" v-if="isLoaded">
-      <span v-b-modal.areyousure >
-        🗑
-      </span>
+    <div class="header">
+      <h1>{{ isLoaded ? recipe.title : 'Laddar...'  }}</h1>
+      <div class="delete" v-if="isLoaded && user">
+        <span v-b-modal.areyousure >🗑</span>
+      </div>
     </div>
-    <h1>{{ isLoaded ? recipe.title : 'Laddar...'  }}
-    </h1>
     <div v-if="isLoaded" class="position-relative">
-      <b-button variant="primary" :to="{ name: 'edit', params: {key}}" class="edit">
+      <b-button variant="primary" :to="{ name: 'edit', params: {key}}" class="edit" v-if="user">
         <b-icon-pencil scale="0.8" style="margin-bottom: 2px;"/>
         Redigera
       </b-button>
@@ -31,6 +30,7 @@ import { useRecipe } from '../modules/use/recipes'
 
 import RecipeItem from '@/components/RecipeItem.vue'
 import { useRoute, useRouter } from 'vue-router/composables'
+import { useAuth } from '@/modules/use/auth'
 
 export default defineComponent({
   name: 'RecipeShow',
@@ -43,9 +43,11 @@ export default defineComponent({
     const { recipe, remove } = useRecipe(key)
     const isLoaded = computed(() => !!(recipe.value && recipe.value.title))
     const router = useRouter()
+    const { user } = useAuth()
     return {
       key,
       recipe,
+      user,
       remove: () => remove().then(x => router.push('/')),
       isLoaded
     }
@@ -69,5 +71,18 @@ export default defineComponent({
     position: absolute;
     right: 0;
     margin-top: -6px;
+  }
+  .show .header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between
+  }
+  .show .header h1 {
+    margin: 0;
+  }
+  .show .header .delete {
+    margin: 0 16px;
+    scale: 1.4;
   }
 </style>

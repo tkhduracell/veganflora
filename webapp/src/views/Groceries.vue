@@ -2,7 +2,7 @@
   <b-container class="groceries">
     <h1>Handlalista</h1>
     <p>Enligt in lagda recept behöver följande hadlas:</p>
-    <Groceries :recipes="recipes" :menu="menu" :findRecipe="findRecipe" v-if="menu" />
+    <Groceries :recipes="recipes" :menu="menu" :findRecipe="findRecipe" v-if="menu" :canEdit="!!user"/>
     <div v-else>
       Inga varor, eftersom
       <router-link :to="{ name: 'menu' }">menyn</router-link>är tom.
@@ -17,19 +17,22 @@ import Groceries from '@/components/Groceries.vue'
 
 import { useRecipes } from '../modules/use/recipes'
 import { useMenu } from '../modules/use/menu'
+import { useAuth } from '@/modules/use/auth'
 
 const Component = defineComponent({
   components: {
     Groceries
   },
   setup() {
+    const { user } = useAuth()
     const { menu } = useMenu()
     const { recipes, findRecipe } = useRecipes()
 
     return {
       recipes,
       findRecipe,
-      menu
+      menu,
+      user
     }
   }
 })

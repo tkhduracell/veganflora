@@ -4,7 +4,7 @@
     <p>Här skapar du veckans meny.</p>
     <div class="splitpane">
       <div class="list">
-        <MenuAdder class="list" :recipes="recipes" @add-item="add" />
+        <MenuAdder class="list" :recipes="recipes" @add-item="add" :canEdit="!!user"/>
       </div>
       <div class="menu">
         <b-form-select v-model="week" :options="weeks" />
@@ -23,6 +23,7 @@ import Menu from '@/components/Menu.vue'
 import { useRecipes } from '../modules/use/recipes'
 import { useMenu } from '../modules/use/menu'
 import { WeekDay, Meal } from '../components/types'
+import { useAuth } from '@/modules/use/auth'
 
 const Component = defineComponent({
   components: {
@@ -30,6 +31,7 @@ const Component = defineComponent({
     Menu
   },
   setup() {
+    const { user } = useAuth()
     const { recipes } = useRecipes()
     const { menu, removeMenuItem, addMenuItem } = useMenu()
 
@@ -60,7 +62,8 @@ const Component = defineComponent({
       recipes,
       menu,
       week,
-      weeks
+      weeks,
+      user
     }
   }
 })

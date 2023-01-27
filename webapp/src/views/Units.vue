@@ -1,5 +1,5 @@
 <template>
-  <b-container class="converts">
+  <b-container :class="{'converts': true, 'disabled': !user }">
     <h1>Måttenheter</h1>
     <b-row class="clearfix" v-if="data">
       <b-col cols=12 v-for="[key, item] in sortBy(Object.entries(data), ([k,]) => k)" :key="key">
@@ -35,7 +35,7 @@
         </div>
       </b-col>
       <b-col cols="12" class="mt-4">
-        <b-button variant="primary" @click="add">
+        <b-button variant="primary" @click="add" :disabled="!user">
           <b-icon-plus />
           Lägg till
         </b-button>
@@ -45,6 +45,7 @@
 </template>
 
 <script lang="ts">
+import { useAuth } from '@/modules/use/auth'
 import { Converts } from '@/modules/use/auto-convert'
 import { doc, getFirestore, onSnapshot, deleteField, updateDoc, arrayUnion, arrayRemove } from '@firebase/firestore'
 import { uuidv4 } from '@firebase/util'
@@ -56,6 +57,7 @@ const Component = defineComponent({
   },
   setup() {
     const store = getFirestore()
+    const { user } = useAuth()
 
     const data = ref<Converts>({})
     const weightsRef = doc(store, 'veganflora', 'root', 'converts', 'weight')
@@ -66,24 +68,30 @@ const Component = defineComponent({
     })
 
     function updateLine(key: string, subkey: string, attr: string, value: string | number) {
+      if (!user.value) return
       updateDoc(weightsRef, { [`${key}.lines.${subkey}.${attr}`]: (typeof value === 'string' ? value.trim().toLowerCase() : value) })
     }
     function addLine(key: string) {
+      if (!user.value) return
       updateDoc(weightsRef, { [`${key}.lines.${uuidv4()}`]: { measure: 'dl', weight: 0 } })
     }
     function removeLine(key: string, subkey: string) {
+      if (!user.value) return
       updateDoc(weightsRef, { [`${key}.lines.${subkey}`]: deleteField() })
     }
 
     function update(key: string, field: 'name', value: string) {
+      if (!user.value) return
       updateDoc(weightsRef, { [`${key}.${field}`]: value.trim().toLowerCase() })
     }
 
     function add() {
+      if (!user.value) return
       const v: Converts = { [uuidv4()]: { name: '', lines: { [uuidv4()]: { measure: 'dl', weight: 0 } } } }
       updateDoc(weightsRef, v)
     }
     function remove(key: string) {
+      if (!user.value) return
       updateDoc(weightsRef, { [key]: deleteField() })
     }
     function isValidPattern(name?: string) {
@@ -99,7 +107,8 @@ const Component = defineComponent({
       add,
       remove,
       sortBy,
-      isValidPattern
+      isValidPattern,
+      user
     }
   }
 })
@@ -143,4 +152,9 @@ export default Component
   margin-left: 14px;
   transition: all 100ms cubic-bezier(0.55, 0.055, 0.675, 0.19);
 }
+
+.converts.disabled .icon {
+  opacity: 0.4;
+}
+
 </style>

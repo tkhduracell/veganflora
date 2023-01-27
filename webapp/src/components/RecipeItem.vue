@@ -24,7 +24,8 @@
         <b-button class="button" variant="primary" @click="plus">+</b-button>
         <b-button class="button" variant="primary" @click="minus">﹣</b-button>
       </div>
-      <b-checkbox switch v-model="convertEnabled" class="convert">Prefer weight</b-checkbox>
+      <b-checkbox switch v-model="convertEnabled" class="convert d-block d-sm-none">Prefer weight</b-checkbox>
+      <b-checkbox switch v-model="convertEnabled" class="convert d-none d-sm-block mt-5">Prefer weight</b-checkbox>
     </div>
 
     <ul class="ingredients">

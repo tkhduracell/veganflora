@@ -10,7 +10,7 @@
           >
             <router-link
               :to="{ name: 'edit', params: { key: item.source.key }}"
-              v-slot="{ href: editUrl }"
+              v-slot="{ href: editUrl }" v-if="canEdit"
             >
               <span
                 v-b-tooltip.hover.topright.html="tooltip(item, editUrl, openUrl)"
@@ -29,11 +29,13 @@ import { Recipe, Meal, IngredientWithContext, Context, WeekDay, Menu, Day } from
 
 export default defineComponent({
   props: {
-    recipes: { required: true, type: Array as PropType<Recipe[]> },
+    recipes: { required: false, type: Array as PropType<Recipe[]> },
     menu: { required: true, type: Object as PropType<Menu> },
-    findRecipe: { required: true, type: Function as PropType<(r: string) => Recipe>}
+    findRecipe: { required: true, type: Function as PropType<(r: string) => Recipe>},
+    canEdit: { type: Boolean }
   },
   setup(props) {
+
     function flatmap<T, K>(arr: T[], fn: (t: T, idx: number) => K[]): K[] {
       return arr.reduce((acc: K[], x, idx) => acc.concat(fn(x, idx)), [])
     }
@@ -69,7 +71,7 @@ export default defineComponent({
     })
 
     function tooltip(item: { measure?: string; amount?: string } & Context<Recipe>, editUrl: string, openUrl: string) {
-      const r = props.recipes.find(r => r.key === item.source.key)
+      const r = props.recipes?.find(r => r.key === item.source.key)
       return `
         ${r ? r.title : '...'}<br>
         ${item.weekday}, ${item.meal}<br>

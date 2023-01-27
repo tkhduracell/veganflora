@@ -136,7 +136,7 @@
       </div>
 
       <div class="buttons" v-else>
-        <b-button type="submit" size="lg" variant="primary" :disabled="isEmpty">Spara</b-button>
+        <b-button type="submit" size="lg" variant="primary" :disabled="isEmpty || !user">Spara</b-button>
         <b-button variant="link" @click="$router.go(-1)">Tillbaka</b-button>
       </div>
     </b-form>
@@ -168,6 +168,7 @@ import { usePrefill } from '../modules/use/prefill'
 import { parseIngredient } from '../modules/ingredients'
 import { Recipe, Ingredient, Tag, Category } from '../components/types'
 import { useRoute, useRouter } from 'vue-router/composables'
+import { useAuth } from '@/modules/use/auth'
 
 export default defineComponent({
   name: 'RecipieEdit',
@@ -176,6 +177,7 @@ export default defineComponent({
     const { params } = useRoute()
     const router = useRouter()
     const key = params.key || false
+    const { user } = useAuth()
 
     const saving = ref(false)
     const { recipe, onSave } = useRecipe(key || '')
@@ -290,7 +292,8 @@ export default defineComponent({
       updateCategory,
       updateTags,
       tags,
-      categories
+      categories,
+      user
     }
   }
 })

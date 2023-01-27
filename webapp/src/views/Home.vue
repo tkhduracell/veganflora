@@ -7,7 +7,7 @@
         class="mb-2 float-right"
         :disabled="!recipes"
         small
-        v-if="recipes"
+        v-if="recipes && user"
       >Nytt Recept</b-button>
       <h1 class="float-left">Recept</h1>
     </div>
@@ -35,6 +35,7 @@ import RecipeTags from '@/components/RecipeTags.vue'
 import { Recipes, useRecipes } from '../modules/use/recipes'
 import { useTagFilter } from '../modules/use/tag-filter'
 import { Recipe } from '../components/types'
+import { useAuth } from '@/modules/use/auth'
 
 const Component = defineComponent({
   components: {
@@ -53,11 +54,14 @@ const Component = defineComponent({
       filtered
     } = useTagFilter<Recipe>(recipes, flatTags)
 
+    const { user } = useAuth()
+
     return {
       recipes: filtered,
       tagValues,
       tagFilter,
-      remove
+      remove,
+      user
     }
   }
 })
