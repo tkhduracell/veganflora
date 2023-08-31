@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
 
 type Unpacked<T> = T extends (infer U)[] ? U : T;
-export const MultiValue = [0.25, 0.5, 1, 2, 3, 4, 5,6, 8, 10, 12, 15, 20]
+export const MultiValue = [0.5, 0.75, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20]
 export type Multi = Unpacked<typeof MultiValue>
 
 
