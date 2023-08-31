@@ -77,6 +77,9 @@
           <b-link v-b-modal.modal-paste-list class="ml-2">
             <b-icon-clipboard />
           </b-link>
+          <div class="small">
+            💎 Tips: *Rubrik*
+          </div>
         </template>
 
         <b-input-group size="sm" v-for="(i, idx) in recipe.ingredients" :key="'ingredient-' + idx">
@@ -93,7 +96,7 @@
             :id="'input-5-'+ idx + '-amount' "
             type="text"
             placeholder="1"
-            :disabled="saving"
+            :disabled="saving || i.name.match(/^\*(.*).*\*$/gi)"
             @keyup="onChange"
           />
           <b-form-input
@@ -101,7 +104,7 @@
             :id="'input-5-'+ idx + '-measure' "
             type="text"
             placeholder="styck"
-            :disabled="saving"
+            :disabled="saving || i.name.match(/^\*(.*).*\*$/gi)"
             @keyup="onChange"
           />
           <b-button size="sm" variant="link" @click="removeIngredientRow(idx)">🗑</b-button>
@@ -307,6 +310,9 @@ export default defineComponent({
   font-size: 75%;
   font-weight: 700;
   line-height: 1;
+}
+.small {
+  font-size: 70%;
 }
 .btn.add {
   margin-top: 10px;
