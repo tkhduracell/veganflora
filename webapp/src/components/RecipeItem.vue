@@ -12,7 +12,8 @@
     <div class="tags">
       <span class="mt-2" v-for="(t, idx) in item.tags" :key="JSON.stringify(t)">
         <span class="separator" v-if="idx > 0">,</span>
-        <b-badge :variant="typeof t === 'string' ? 'secondary' : t.color">{{ typeof t === 'string' ? t : t.text }}</b-badge>
+        <b-badge :variant="typeof t === 'string' ? 'secondary' : t.color">{{ typeof t === 'string' ? t : t.text
+        }}</b-badge>
       </span>
     </div>
 
@@ -69,15 +70,17 @@ export default defineComponent({
 h3 {
   margin: 40px 0 0;
 }
+
 .categories {
   font-size: 140%;
 }
-.tags {
 
-}
+.tags {}
+
 .breaking {
   white-space: pre-line;
 }
+
 .separator {
   display: inline-block;
   width: 1em;
@@ -85,20 +88,24 @@ h3 {
   text-align: center;
   vertical-align: bottom;
 }
+
 .size {
   display: flex !important;
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
 }
+
 .convert {
   align-self: center;
   flex-grow: 1;
   text-align: end;
 }
+
 .multiplier {
   display: inline-block;
 }
+
 .multiplier .button {
   scale: 0.8;
   font-size: 160%;
@@ -107,6 +114,7 @@ h3 {
   margin-left: 0.2em;
   display: inline-block;
 }
+
 .multiplier .value {
   width: 2em;
   display: inline-block;
