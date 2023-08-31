@@ -30,11 +30,11 @@
     </div>
 
     <ul class="ingredients">
-      <div
-        v-for="(i, idx) in item.ingredients"
-        :key="item.key + i.name + i.amount + i.measure + idx"
-      >
-        <RecipeIngredient :i="convertEnabled ? convert(i) : i" :multiplier="multiplier" />
+      <div v-for="(i, idx) in item.ingredients" :key="item.key + i.name + i.amount + i.measure + idx">
+        <b v-if="i.name.match(/^\*.*\*$/gi)" class="d-block mt-2">
+          {{ i.name.replace(/^\*(.*)\*$/gi, '$1') }}
+        </b>
+        <RecipeIngredient :i="convertEnabled ? convert(i) : i" :multiplier="multiplier" v-else />
       </div>
     </ul>
     <p class="breaking">{{ item.text }}</p>
