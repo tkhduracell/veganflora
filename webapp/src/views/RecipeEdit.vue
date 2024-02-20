@@ -157,10 +157,11 @@
 
         <draggable v-model="recipe.ingredients"
           group="items"
+          handle=".movable"
           :disabled="!recipe || recipe.ingredients?.length < 2">
           <b-input-group
             v-for="(i, idx) in recipe.ingredients"
-            :key="'ingredient-' + idx"
+            :key="'ingredient-' + hash(i.name, i.amount, i.measure)"
             class="py-1 ingredient-items"
             size="sm"
             >
@@ -404,8 +405,13 @@ export default defineComponent({
       pasteList.value = ''
     }
 
+    function hash (name?: string, amount?: string, measure?: string) {
+      return `${name}-${amount}-${measure}`.replace(/ /gi, '-')
+    }
+
     return {
       key,
+      hash,
       recipe,
       removeIngredientRow,
       addIngredientRow,
