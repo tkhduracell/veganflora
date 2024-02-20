@@ -19,9 +19,7 @@ module.exports = {
     'no-use-before-define': 'warn',
     camelcase: 'warn',
     'vue/multi-word-component-names': 'off',
-    'vue/max-attributes-per-line': ['error', {
-
-    }],
+    'vue/max-attributes-per-line': 'warn',
     '@typescript-eslint/no-unused-vars': 'off'
   },
   overrides: [
