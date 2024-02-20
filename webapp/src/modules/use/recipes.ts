@@ -1,6 +1,7 @@
-import { ref, onMounted, onUnmounted, Ref, reactive } from 'vue'
+import { ref, onMounted, onUnmounted, Ref } from 'vue'
 
 import { collection, deleteDoc, doc, getDoc, getFirestore, onSnapshot, QuerySnapshot, serverTimestamp, setDoc, Timestamp } from 'firebase/firestore'
+import { getStorage, ref as imageRef, uploadBytesResumable, UploadTask } from 'firebase/storage'
 
 import { Recipe, Tag } from '@/components/types'
 
@@ -29,6 +30,7 @@ export function useRecipe (key: string) {
     text: ''
   }
   const recipe = ref<Recipe>(empty)
+  const imageUpload = ref<UploadTask>()
 
   onMounted(async () => {
     const store = getFirestore()
@@ -58,24 +60,26 @@ export function useRecipe (key: string) {
   }
 
   async function onSave () {
-    const copy = JSON.parse(JSON.stringify(recipe.value))
+    const { key, created_at, image, ...rest } = recipe.value
+    const data = {
+      // Timestamp need reconstruct after json clone
+      created_at: !created_at ? serverTimestamp() : new Timestamp(created_at.seconds, created_at.nanoseconds),
+      updated_at: serverTimestamp(),
+      ...rest
+    }
 
-    delete copy.key
-
-    // Timestamp need reconstruct after json clone
-    copy.created_at = !copy.created_at
-      ? serverTimestamp()
-      : new Timestamp(copy.created_at.seconds, copy.created_at.nanoseconds)
-
-    const savekey = key || safekey(copy.title, copy.category)
+    const savekey = key || safekey(data.title, data.category)
 
     if (savekey) {
+      if (recipe.value.image) {
+        const storage = getStorage()
+        const image = imageRef(storage, `images/${savekey}.jpg`)
+        imageUpload.value = uploadBytesResumable(image, recipe.value.image, { contentType: 'image/jpeg' })
+      }
+
       const store = getFirestore()
       const document = doc(store, 'veganflora', 'root', 'recipies', savekey)
-      await setDoc(document, {
-          ...copy,
-          updated_at: serverTimestamp()
-        }, { merge: false })
+      await setDoc(document, data, { merge: false })
     }
     return { savekey }
   }
@@ -93,11 +97,11 @@ export function useRecipes (): Recipes {
     const col = collection(store, 'veganflora', 'root', 'recipies')
 
     type StoreRecipie = Omit<Recipe, 'tags'> & { tags: (string | Tag)[] }
-    function stringToBadge<T extends { text: string }>(x: T | string): T {
+    function stringToBadge<T extends { text: string }> (x: T | string): T {
       return typeof x === 'string' ? { text: x } as T : x
     }
 
-    const fancyTag = ({tags, ...rest}: StoreRecipie) => ({...rest, tags: tags?.map(stringToBadge) })
+    const fancyTag = ({ tags, ...rest }: StoreRecipie) => ({ ...rest, tags: tags?.map(stringToBadge) })
 
     close.value = onSnapshot(col, async (result) => {
       console.log('Loading recipes ...')

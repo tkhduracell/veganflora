@@ -1,17 +1,51 @@
 <template>
   <div>
-    <b-form inline class="mb-2">
-      <b-input id="form-search" v-model="searchterm" placeholder="Filtrera..." size=sm />
+    <b-form
+      inline
+      class="mb-2"
+    >
+      <b-input
+        id="form-search"
+        v-model="searchterm"
+        placeholder="Filtrera..."
+        size="sm"
+      />
     </b-form>
     <h5>Resultat</h5>
     <div v-if="result">
-      <div v-for="r in result" :key="r.key" @click="selected = r.key" :class="{'selected': r.key === selected}" >
-        <span class="name">{{r.title}}</span>
-        <div class="selects" v-if="r.key === selected">
-          <b-form @submit.prevent="add(r.key)" inline>
-            <b-form-select size=sm v-model="weekday" :options="weekdays" />
-            <b-form-select size=sm v-model="meal" :options="meals" class="ml-1" />
-            <b-button type="submit" variant="primary" size=sm class="ml-1" :disabled="!canEdit">
+      <div
+        v-for="r in result"
+        :key="r.key"
+        :class="{'selected': r.key === selected}"
+        @click="selected = r.key"
+      >
+        <span class="name">{{ r.title }}</span>
+        <div
+          v-if="r.key === selected"
+          class="selects"
+        >
+          <b-form
+            inline
+            @submit.prevent="add(r.key)"
+          >
+            <b-form-select
+              v-model="weekday"
+              size="sm"
+              :options="weekdays"
+            />
+            <b-form-select
+              v-model="meal"
+              size="sm"
+              :options="meals"
+              class="ml-1"
+            />
+            <b-button
+              type="submit"
+              variant="primary"
+              size="sm"
+              class="ml-1"
+              :disabled="!canEdit"
+            >
               Lägg till ➡️
             </b-button>
           </b-form>
@@ -45,13 +79,14 @@ export default defineComponent({
 
     const searchterm = ref<string>('')
     const result = computed(() => {
-      return props.recipes ? (props.recipes as Recipe[])
-        .filter(r => {
-          return !searchterm.value ||
+      return props.recipes
+        ? (props.recipes as Recipe[])
+            .filter(r => {
+              return !searchterm.value ||
             r.key.toLocaleLowerCase().includes(searchterm.value.toLocaleLowerCase()) ||
             r.title.toLocaleLowerCase().includes(searchterm.value.toLocaleLowerCase())
-        })
-        .slice(-20)
+            })
+            .slice(-20)
         : null
     })
 

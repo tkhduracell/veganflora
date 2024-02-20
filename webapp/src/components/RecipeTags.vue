@@ -3,8 +3,8 @@
     <b-form-checkbox-group
       :value="value"
       :options="options"
-      @input="$emit('input', $event)"
       name="recipe-tags"
+      @input="$emit('input', $event)"
     />
   </div>
 </template>
@@ -16,9 +16,9 @@ export default defineComponent({
   name: 'RecipeTags',
   props: {
     value: { type: Array as PropType<string[]>, required: true },
-    values: { type: Array as PropType<string[]>, required: true },
+    values: { type: Array as PropType<string[]>, required: true }
   },
-  setup(props) {
+  setup (props) {
     return {
       options: computed(() => {
         return props.values.map(text => {

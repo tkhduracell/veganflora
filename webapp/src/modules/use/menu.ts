@@ -1,7 +1,6 @@
 import { Menu, Meal, WeekDay } from '../../components/types'
 import { ref, onMounted } from 'vue'
 
-
 import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore'
 
 const dayTemplate = {
@@ -25,13 +24,13 @@ const template = {
 
 async function set (menu: Menu) {
   const store = getFirestore()
-  const root = doc(store, 'veganflora','root', 'menus','root')
+  const root = doc(store, 'veganflora', 'root', 'menus', 'root')
   return setDoc(root, menu)
 }
 
 async function get (): Promise<Menu | undefined> {
   const store = getFirestore()
-  const root = doc(store, 'veganflora','root', 'menus','root')
+  const root = doc(store, 'veganflora', 'root', 'menus', 'root')
 
   const result = await getDoc(root)
   return result && result.exists()

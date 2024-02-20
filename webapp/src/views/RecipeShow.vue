@@ -1,23 +1,51 @@
 <template>
   <b-container class="show">
     <div class="header">
-      <h1>{{ isLoaded ? recipe.title : 'Laddar...'  }}</h1>
-      <div class="delete" v-if="isLoaded && user">
-        <span v-b-modal.areyousure >🗑</span>
+      <h1>{{ isLoaded ? recipe.title : 'Laddar...' }}</h1>
+      <div
+        v-if="isLoaded && user"
+        class="delete"
+      >
+        <span v-b-modal.areyousure>🗑</span>
       </div>
     </div>
-    <div v-if="isLoaded" class="position-relative">
-      <b-button variant="primary" :to="{ name: 'edit', params: {key}}" class="edit" v-if="user">
-        <b-icon-pencil scale="0.8" style="margin-bottom: 2px;"/>
+    <div
+      v-if="isLoaded"
+      class="position-relative"
+    >
+      <b-button
+        v-if="user"
+        variant="primary"
+        :to="{ name: 'edit', params: {key}}"
+        class="edit"
+      >
+        <b-icon-pencil
+          scale="0.8"
+          style="margin-bottom: 2px;"
+        />
         Redigera
       </b-button>
-      <RecipeItem :item="recipe" class="mt-2" />
+      <RecipeItem
+        :item="recipe"
+        class="mt-2"
+      />
     </div>
-    <b-spinner variant="primary" v-else />
+    <b-spinner
+      v-else
+      variant="primary"
+    />
 
-    <b-modal id="areyousure" centered title="Är du säker?" ok-variant="danger" button-size="sm" @ok="remove" v-if="recipe">
+    <b-modal
+      v-if="recipe"
+      id="areyousure"
+      centered
+      title="Är du säker?"
+      ok-variant="danger"
+      button-size="sm"
+      @ok="remove"
+    >
       <p class="">
-        Är du säker på att du vill ta bort <strong>{{recipe.title}}</strong>?
+        Är du säker på att du vill ta bort <strong>{{ recipe.title }}</strong>?
       </p>
     </b-modal>
   </b-container>

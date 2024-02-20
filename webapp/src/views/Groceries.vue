@@ -2,10 +2,18 @@
   <b-container class="groceries">
     <h1>Handlalista</h1>
     <p>Enligt in lagda recept behöver följande hadlas:</p>
-    <Groceries :recipes="recipes" :menu="menu" :findRecipe="findRecipe" v-if="menu" :canEdit="!!user"/>
+    <Groceries
+      v-if="menu"
+      :recipes="recipes"
+      :menu="menu"
+      :find-recipe="findRecipe"
+      :can-edit="!!user"
+    />
     <div v-else>
       Inga varor, eftersom
-      <router-link :to="{ name: 'menu' }">menyn</router-link>är tom.
+      <router-link :to="{ name: 'menu' }">
+        menyn
+      </router-link>är tom.
     </div>
   </b-container>
 </template>
@@ -23,7 +31,7 @@ const Component = defineComponent({
   components: {
     Groceries
   },
-  setup() {
+  setup () {
     const { user } = useAuth()
     const { menu } = useMenu()
     const { recipes, findRecipe } = useRecipes()

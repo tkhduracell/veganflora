@@ -1,19 +1,39 @@
 <template>
   <div>
-    <div class="week" v-for="[weekname, week] in Object.entries(menu)" :key="'w-' + weekname">
-      <div class="day" v-for="weekday in WeekDays" :key="'w-' + weekname + '-d-' + weekday">
+    <div
+      v-for="[weekname, week] in Object.entries(menu)"
+      :key="'w-' + weekname"
+      class="week"
+    >
+      <div
+        v-for="weekday in WeekDays"
+        :key="'w-' + weekname + '-d-' + weekday"
+        class="day"
+      >
         <div class="name">
           {{ weekday }}
         </div>
-        <MenuItem :week="weekname" :weekday="weekday" meal="Frukost"
-          :items=decorate(week.days[weekday].Frukost)
-          @remove-item="removeItem(weekname, weekday, Meal.breakfast, $event)" />
-        <MenuItem :week="weekname" :weekday="weekday" meal="Lunch"
-          :items=decorate(week.days[weekday].Lunch)
-          @remove-item="removeItem(weekname, weekday, Meal.lunch, $event)" />
-        <MenuItem :week="weekname" :weekday="weekday" meal="Middag"
-          :items=decorate(week.days[weekday].Middag)
-          @remove-item="removeItem(weekname, weekday, Meal.dinner, $event)" />
+        <MenuItem
+          :week="weekname"
+          :weekday="weekday"
+          meal="Frukost"
+          :items="decorate(week.days[weekday].Frukost)"
+          @remove-item="removeItem(weekname, weekday, Meal.breakfast, $event)"
+        />
+        <MenuItem
+          :week="weekname"
+          :weekday="weekday"
+          meal="Lunch"
+          :items="decorate(week.days[weekday].Lunch)"
+          @remove-item="removeItem(weekname, weekday, Meal.lunch, $event)"
+        />
+        <MenuItem
+          :week="weekname"
+          :weekday="weekday"
+          meal="Middag"
+          :items="decorate(week.days[weekday].Middag)"
+          @remove-item="removeItem(weekname, weekday, Meal.dinner, $event)"
+        />
       </div>
     </div>
   </div>

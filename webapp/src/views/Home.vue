@@ -2,25 +2,43 @@
   <b-container class="home">
     <div class="clearfix">
       <b-button
+        v-if="recipes && user"
         :to="{name: 'new'}"
         variant="primary"
         class="mb-2 float-right"
         :disabled="!recipes"
         small
-        v-if="recipes && user"
-      >Nytt Recept</b-button>
-      <h1 class="float-left">Recept</h1>
+      >
+        Nytt Recept
+      </b-button>
+      <h1 class="float-left">
+        Recept
+      </h1>
     </div>
     <div>
       <b>Filter</b>
-      <RecipeTags :value="tagFilter" :values="tagValues.map(x => x.text)" v-on:input="tagFilter = $event" />
-      <RecipeTree :recipes="recipes" v-if="recipes && recipes.length > 0" @remove-item="remove" />
+      <RecipeTags
+        :value="tagFilter"
+        :values="tagValues.map(x => x.text)"
+        @input="tagFilter = $event"
+      />
+      <RecipeTree
+        v-if="recipes && recipes.length > 0"
+        :recipes="recipes"
+        @remove-item="remove"
+      />
       <div v-else-if="recipes">
         Inga recept har taggarna:
         <b>{{ tagFilter.join(' & ') }}</b>
       </div>
-      <div class="text-center" v-else>
-        <b-spinner variant="primary" class="mr-2" />Hämtar kokboken...
+      <div
+        v-else
+        class="text-center"
+      >
+        <b-spinner
+          variant="primary"
+          class="mr-2"
+        />Hämtar kokboken...
       </div>
     </div>
   </b-container>
@@ -42,8 +60,8 @@ const Component = defineComponent({
     RecipeTree,
     RecipeTags
   },
-  setup() {
-    function flatTags(r: Recipe): string[] {
+  setup () {
+    function flatTags (r: Recipe): string[] {
       return (r.tags || []).map(t => typeof t === 'object' ? t.text : t)
     }
 

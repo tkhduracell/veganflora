@@ -2,7 +2,7 @@ import { Ref, ref, watch } from 'vue'
 
 import { usePrefill } from './prefill'
 
-export function useTagFilter<T>(input: Ref<T[] | undefined>, provider: (t: T) => string[]) {
+export function useTagFilter<T> (input: Ref<T[] | undefined>, provider: (t: T) => string[]) {
   const { tags } = usePrefill()
   const filter = ref<string[]>([])
   const filtered = ref<T[] | undefined>(input.value as T[]) as Ref<T[] | undefined>

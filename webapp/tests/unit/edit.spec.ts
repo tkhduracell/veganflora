@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { shallowMount, createLocalVue } from '@vue/test-utils'
 import RecipeEdit from '@/views/RecipeEdit.vue'
 
@@ -10,22 +11,22 @@ localVue.use(VueRouter)
 
 jest.mock('vue-router/composables', () => ({
   useRoute: () => ({
-    params: { key: '' },
+    params: { key: '' }
   }),
   useRouter: () => ({ push: () => null })
-}));
+}))
 
 jest.mock('firebase/firestore', () => ({
   getFirestore: () => {},
   doc: () => {},
   onSnapshot: () => {},
   getDoc: () => Promise.resolve({ exists: () => true, data: () => ({}) })
-}));
+}))
 
 describe('RecipeEdit.vue', () => {
   it('renders text', () => {
     const wrapper = shallowMount(RecipeEdit, {
-      localVue,
+      localVue
     })
     expect(wrapper.text()).toContain('Nytt Recept')
   })

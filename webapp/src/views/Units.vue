@@ -1,41 +1,110 @@
 <template>
   <b-container :class="{'converts': true, 'disabled': !user }">
     <h1>Måttenheter</h1>
-    <b-row class="clearfix" v-if="data">
-      <b-col cols=12 v-for="[key, item] in sortBy(Object.entries(data), ([k,]) => k)" :key="key">
-        <b-row no-gutters class="mb-2 mt-2">
+    <b-row
+      v-if="data"
+      class="clearfix"
+    >
+      <b-col
+        v-for="[key, item] in sortBy(Object.entries(data), ([k,]) => k)"
+        :key="key"
+        cols="12"
+      >
+        <b-row
+          no-gutters
+          class="mb-2 mt-2"
+        >
           <b-col cols="10">
-            <b-form-input size="lg" :value="item.name" @input="update(key, 'name', $event)" :state="isValidPattern(item.name)" />
+            <b-form-input
+              size="lg"
+              :value="item.name"
+              :state="isValidPattern(item.name)"
+              @input="update(key, 'name', $event)"
+            />
           </b-col>
-          <b-col cols="auto" class="item icon trash" @click="remove(key)">
-            <b-icon-trash-fill scale="1.4" class=""/>
+          <b-col
+            cols="auto"
+            class="item icon trash"
+            @click="remove(key)"
+          >
+            <b-icon-trash-fill
+              scale="1.4"
+              class=""
+            />
           </b-col>
         </b-row>
-        <div v-for="([subkey, line], idx) in sortBy(Object.entries(item.lines), ([k,]) => k)" :key="key+subkey">
-          <b-row no-gutters class="">
-            <b-col cols=auto class="line icon plus show" @click="addLine(key)" v-if="idx === Object.keys(item.lines).length - 1">
-              <b-icon-plus-circle-fill scale="1.4" class=""/>
+        <div
+          v-for="([subkey, line], idx) in sortBy(Object.entries(item.lines), ([k,]) => k)"
+          :key="key+subkey"
+        >
+          <b-row
+            no-gutters
+            class=""
+          >
+            <b-col
+              v-if="idx === Object.keys(item.lines).length - 1"
+              cols="auto"
+              class="line icon plus show"
+              @click="addLine(key)"
+            >
+              <b-icon-plus-circle-fill
+                scale="1.4"
+                class=""
+              />
             </b-col>
-            <b-col cols=auto class="line icon plus" v-else>
-              <b-icon-plus-circle-fill scale="1.4" class=""/>
+            <b-col
+              v-else
+              cols="auto"
+              class="line icon plus"
+            >
+              <b-icon-plus-circle-fill
+                scale="1.4"
+                class=""
+              />
             </b-col>
-            <b-col cols=3>
-              <b-form-input @change="updateLine(key, subkey, 'measure', $event )" :value="line.measure" :state="isValidPattern(line.measure)" />
+            <b-col cols="3">
+              <b-form-input
+                :value="line.measure"
+                :state="isValidPattern(line.measure)"
+                @change="updateLine(key, subkey, 'measure', $event )"
+              />
             </b-col>
-            <b-col cols=3>
-              <b-form-input @change="updateLine(key, subkey, 'weight', $event )" :value="line.weight" type="number" />
+            <b-col cols="3">
+              <b-form-input
+                :value="line.weight"
+                type="number"
+                @change="updateLine(key, subkey, 'weight', $event )"
+              />
             </b-col>
-            <b-col cols=3>
-              <b-form-input @change="updateLine(key, subkey, 'weight_measure', $event )" :value="line.weight_measure" placeholder="g"/>
+            <b-col cols="3">
+              <b-form-input
+                :value="line.weight_measure"
+                placeholder="g"
+                @change="updateLine(key, subkey, 'weight_measure', $event )"
+              />
             </b-col>
-            <b-col cols=auto class="line icon trash show" @click="removeLine(key, subkey)">
-              <b-icon-trash-fill scale="1.4" class=""/>
+            <b-col
+              cols="auto"
+              class="line icon trash show"
+              @click="removeLine(key, subkey)"
+            >
+              <b-icon-trash-fill
+                scale="1.4"
+                class=""
+              />
             </b-col>
           </b-row>
         </div>
       </b-col>
-      <b-col cols="12" class="mt-4">
-        <b-button variant="primary" @click="add" :disabled="!user">
+      <b-col
+        cols="12"
+        class="mt-4"
+      >
+        <b-button
+          variant="primary"
+          :disabled="!user"
+          @click="add"
+        >
           <b-icon-plus />
           Lägg till
         </b-button>
@@ -55,7 +124,7 @@ import { defineComponent, reactive, ref, watch } from 'vue'
 const Component = defineComponent({
   components: {
   },
-  setup() {
+  setup () {
     const store = getFirestore()
     const { user } = useAuth()
 
@@ -67,35 +136,35 @@ const Component = defineComponent({
       }
     })
 
-    function updateLine(key: string, subkey: string, attr: string, value: string | number) {
+    function updateLine (key: string, subkey: string, attr: string, value: string | number) {
       if (!user.value) return
       updateDoc(weightsRef, { [`${key}.lines.${subkey}.${attr}`]: (typeof value === 'string' ? value.trim().toLowerCase() : value) })
     }
-    function addLine(key: string) {
+    function addLine (key: string) {
       if (!user.value) return
       updateDoc(weightsRef, { [`${key}.lines.${uuidv4()}`]: { measure: 'dl', weight: 0 } })
     }
-    function removeLine(key: string, subkey: string) {
+    function removeLine (key: string, subkey: string) {
       if (!user.value) return
       updateDoc(weightsRef, { [`${key}.lines.${subkey}`]: deleteField() })
     }
 
-    function update(key: string, field: 'name', value: string) {
+    function update (key: string, field: 'name', value: string) {
       if (!user.value) return
       updateDoc(weightsRef, { [`${key}.${field}`]: value.trim().toLowerCase() })
     }
 
-    function add() {
+    function add () {
       if (!user.value) return
       const v: Converts = { [uuidv4()]: { name: '', lines: { [uuidv4()]: { measure: 'dl', weight: 0 } } } }
       updateDoc(weightsRef, v)
     }
-    function remove(key: string) {
+    function remove (key: string) {
       if (!user.value) return
       updateDoc(weightsRef, { [key]: deleteField() })
     }
-    function isValidPattern(name?: string) {
-      (name ?? '').trim().length > 0
+    function isValidPattern (name?: string) {
+      return (name ?? '').trim().length > 0
     }
 
     return {

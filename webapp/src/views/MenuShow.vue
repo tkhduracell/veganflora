@@ -4,11 +4,25 @@
     <div v-if="items && items.length === 0">
       Inga recept inlagda!
       Lägg in recept i
-      <router-link class="strong" :to="{ name: 'menu' }">menyn</router-link>först!
+      <router-link
+        class="strong"
+        :to="{ name: 'menu' }"
+      >
+        menyn
+      </router-link>först!
     </div>
-    <RecipePane v-else-if="items" :items="items"></RecipePane>
-    <div class="loader" v-else>
-      <b-spinner class="mr-2" variant="primary"></b-spinner>
+    <RecipePane
+      v-else-if="items"
+      :items="items"
+    />
+    <div
+      v-else
+      class="loader"
+    >
+      <b-spinner
+        class="mr-2"
+        variant="primary"
+      />
       <span class="mb-1">Laddar...</span>
     </div>
   </b-container>
@@ -28,7 +42,7 @@ const Component = defineComponent({
   components: {
     RecipePane
   },
-  setup() {
+  setup () {
     const { params } = useRoute()
     const week = params.week
     const weekday = params.weekday as WeekDay

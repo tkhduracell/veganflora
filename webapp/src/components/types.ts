@@ -1,13 +1,10 @@
-import { Timestamp } from 'firebase/firestore';
-
-
+import { Timestamp } from 'firebase/firestore'
 
 export type Tag = {
   text: string;
   color: string;
 }
 export type Category = string
-
 
 export type Recipe = {
   size: string;
@@ -17,6 +14,7 @@ export type Recipe = {
   ingredients: Ingredient[];
   title: string;
   key: string;
+  image?: File
   created_at?: Timestamp;
   updated_at?: Timestamp;
 }

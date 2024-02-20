@@ -2,16 +2,21 @@
   <div>
     <li
       v-if="i.measure && i.amount"
-    >{{ prettyMulti(i.amount, multiplier) }} {{ i.measure }} {{ i.name }}</li>
-    <li v-else-if="i.amount">{{ prettyMulti(i.amount, multiplier) }} {{ i.name }}</li>
-    <li v-else>{{ i.name }}</li>
+    >
+      {{ prettyMulti(i.amount, multiplier) }} {{ i.measure }} {{ i.name }}
+    </li>
+    <li v-else-if="i.amount">
+      {{ prettyMulti(i.amount, multiplier) }} {{ i.name }}
+    </li>
+    <li v-else>
+      {{ i.name }}
+    </li>
   </div>
 </template>
 
 <script lang="ts">
 import { useMulti, Multi } from '@/modules/use/multi'
 import { PropType, defineComponent, ref } from 'vue'
-
 
 import { Ingredient } from './types'
 
@@ -20,7 +25,7 @@ export default defineComponent({
     i: { type: Object as PropType<Ingredient>, required: true },
     multiplier: { type: Number as PropType<Multi>, required: true }
   },
-  setup() {
+  setup () {
     const { prettyMulti } = useMulti()
 
     return { prettyMulti }

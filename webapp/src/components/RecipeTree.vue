@@ -1,17 +1,34 @@
 <template>
   <b-row class="recipe-tree">
-    <b-col md=4 xl=3 class="category mt-4" v-for="(recipes, category) in tree" :key="category">
+    <b-col
+      v-for="(recipes, category) in tree"
+      :key="category"
+      md="4"
+      xl="3"
+      class="category mt-4"
+    >
       <strong>{{ category }}</strong>
-      <div v-for="r in recipes" :key="category + r.key" class="recipe clearfix ml-2 mt-1 mb-1">
-        <b-link class="link" :to="{ name: 'show', params: {key: r.key} }">{{ r.title }}</b-link>
+      <div
+        v-for="r in recipes"
+        :key="category + r.key"
+        class="recipe clearfix ml-2 mt-1 mb-1"
+      >
+        <b-link
+          class="link"
+          :to="{ name: 'show', params: {key: r.key} }"
+        >
+          {{ r.title }}
+        </b-link>
 
-        <div class="d-none d-md-block"></div>
+        <div class="d-none d-md-block" />
         <b-badge
           v-for="(t, ti) in r.tags"
           :key="r.key + '-tag-' + ti"
           class="ml-2 ml-md-0  mr-1 ml-md-0"
           :style="[ typeof t === 'object' ? {'background-color': t.color} : '']"
-        >{{ typeof t === 'object' ? t.text : t}}</b-badge>
+        >
+          {{ typeof t === 'object' ? t.text : t }}
+        </b-badge>
       </div>
     </b-col>
   </b-row>
@@ -33,7 +50,7 @@ export default defineComponent({
   components: {
     RecipeItem
   },
-  setup(props) {
+  setup (props) {
     const tree = computed(() => {
       const tree = {} as Record<string, { key: string; title: string; tags: Tag[] }[]>
       unique(props.recipes.map(r => r.category)).forEach(c => {
@@ -46,7 +63,7 @@ export default defineComponent({
       return tree
     })
     return {
-      tree,
+      tree
     }
   }
 })

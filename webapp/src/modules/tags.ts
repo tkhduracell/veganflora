@@ -10,8 +10,8 @@ export const AutoTags = [
   AutoTag.Updated
 ]
 
-export function autoTag(r: Recipe): Recipe {
-  function lastNDays(ts: Timestamp, n: number) {
+export function autoTag (r: Recipe): Recipe {
+  function lastNDays (ts: Timestamp, n: number) {
     return new Date().getTime() - ts.toDate().getTime() < 1000 * 3600 * n
   }
   const created = r.created_at && lastNDays(r.created_at, 14)

@@ -1,16 +1,23 @@
 <template>
   <div>
-    <div v-for="key in Object.keys(items).sort()" :key="key">
+    <div
+      v-for="key in Object.keys(items).sort()"
+      :key="key"
+    >
       <strong>{{ titleCase(key) }}</strong>
       <ul class="mb-0">
-        <li v-for="(item, idx) in items[key]" :key="key + idx">
+        <li
+          v-for="(item, idx) in items[key]"
+          :key="key + idx"
+        >
           <router-link
-            :to="{ name: 'show', params: { key: item.source.key }}"
             v-slot="{ href: openUrl }"
+            :to="{ name: 'show', params: { key: item.source.key }}"
           >
             <router-link
+              v-if="canEdit"
+              v-slot="{ href: editUrl }"
               :to="{ name: 'edit', params: { key: item.source.key }}"
-              v-slot="{ href: editUrl }" v-if="canEdit"
             >
               <span
                 v-b-tooltip.hover.topright.html="tooltip(item, editUrl, openUrl)"
@@ -31,16 +38,15 @@ export default defineComponent({
   props: {
     recipes: { required: false, type: Array as PropType<Recipe[]> },
     menu: { required: true, type: Object as PropType<Menu> },
-    findRecipe: { required: true, type: Function as PropType<(r: string) => Recipe>},
+    findRecipe: { required: true, type: Function as PropType<(r: string) => Recipe> },
     canEdit: { type: Boolean }
   },
-  setup(props) {
-
-    function flatmap<T, K>(arr: T[], fn: (t: T, idx: number) => K[]): K[] {
+  setup (props) {
+    function flatmap<T, K> (arr: T[], fn: (t: T, idx: number) => K[]): K[] {
       return arr.reduce((acc: K[], x, idx) => acc.concat(fn(x, idx)), [])
     }
 
-    function toIngredientWithContext(key: string, week: number, weekday: WeekDay, meal: Meal): IngredientWithContext[] {
+    function toIngredientWithContext (key: string, week: number, weekday: WeekDay, meal: Meal): IngredientWithContext[] {
       const source = props.findRecipe(key)
       return source && source.ingredients
         ? source.ingredients.map(i => ({ week, weekday, meal, source, ...i }))
@@ -70,7 +76,7 @@ export default defineComponent({
       }, {})
     })
 
-    function tooltip(item: { measure?: string; amount?: string } & Context<Recipe>, editUrl: string, openUrl: string) {
+    function tooltip (item: { measure?: string; amount?: string } & Context<Recipe>, editUrl: string, openUrl: string) {
       const r = props.recipes?.find(r => r.key === item.source.key)
       return `
         ${r ? r.title : '...'}<br>
@@ -80,7 +86,7 @@ export default defineComponent({
       `
     }
 
-    function titleCase(str: string): string {
+    function titleCase (str: string): string {
       return str.toLowerCase().split(' ').map(function (word) {
         return word.replace(word[0], word[0].toUpperCase())
       }).join(' ')

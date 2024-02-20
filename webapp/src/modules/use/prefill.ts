@@ -1,7 +1,7 @@
 import { ref, onMounted } from 'vue'
 import { AutoTags } from '../tags'
 import { doc, getDoc, getFirestore, onSnapshot } from 'firebase/firestore'
-import { Recipe } from '@/components/types';
+import { Recipe } from '@/components/types'
 
 type Prefill = {
   tags: Exclude<Recipe['tags'], undefined>,
@@ -16,7 +16,7 @@ export function usePrefill () {
     const store = getFirestore()
 
     onSnapshot(doc(store, 'veganflora', 'root'), result => {
-      const {prefill} = result.data() as { prefill: Prefill }
+      const { prefill } = result.data() as { prefill: Prefill }
       console.log('Loaded prefill: ', prefill)
 
       tags.value = [...AutoTags.map(x => ({ text: x, color: '' })), ...prefill.tags]

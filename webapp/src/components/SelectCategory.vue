@@ -1,10 +1,25 @@
 <template>
   <div>
-    <span v-for="(c, idx) in category" :key="JSON.stringify(c)" class="">
-      <span class="separator" v-if="idx > 0">{{separator}}</span>
-      <b-form-tag small :variant="variant" @remove="remove(idx)" class="div">{{ c }}</b-form-tag>
+    <span
+      v-for="(c, idx) in category"
+      :key="JSON.stringify(c)"
+      class=""
+    >
+      <span
+        v-if="idx > 0"
+        class="separator"
+      >{{ separator }}</span>
+      <b-form-tag
+        small
+        :variant="variant"
+        class="div"
+        @remove="remove(idx)"
+      >{{ c }}</b-form-tag>
     </span>
-    <span v-if="category && category.length > 0" class="separator">{{separator}}</span>
+    <span
+      v-if="category && category.length > 0"
+      class="separator"
+    >{{ separator }}</span>
 
     <input
       v-if="custom"
@@ -12,12 +27,30 @@
       class="ml-1"
       @blur="complete()"
       @keypress.enter="complete()"
-    />
-    <select v-else-if="suggestions.length > 0" size="sm" v-model="suggestion" @change="complete()">
-      <option value>Välj...</option>
-      <option v-for="s in suggestions" :value="s" :key="s">{{ s }}</option>
+    >
+    <select
+      v-else-if="suggestions.length > 0"
+      v-model="suggestion"
+      size="sm"
+      @change="complete()"
+    >
+      <option value>
+        Välj...
+      </option>
+      <option
+        v-for="s in suggestions"
+        :key="s"
+        :value="s"
+      >
+        {{ s }}
+      </option>
     </select>
-    <b-link @click="custom = !custom" class="ml-1 p-1">{{ custom ? '⨯' : '✎' }}</b-link>
+    <b-link
+      class="ml-1 p-1"
+      @click="custom = !custom"
+    >
+      {{ custom ? '⨯' : '✎' }}
+    </b-link>
   </div>
 </template>
 
@@ -35,12 +68,12 @@ export default defineComponent({
     suggestions: { required: true, type: Array as PropType<string[]> },
     variant: { type: String, default: 'primary' }
   },
-  setup(props, { emit }) {
+  setup (props, { emit }) {
     const custom = ref<boolean>(false)
     const newValue = ref<string>('')
     const suggestion = ref<string>('')
 
-    function complete() {
+    function complete () {
       const addition = custom.value ? newValue.value : suggestion.value
       if (!addition || addition.trim().length === 0) return
       custom.value = false
@@ -52,7 +85,7 @@ export default defineComponent({
       suggestion.value = ''
     }
 
-    function remove(idx: number) {
+    function remove (idx: number) {
       const newValue = props.category?.filter((itm, i) => i !== idx) ?? []
       emit('update:category', newValue)
     }
