@@ -1,18 +1,32 @@
 <template>
   <b-container class="edit">
-    <h1 v-if="key && recipe && recipe.title">
-      {{ recipe.title }}
-    </h1>
-    <b-spinner
+    <div>
+      <b-button
+        class="float-right"
+        type="submit"
+        size="lg"
+        variant="primary"
+        :disabled="isEmpty || !user"
+        v-if="recipe"
+      >
+        <b-icon-check />
+        Spara
+      </b-button>
+
+      <h1 v-if="key && recipe && recipe.title">
+        {{ recipe.title }}
+      </h1>
+      <b-spinner
       v-if="key && (!recipe || !recipe.title)"
       class="mb-2"
-    />
-    <h1 v-if="!key && recipe && recipe.title">
-      {{ recipe.title }}
-    </h1>
-    <h1 v-if="!key && (!recipe || !recipe.title)">
-      Nytt Recept
-    </h1>
+      />
+      <h1 v-if="!key && recipe && recipe.title">
+        {{ recipe.title }}
+      </h1>
+      <h1 v-if="!key && (!recipe || !recipe.title)">
+        Nytt Recept
+      </h1>
+    </div>
 
     <b-form
       v-if="recipe"
@@ -104,7 +118,7 @@
         <b-form-file
           id="input-5"
           v-model="recipe.image"
-          :disabled="saving"
+          disabled
           accept="image/jpeg, image/png"
           placeholder="Välj en bild"
         />
@@ -141,46 +155,54 @@
           </div>
         </template>
 
-        <b-input-group
-          v-for="(i, idx) in recipe.ingredients"
-          :key="'ingredient-' + idx"
-          size="sm"
-        >
-          <b-form-input
-            :id="'input-5-' + idx + '-name'"
-            v-model="i.name"
-            type="text"
-            required
-            :disabled="saving"
-            @keyup="onChange"
-          />
-          <b-form-input
-            :id="'input-5-' + idx + '-amount'"
-            v-model="i.amount"
-            type="text"
-            placeholder="1"
-            :disabled="saving || i.name.match(/^\*(.*).*\*$/gi)"
-            @keyup="onChange"
-          />
-          <b-form-input
-            :id="'input-5-' + idx + '-measure'"
-            v-model="i.measure"
-            type="text"
-            placeholder="styck"
-            :disabled="saving || i.name.match(/^\*(.*).*\*$/gi)"
-            @keyup="onChange"
-          />
-          <b-button
+        <draggable v-model="recipe.ingredients"
+          group="items"
+          :disabled="!recipe || recipe.ingredients?.length < 2">
+          <b-input-group
+            v-for="(i, idx) in recipe.ingredients"
+            :key="'ingredient-' + idx"
+            class="py-1 ingredient-items"
             size="sm"
-            variant="link"
-            @click="removeIngredientRow(idx)"
-          >
+            >
+            <b-icon-three-dots-vertical class="movable m-2"
+              v-if="recipe && recipe.ingredients?.length > 1" />
+
+            <b-form-input
+              :id="'input-5-' + idx + '-name'"
+              v-model="i.name"
+              type="text"
+              required
+              :disabled="saving"
+              @keyup="onChange"
+            />
+            <b-form-input
+              :id="'input-5-' + idx + '-amount'"
+              v-model="i.amount"
+              type="text"
+              placeholder="1"
+              :disabled="saving || i.name.match(/^\*(.*).*\*$/gi)"
+              @keyup="onChange"
+            />
+            <b-form-input
+              :id="'input-5-' + idx + '-measure'"
+              v-model="i.measure"
+              type="text"
+              placeholder="styck"
+              :disabled="saving || i.name.match(/^\*(.*).*\*$/gi)"
+              @keyup="onChange"
+            />
+            <b-button
+              size="sm"
+              variant="link"
+              @click="removeIngredientRow(idx)"
+            >
             🗑
           </b-button>
         </b-input-group>
-        <b-alert
-          v-if="!recipe.ingredients || recipe.ingredients.length === 0"
-          variant="warning"
+      </draggable>
+      <b-alert
+      v-if="!recipe.ingredients || recipe.ingredients.length === 0"
+      variant="warning"
           show
         >
           <div>Inga ingredienser tillagda. Använd knappen nedan för att lägga till.</div>
@@ -191,8 +213,7 @@
             :disabled="saving"
             @click="addIngredientRow()"
           >
-            ➕Lägg
-            till
+            <b-icon-plus /> Lägg till
           </b-button>
         </b-alert>
         <b-button
@@ -203,7 +224,8 @@
           :disabled="saving"
           @click="addIngredientRow()"
         >
-          ➕Lägg till
+        <b-icon-plus />
+        Lägg till
         </b-button>
       </b-form-group>
 
@@ -228,7 +250,7 @@
           variant="primary"
           :disabled="isEmpty || !user"
         >
-          Spara
+        <b-icon-check /> Spara
         </b-button>
         <b-button
           variant="link"
@@ -273,10 +295,11 @@ import { parseIngredient } from '../modules/ingredients'
 import { Recipe, Ingredient, Tag } from '../components/types'
 import { useRoute, useRouter } from 'vue-router/composables'
 import { useAuth } from '@/modules/use/auth'
+import draggable from 'vuedraggable'
 
 export default defineComponent({
   name: 'RecipieEdit',
-  components: { SelectTags, BIconClipboard, SelectCategory },
+  components: { SelectTags, BIconClipboard, SelectCategory, draggable },
   setup () {
     const { params } = useRoute()
     const router = useRouter()
@@ -425,5 +448,8 @@ export default defineComponent({
   position: absolute;
   right: 0;
   top: -2em;
+}
+.ingredient-items .movable {
+  cursor: move;
 }
 </style>
