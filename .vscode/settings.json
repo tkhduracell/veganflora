@@ -3,24 +3,16 @@
         "./webapp",
         "./ingest"
     ],
-    "javascript.preferences.quoteStyle": "single",
-    "typescript.preferences.quoteStyle": "single",
-    "javascript.suggest.completeFunctionCalls": true,
-    "typescript.referencesCodeLens.enabled": true,
-    "typescript.suggest.completeFunctionCalls": true,
-    "javascript.format.enable": false,
-    "javascript.format.insertSpaceBeforeFunctionParenthesis": true,
-    "javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": true,
-    "typescript.format.insertSpaceBeforeFunctionParenthesis": false,
-    "typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": true,
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
     "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
+        "source.fixAll.eslint": "explicit"
     },
-    "[javascript]": {
-        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-    },
-    "[typescript]": {
-        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-    },
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact",
+        "vue"
+    ],
+    "nuxt.isNuxtApp": false,
 }

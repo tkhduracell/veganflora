@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"name": "functions",
+			"path": "functions"
+		},
+		{
+			"name": "webapp",
+			"path": "webapp"
+		},
+		{
+			"name": "ingest",
+			"path": "ingest"
+		}
+	],
+	"settings": {
+		"typescript.referencesCodeLens.enabled": true,
+		"javascript.format.enable": false,
+		"jest.disabledWorkspaceFolders": [
+			"veganflora"
+		]
+	}
+}
