@@ -1,3 +1,9 @@
+export type Ingredient = {
+  name: string;
+  amount?: string;
+  measure?: string;
+  note?: string;
+}
 
 export function noEmpty (x: string) {
   return !x.match(/^\s*$/gum)
@@ -79,11 +85,4 @@ export function parseIngredient (x: string) {
   }
 
   return out
-}
-
-export type Ingredient = {
-  name: string;
-  amount?: string;
-  measure?: string;
-  note?: string;
 }

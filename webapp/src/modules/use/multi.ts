@@ -15,7 +15,7 @@ export function useMulti () {
     idx.value = Math.max(Math.min(idx.value - 1, MultiValue.length - 1), 0)
   }
 
-  function prettyMulti (amount: any, multiplier: Multi) {
+  function prettyMulti (amount: string | number, multiplier: Multi) {
     const out = (typeof amount === 'string' ? parseFloat(amount.replace(',', '.')) : amount) * multiplier
     if (isNaN(out)) {
       return multiplier > 1 ? `${multiplier} x ${amount}` : amount

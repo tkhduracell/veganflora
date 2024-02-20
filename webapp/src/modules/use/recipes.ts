@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { ref, onMounted, onUnmounted, Ref } from 'vue'
 
 import { collection, deleteDoc, doc, getDoc, getFirestore, onSnapshot, QuerySnapshot, serverTimestamp, setDoc, Timestamp } from 'firebase/firestore'

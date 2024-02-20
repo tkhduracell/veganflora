@@ -16,7 +16,7 @@
           v-model="week"
           :options="weeks"
         />
-        <Menu
+        <MenuComp
           :menu="menu"
           @remove-item="remove"
         />
@@ -29,7 +29,7 @@
 import { defineComponent, ref, computed, watch } from 'vue'
 
 import MenuAdder from '@/components/MenuAdder.vue'
-import Menu from '@/components/Menu.vue'
+import MenuComp from '@/components/Menu.vue'
 
 import { useRecipes } from '../modules/use/recipes'
 import { useMenu } from '../modules/use/menu'
@@ -39,7 +39,7 @@ import { useAuth } from '@/modules/use/auth'
 const Component = defineComponent({
   components: {
     MenuAdder,
-    Menu
+    MenuComp
   },
   setup () {
     const { user } = useAuth()

@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { onMounted, onUnmounted, reactive, ref, UnwrapRef } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
 

@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { Timestamp } from 'firebase/firestore'
 
 export type Tag = {
@@ -5,6 +6,12 @@ export type Tag = {
   color: string;
 }
 export type Category = string
+
+export type Ingredient = {
+  name: string;
+  amount?: string;
+  measure?: string;
+}
 
 export type Recipe = {
   size: string;
@@ -17,14 +24,6 @@ export type Recipe = {
   image?: File
   created_at?: Timestamp;
   updated_at?: Timestamp;
-}
-
-export type Menu = {
-  [key: string]: Week;
-}
-
-export type Week = {
-  days: { [key: string]: Day };
 }
 
 export enum WeekDay {
@@ -65,10 +64,12 @@ export type Day = {
   [Meal.dinner]: string[];
 }
 
-export type Ingredient = {
-  name: string;
-  amount?: string;
-  measure?: string;
+export type Week = {
+  days: { [key: string]: Day };
+}
+
+export type Menu = {
+  [key: string]: Week;
 }
 
 export type Context<T> = {

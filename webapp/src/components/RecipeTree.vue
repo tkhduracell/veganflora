@@ -37,8 +37,6 @@
 <script lang="ts">
 import { PropType, defineComponent, ref, computed, getCurrentInstance } from 'vue'
 
-import RecipeItem from '@/components/RecipeItem.vue'
-
 import { Recipe, Tag } from './types'
 import { unique } from '../modules/common/set'
 
@@ -47,9 +45,7 @@ export default defineComponent({
   props: {
     recipes: { required: true, type: Array as PropType<Recipe[]> }
   },
-  components: {
-    RecipeItem
-  },
+  components: {},
   setup (props) {
     const tree = computed(() => {
       const tree = {} as Record<string, { key: string; title: string; tags: Tag[] }[]>
