@@ -160,8 +160,8 @@
           handle=".movable"
           :disabled="!recipe || recipe.ingredients?.length < 2">
           <b-input-group
-            v-for="(i, idx) in recipe.ingredients"
-            :key="'ingredient-' + hash(i.name, i.amount, i.measure)"
+            v-for="i in recipe.ingredients"
+            :key="'ingredient-' + i.id"
             class="py-1 ingredient-items"
             size="sm"
             >
@@ -169,7 +169,7 @@
               v-if="recipe && recipe.ingredients?.length > 1" />
 
             <b-form-input
-              :id="'input-5-' + idx + '-name'"
+              :id="'input-5-' + i.id + '-name'"
               v-model="i.name"
               type="text"
               required
@@ -177,7 +177,7 @@
               @keyup="onChange"
             />
             <b-form-input
-              :id="'input-5-' + idx + '-amount'"
+              :id="'input-5-' + i.id + '-amount'"
               v-model="i.amount"
               type="text"
               placeholder="1"
@@ -185,7 +185,7 @@
               @keyup="onChange"
             />
             <b-form-input
-              :id="'input-5-' + idx + '-measure'"
+              :id="'input-5-' + i.id + '-measure'"
               v-model="i.measure"
               type="text"
               placeholder="styck"
@@ -195,16 +195,17 @@
             <b-button
               size="sm"
               variant="link"
-              @click="removeIngredientRow(idx)"
+              @click="removeIngredientRow(i.id)"
             >
             🗑
           </b-button>
         </b-input-group>
       </draggable>
+
       <b-alert
-      v-if="!recipe.ingredients || recipe.ingredients.length === 0"
-      variant="warning"
-          show
+        v-if="!recipe.ingredients || recipe.ingredients.length === 0"
+        variant="warning"
+        show
         >
           <div>Inga ingredienser tillagda. Använd knappen nedan för att lägga till.</div>
           <b-button
@@ -297,6 +298,7 @@ import { Recipe, Ingredient, Tag } from '../components/types'
 import { useRoute, useRouter } from 'vue-router/composables'
 import { useAuth } from '@/modules/use/auth'
 import draggable from 'vuedraggable'
+import { v4 as uuidv4 } from 'uuid'
 
 export default defineComponent({
   name: 'RecipieEdit',
@@ -308,7 +310,15 @@ export default defineComponent({
     const { user } = useAuth()
 
     const saving = ref(false)
-    const { recipe, onSave } = useRecipe(key || '')
+    const {
+      recipe,
+      onSave,
+      addIngredientRow,
+      addIngredientRows,
+      removeIngredientRow,
+      updateCategory,
+      updateTags
+    } = useRecipe(key || '')
     const prefill = usePrefill()
 
     const tags = computed<Tag[]>(() => {
@@ -347,32 +357,6 @@ export default defineComponent({
       }
     }, 1000)
 
-    function removeIngredientRow (index: number) {
-      const { ingredients, ...rest } = recipe.value
-      recipe.value = {
-        ...rest,
-        ingredients: ingredients.filter((itm, idx) => idx !== index)
-      }
-    }
-
-    function addIngredientRow () {
-      const { ingredients, ...rest } = recipe.value
-      recipe.value = {
-        ...rest,
-        ingredients: [
-          ...ingredients, { name: '' } as Ingredient
-        ]
-      }
-    }
-
-    function updateCategory (update: Recipe['category']) {
-      recipe.value = { ...recipe.value, category: update }
-    }
-
-    function updateTags (update: Recipe['tags']) {
-      recipe.value = { ...recipe.value, tags: update }
-    }
-
     const isEmpty = computed(() => {
       const r = recipe.value || {} as Recipe
       return !r || (r.ingredients || []).length === 0 || (r.title || '').trim().length === 0
@@ -392,26 +376,22 @@ export default defineComponent({
     }
 
     const pasteList = ref('')
-    function onPasteList () {
-      const ingredientsAdd = pasteList.value
-        .split(/\n/gi)
-        .map(parseIngredient)
-      const { ingredients, ...rest } = recipe.value
-      recipe.value = {
-        ...rest,
-        ingredients: ingredients ? [...ingredients, ...ingredientsAdd] : [...ingredientsAdd]
-      }
-      onChange()
-      pasteList.value = ''
-    }
 
-    function hash (name?: string, amount?: string, measure?: string) {
-      return `${name}-${amount}-${measure}`.replace(/ /gi, '-')
+    function onPasteList () {
+      try {
+        const ingredientsAdd = pasteList.value
+          .split(/\n/gi)
+          .map(parseIngredient)
+        addIngredientRows(ingredientsAdd)
+        onChange()
+        pasteList.value = ''
+      } catch (err) {
+        console.error('Failed to parse pasted list', err)
+      }
     }
 
     return {
       key,
-      hash,
       recipe,
       removeIngredientRow,
       addIngredientRow,

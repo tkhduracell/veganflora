@@ -4,9 +4,10 @@ import { ref, onMounted, onUnmounted, Ref } from 'vue'
 import { collection, deleteDoc, doc, getDoc, getFirestore, onSnapshot, QuerySnapshot, serverTimestamp, setDoc, Timestamp } from 'firebase/firestore'
 import { getStorage, ref as imageRef, uploadBytesResumable, UploadTask } from 'firebase/storage'
 
-import { Recipe, Tag } from '@/components/types'
+import { Ingredient, Recipe, Tag } from '@/components/types'
 
 import { autoTag } from '../../modules/tags'
+import { v4 as uuidv4 } from 'uuid'
 
 function asArray<V> (result: QuerySnapshot): { key: string; value: V }[] {
   const out: { key: string; value: V }[] = []
@@ -41,7 +42,11 @@ export function useRecipe (key: string) {
       const ref = doc(store, 'veganflora', 'root', 'recipies', key ?? 'does-not-exist')
       const result = await getDoc(ref)
       if (result && result.exists()) {
-        recipe.value = result.data() as Recipe
+        const data = result.data() as Recipe
+        recipe.value = {
+          ...data,
+          ingredients: (data.ingredients ?? []).map(i => ({ ...i, id: uuidv4() }))
+        } as Recipe
       } else {
         console.log('Recpie not found, starting with clean slate')
       }
@@ -61,12 +66,16 @@ export function useRecipe (key: string) {
   }
 
   async function onSave () {
-    const { key, created_at, image, ...rest } = recipe.value
+    const { key, created_at, image, ingredients, ...rest } = recipe.value
     const data = {
       // Timestamp need reconstruct after json clone
       created_at: !created_at ? serverTimestamp() : new Timestamp(created_at.seconds, created_at.nanoseconds),
       updated_at: serverTimestamp(),
-      ...rest
+      ...rest,
+      ingredients: ingredients.map(i => {
+        const { id, ...rest } = i
+        return rest
+      })
     }
 
     const savekey = key || safekey(data.title, data.category)
@@ -85,7 +94,51 @@ export function useRecipe (key: string) {
     return { savekey }
   }
 
-  return { recipe, onSave, remove: () => remove(key) }
+  function removeIngredientRow (id: string) {
+    const { ingredients, ...rest } = recipe.value
+    recipe.value = {
+      ...rest,
+      ingredients: ingredients.filter(({ id: _id }) => id !== _id)
+    }
+  }
+
+  function addIngredientRow () {
+    const { ingredients, ...rest } = recipe.value
+    recipe.value = {
+      ...rest,
+      ingredients: [
+        ...ingredients, { name: '', id: uuidv4() } satisfies Ingredient
+      ]
+    }
+  }
+
+  function addIngredientRows (items: Omit<Ingredient, 'id'>[]) {
+    const keyed = items.map((i, idx) => ({ ...i, id: uuidv4() }))
+    const { ingredients, ...rest } = recipe.value
+    recipe.value = {
+      ...rest,
+      ingredients: [...ingredients, ...keyed]
+    }
+  }
+
+  function updateCategory (update: Recipe['category']) {
+    recipe.value = { ...recipe.value, category: update }
+  }
+
+  function updateTags (update: Recipe['tags']) {
+    recipe.value = { ...recipe.value, tags: update }
+  }
+
+  return {
+    recipe,
+    onSave,
+    remove: () => remove(key),
+    updateCategory,
+    updateTags,
+    addIngredientRow,
+    addIngredientRows,
+    removeIngredientRow
+  }
 }
 
 export type Recipes = {recipes: Ref<Recipe[] | undefined>; findRecipe: (key: string) => Recipe | undefined; remove: (key: string) => void}

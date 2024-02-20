@@ -53,12 +53,12 @@ export function normalizeValue (x: string |number): string | number {
   return x
 }
 
-export function parseIngredient (x: string) {
+export function parseIngredient (x: string): Omit<Ingredient, 'id'> {
   const regex = /\s*(?:(?<amount>[\d¼½¾,.]+(?:\s+[\d¼½¾])?(?:\s*-\s*[\d¼½¾]+)?)\s*)?(?:(?<measure>st|g|gram|krm|tsk|msk|ml|dl|liten\snäve|stora?|medelstor)\s+)?(?<name>.+)?/gu
 
   const match = regex.exec(normalize(x))
 
-  let out = { name: x } as Ingredient
+  let out = { name: x } as Omit<Ingredient, 'id'>
   if (match && match.groups && Object.keys(match.groups).length === 2) {
     out = {
       amount: match.groups.amount as string,

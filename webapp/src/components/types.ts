@@ -8,6 +8,7 @@ export type Tag = {
 export type Category = string
 
 export type Ingredient = {
+  id: string;
   name: string;
   amount?: string;
   measure?: string;
