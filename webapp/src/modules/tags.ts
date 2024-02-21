@@ -10,7 +10,7 @@ export const AutoTags = [
   AutoTag.Updated
 ]
 
-export function autoTag (r: Recipe): Recipe {
+export function autoTag (r: Recipe): Recipe & { tags: Tag[] } {
   function lastNDays (ts: Timestamp, n: number) {
     return new Date().getTime() - ts.toDate().getTime() < 1000 * 3600 * n
   }

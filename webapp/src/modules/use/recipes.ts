@@ -150,12 +150,21 @@ export function useRecipes (): Recipes {
     const store = getFirestore()
     const col = collection(store, 'veganflora', 'root', 'recipies')
 
-    type StoreRecipie = Omit<Recipe, 'tags'> & { tags: (string | Tag)[] }
-    function stringToBadge<T extends { text: string }> (x: T | string): T {
-      return typeof x === 'string' ? { text: x } as T : x
+    type StoreRecipie = Omit<Recipe, 'tags'> & { tags: Tag[] }
+
+    const tags = await getDoc(doc(store, 'veganflora', 'root'))
+      .then(itm => itm.data()?.prefill?.tags as Tag[] ?? [])
+
+    function toCommonTag(_t: Tag): Tag {
+      const t = typeof _t === 'string' ? { text: _t, color: '' } as Tag : _t
+      const tag = tags.find(({ text }) => text === t.text)
+      if (tag) return tag
+      return t
     }
 
-    const fancyTag = ({ tags, ...rest }: StoreRecipie) => ({ ...rest, tags: tags?.map(stringToBadge) })
+    const fancyTag = ({ tags, ...rest }: StoreRecipie) => {
+      return ({ ...rest, tags: tags?.map(toCommonTag) ?? [] })
+    }
 
     close.value = onSnapshot(col, async (result) => {
       console.log('Loading recipes ...')
