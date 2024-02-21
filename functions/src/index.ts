@@ -30,7 +30,7 @@ export const prefillUpdate = region('europe-west3')
                 data.tags
                     .map(t => typeof t === 'string' ? { text: t, color: '' } : t)
                     .forEach(t => {
-                        if (tagsByName.has(t.text)) {
+                        if (!tagsByName.has(t.text)) {
                             tagsByName.set(t.text, { text: t.text, color: t.color });
                         }
                     })
