@@ -7,6 +7,7 @@
         size="lg"
         variant="primary"
         :disabled="isEmpty || !user"
+        @click="save"
         v-if="recipe"
       >
         <b-icon-check />
