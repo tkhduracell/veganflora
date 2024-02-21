@@ -13,19 +13,27 @@ export const prefillUpdate = region('europe-west3')
     .document('/veganflora/root/recipies/{id}')
     .onWrite(async (_, ctx) => {
         logger.info(`${ctx.params.id}:onWrite()`);
-        
+
         const cursor = await root.collection('recipies').get()
-        
-        const tagSet = new Set<{ text: string }>()
-        const categorySet = new Set<string>()
+
+        type Tag = { text: string, color: string }
+        type TagLegacy = string
+        type Category = string
+
+        const tagsByName = new Map<Tag['text'], Tag>()
+        const categorySet = new Set<Category>()
 
         cursor.forEach(doc => {
-            const data = doc.data() as { tags?: (string | { text: string })[], category?: string[] }
+            const data = doc.data() as { tags?: (TagLegacy | Tag)[], category?: Category[] }
 
             if (data.tags) {
                 data.tags
                     .map(t => typeof t === 'string' ? { text: t, color: '' } : t)
-                    .forEach(t => tagSet.add(t))
+                    .forEach(t => {
+                        if (tagsByName.has(t.text)) {
+                            tagsByName.set(t.text, { text: t.text, color: t.color });
+                        }
+                    })
             }
 
             if (data.category) {
@@ -33,10 +41,10 @@ export const prefillUpdate = region('europe-west3')
             }
         })
 
-        const tags = [...tagSet.values()].sort()
+        const tags = [...tagsByName.values()].sort((a,b) => a.text.localeCompare(b.text))
         const categories = [...categorySet.values()].sort()
 
         logger.info(`Updating prefill`, { tags, categories });
-        
+
         await root.update({ prefill: { tags, categories } })
     });
