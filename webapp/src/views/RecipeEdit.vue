@@ -197,7 +197,7 @@
               v-model="i.amount"
               type="text"
               placeholder="1"
-              :disabled="saving || i.name.match(/^\*(.*).*\*$/gi)"
+              :disabled="saving || (i.name ?? '').match(/^\*(.*).*\*$/gi)"
               @keyup="onChange"
             />
             <b-form-input
@@ -205,7 +205,7 @@
               v-model="i.measure"
               type="text"
               placeholder="styck"
-              :disabled="saving || i.name.match(/^\*(.*).*\*$/gi)"
+              :disabled="saving || (i.name ?? '').match(/^\*(.*).*\*$/gi)"
               @keyup="onChange"
             />
             <b-button
@@ -397,7 +397,9 @@ export default defineComponent({
       try {
         const ingredientsAdd = pasteList.value
           .split(/\n/gi)
+          .filter(s => s.trim() !== '')
           .map(parseIngredient)
+          .filter(i => i.name !== '')
         addIngredientRows(ingredientsAdd)
         onChange()
         pasteList.value = ''
