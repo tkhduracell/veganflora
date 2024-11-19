@@ -144,13 +144,28 @@
         class="position-relative"
       >
         <template #label>
-          Ingredienser (Namn, Mängd, Enhet)
-          <b-link
-            v-b-modal.modal-paste-list
-            class="ml-2"
-          >
-            <b-icon-clipboard />
-          </b-link>
+          <div class="d-flex flex-row">
+            <div>
+              Ingredienser (Namn, Mängd, Enhet)
+            </div>
+            <div class="flex-grow-1">
+              <b-link
+                v-b-modal.modal-paste-list
+                class="ml-2"
+                >
+                <b-icon-clipboard />
+              </b-link>
+            </div>
+            <div>
+              <b-link
+                @click="recipe.ingredients = []"
+                class="ml-2"
+                >
+                Rensa
+                🗑
+              </b-link>
+            </div>
+          </div>
           <div class="small">
             💎 Tips: *Rubrik*
           </div>
