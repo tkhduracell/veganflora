@@ -29,6 +29,7 @@ export function normalize (x: string) {
     .replace(/7\s*[\\/]\s*8/gi, '⅞')
     .replace(/1\s*[\\/]\s*9/gi, '⅑')
     .replace(/1\s*[\\/]\s*10/gi, '⅒')
+    .replace(/^ *\* */gi, '')
 }
 export function normalizeValue (x: string |number): string | number {
   if (typeof x === 'number') return x
