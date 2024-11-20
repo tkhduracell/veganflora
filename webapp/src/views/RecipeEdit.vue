@@ -1,25 +1,12 @@
 <template>
   <b-container class="edit">
-    <div>
-      <b-button
-        class="float-right"
-        type="submit"
-        size="lg"
-        variant="primary"
-        :disabled="isEmpty || !user"
-        @click="save"
-        v-if="recipe"
-      >
-        <b-icon-check />
-        Spara
-      </b-button>
-
+    <div class="d-flex align-items-center" style="gap: 1em">
       <h1 v-if="key && recipe && recipe.title">
         {{ recipe.title }}
       </h1>
       <b-spinner
-      v-if="key && (!recipe || !recipe.title)"
-      class="mb-2"
+        v-if="key && (!recipe || !recipe.title)"
+        class="mb-2"
       />
       <h1 v-if="!key && recipe && recipe.title">
         {{ recipe.title }}
@@ -27,6 +14,38 @@
       <h1 v-if="!key && (!recipe || !recipe.title)">
         Nytt Recept
       </h1>
+
+      <div class="flex-grow-1">
+
+      </div>
+
+        <b-button
+        size="sm"
+        variant="primary"
+        :disabled="!user || isImporting"
+        v-b-modal.modal-import
+        v-if="recipe"
+        >
+        <b-spinner
+          v-if="isImporting"
+          class=""
+        />
+        <div v-else>
+          <b-icon-file-earmark-arrow-down />
+          Importera
+        </div>
+      </b-button>
+      <b-button
+        size="lg"
+        variant="primary"
+        :disabled="isEmpty || !user"
+        @click="save"
+        v-if="recipe"
+        >
+        <b-icon-check />
+        Spara
+      </b-button>
+
     </div>
 
     <b-form
@@ -135,6 +154,19 @@
           <b-textarea
             v-model.trim="pasteList"
             rows="20"
+          />
+        </b-form-group>
+      </b-modal>
+
+      <b-modal
+        id="modal-import"
+        title="Importera recept"
+        @ok="onImportUrl"
+      >
+        <b-form-group class>
+          Vilken url vill du importera?
+          <b-form-input
+            v-model.trim="importUrl"
           />
         </b-form-group>
       </b-modal>
@@ -314,7 +346,7 @@ import { Recipe, Ingredient, Tag } from '../components/types'
 import { useRoute, useRouter } from 'vue-router/composables'
 import { useAuth } from '@/modules/use/auth'
 import draggable from 'vuedraggable'
-import { v4 as uuidv4 } from 'uuid'
+import { useImportUrl } from '@/modules/use/import'
 
 export default defineComponent({
   name: 'RecipieEdit',
@@ -408,7 +440,12 @@ export default defineComponent({
       }
     }
 
+    const { importUrl, onImportUrl, isImporting } = useImportUrl(recipe)
+
     return {
+      importUrl,
+      onImportUrl,
+      isImporting,
       key,
       recipe,
       removeIngredientRow,

@@ -62,16 +62,11 @@ async function summarizeWithChatGPT(text: string): Promise<string> {
                   "items": {
                     "type": "object",
                     "required": [
-                      "id",
                       "name",
                       "amount",
                       "measure"
                     ],
                     "properties": {
-                      "id": {
-                        "type": "string",
-                        "description": "A unique identifier for the ingredient."
-                      },
                       "name": {
                         "type": "string",
                         "description": "The name of the ingredient."
@@ -82,12 +77,12 @@ async function summarizeWithChatGPT(text: string): Promise<string> {
                       },
                       "measure": {
                         "type": "string",
-                        "description": "The measurement unit for the ingredient (e.g., cups, grams)."
+                        "description": "The measurement unit for the ingredient (e.g., tsk, dl, cups, gram)."
                       }
                     },
                     "additionalProperties": false
                   },
-                  "description": "A list of ingredients used in the recipe."
+                  "description": "A list of ingredients used in the recipe. Use *Rubrik* to create a section."
                 }
               },
               "additionalProperties": false
@@ -114,7 +109,7 @@ export async function fetchAndSummarize(url: string): Promise<string> {
 }
 
 export const importRecepie = region('europe-west3')
-    .runWith({secrets: [openAiApiKey]})
+    .runWith({ secrets: [openAiApiKey], timeoutSeconds: 120 })
     .https
     .onCall(async ({url}) => {
         try {
