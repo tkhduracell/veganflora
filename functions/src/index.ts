@@ -3,12 +3,123 @@ import {region, logger} from 'firebase-functions';
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 
+import OpenAI from "openai";
+
 initializeApp();
 
 const db = getFirestore();
 const root = db.collection('veganflora').doc('root')
 
 const randomColor = () => `#${Math.floor(Math.random()*16777215).toString(16)}`
+
+async function summarizeWithChatGPT(text: string): Promise<string> {
+    const openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+    });
+
+    const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            "role": "user",
+            "content": [
+              { "text": `${text}`, "type": "text" }
+            ]
+          }
+        ],
+        temperature: 1,
+        max_tokens: 2048,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0,
+        response_format: {
+          "type": "json_schema",
+          "json_schema": {
+            "name": "recipe",
+            "schema": {
+              "type": "object",
+              "required": [
+                "ingredients",
+                "title",
+                "text"
+              ],
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "description": "Instructions for preparing the recipe in Markdown format. No headers only a step-by-step list."
+                },
+                "title": {
+                  "type": "string",
+                  "description": "The title of the recipe."
+                },
+                "ingredients": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "id",
+                      "name",
+                      "amount",
+                      "measure"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "A unique identifier for the ingredient."
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "The name of the ingredient."
+                      },
+                      "amount": {
+                        "type": "string",
+                        "description": "The quantity of the ingredient needed."
+                      },
+                      "measure": {
+                        "type": "string",
+                        "description": "The measurement unit for the ingredient (e.g., cups, grams)."
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "description": "A list of ingredients used in the recipe."
+                }
+              },
+              "additionalProperties": false
+            },
+            "strict": true
+          }
+        },
+      });
+    return response.choices[0]?.message?.content ?? ''
+}
+
+export async function fetchAndSummarize(url: string): Promise<string> {
+    // Hämta innehållet från URL
+    logger.info('Fetching url', url)
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`HTTP-fel! Status: ${response.status}`);
+    }
+    const text = await response.text();
+
+    // Sammanfatta innehållet
+    logger.info('Summarizing using gpt4', url)
+    return await summarizeWithChatGPT(text);
+}
+
+export const importRecepie = region('europe-west3')
+    .https
+    .onCall(async ({url}) => {
+        try {
+            const summary = await fetchAndSummarize(url)
+            return summary
+        } catch (error) {
+            console.error("Ett fel uppstod:", error);
+        }
+        return null
+    })
+
 
 export const prefillUpdate = region('europe-west3')
     .firestore
