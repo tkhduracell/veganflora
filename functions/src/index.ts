@@ -3,6 +3,11 @@ import {region, logger} from 'firebase-functions';
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 
+import{ defineSecret } from 'firebase-functions/params'
+
+const openAiApiKey = defineSecret('OPENAI_API_KEY');
+
+
 import OpenAI from "openai";
 
 initializeApp();
@@ -14,7 +19,7 @@ const randomColor = () => `#${Math.floor(Math.random()*16777215).toString(16)}`
 
 async function summarizeWithChatGPT(text: string): Promise<string> {
     const openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
+        apiKey: openAiApiKey.value(),
     });
 
     const response = await openai.chat.completions.create({
@@ -109,6 +114,7 @@ export async function fetchAndSummarize(url: string): Promise<string> {
 }
 
 export const importRecepie = region('europe-west3')
+    .runWith({secrets: [openAiApiKey]})
     .https
     .onCall(async ({url}) => {
         try {
