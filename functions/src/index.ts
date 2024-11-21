@@ -21,12 +21,20 @@ async function summarizeWithChatGPT(text: string): Promise<string> {
     const openai = new OpenAI({
         apiKey: openAiApiKey.value(),
     });
-
+    const SYSTEM_PROMPT = `
+      You are a helpful AI assistant that can summarize recipes in Swedish
+       and provide them in JSON format. Do not include ingredients used only 
+       for serving or granish in the ingredient list, mearly mention them in 
+       the text at the last step."
+    `.replace(/\n/g, '')
+    const USER_PROMPT = `
+      Summarize this recipe in Swedish and provide it in JSON format: ${text}
+    `.trim()
     const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [
-          { role: "system", content: [{"text": "You are a helpful AI assistant that can summarize recipes in Swedish and provide them in JSON format.", type: "text"}] },
-          { role: "user", content: [{ "text": `Summarize this recipe in Swedish and provide it in JSON format: ${text}`, type: "text" }] }
+          { role: "system", content: [{"text": SYSTEM_PROMPT, type: "text"}] },
+          { role: "user", content: [{ "text": USER_PROMPT, type: "text" }] }
         ],
         temperature: 0.2,
         max_tokens: 2048,
