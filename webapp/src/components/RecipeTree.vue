@@ -20,7 +20,6 @@
           {{ r.title }}
         </b-link>
 
-        <div class="d-none d-md-block" />
         <b-badge
           v-for="(t, ti) in r.tags"
           :key="r.key + '-tag-' + ti"
