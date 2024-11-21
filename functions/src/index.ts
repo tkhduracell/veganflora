@@ -25,14 +25,10 @@ async function summarizeWithChatGPT(text: string): Promise<string> {
     const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [
-          {
-            "role": "user",
-            "content": [
-              { "text": `${text}`, "type": "text" }
-            ]
-          }
+          { role: "system", content: [{"text": "You are a helpful AI assistant that can summarize recipes in Swedish and provide them in JSON format.", type: "text"}] },
+          { role: "user", content: [{ "text": `Summarize this recipe in Swedish and provide it in JSON format: ${text}`, type: "text" }] }
         ],
-        temperature: 1,
+        temperature: 0.2,
         max_tokens: 2048,
         top_p: 1,
         frequency_penalty: 0,
