@@ -22,10 +22,15 @@ async function summarizeWithChatGPT(text: string): Promise<string> {
         apiKey: openAiApiKey.value(),
     });
     const SYSTEM_PROMPT = `
-      You are a helpful AI assistant that can summarize recipes in Swedish
-       and provide them in JSON format. Do not include ingredients used only 
-       for serving or granish in the ingredient list, mearly mention them in 
-       the text at the last step."
+       You are a helpful AI assistant that can summarize recipes in Swedish
+       and provide them in JSON format. 
+       
+       Instructions: 
+        * Do not include ingredients used only for serving or granish in the ingredient list, mearly mention them in 
+       the text at the last step. 
+        * The step by step instruction should contain a list of steps in a Markdown language format.
+        * The step by step instruction should not include any main header, but can contain several 
+          Markdown sections if there are natual parts to the recepie instructions itself.
     `.replace(/\n/g, '')
     const USER_PROMPT = `
       Summarize this recipe in Swedish and provide it in JSON format: ${text}
@@ -55,7 +60,7 @@ async function summarizeWithChatGPT(text: string): Promise<string> {
               "properties": {
                 "text": {
                   "type": "string",
-                  "description": "Instructions for preparing the recipe in Markdown format. No headers just a step-by-step list."
+                  "description": "Step-by-step instructions for preparing the recipe."
                 },
                 "title": {
                   "type": "string",
