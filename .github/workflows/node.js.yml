@@ -9,6 +9,9 @@ on:
 
 jobs:
   deploy-functions:
+    concurrency:
+      group: 'functions'
+
     runs-on: ubuntu-latest
 
     strategy:
@@ -39,6 +42,9 @@ jobs:
         run: npm exec -- firebase deploy --only functions
 
   deploy-webapp:
+    concurrency:
+      group: 'web'
+
     runs-on: ubuntu-latest
 
     strategy:
