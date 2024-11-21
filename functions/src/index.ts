@@ -23,7 +23,7 @@ async function summarizeWithChatGPT(text: string): Promise<string> {
     });
 
     const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: "GPT-4o-mini",
         messages: [
           {
             "role": "user",
@@ -51,7 +51,7 @@ async function summarizeWithChatGPT(text: string): Promise<string> {
               "properties": {
                 "text": {
                   "type": "string",
-                  "description": "Instructions for preparing the recipe in Markdown format. No headers only a step-by-step list."
+                  "description": "Instructions for preparing the recipe in Markdown format. No headers just a step-by-step list."
                 },
                 "title": {
                   "type": "string",
@@ -82,7 +82,7 @@ async function summarizeWithChatGPT(text: string): Promise<string> {
                     },
                     "additionalProperties": false
                   },
-                  "description": "A list of ingredients used in the recipe. Use *Rubrik* to create a section."
+                  "description": "A list of ingredients used in the recipe, excluding optional items. Use items with {name: *Section*} to create a section."
                 }
               },
               "additionalProperties": false
@@ -104,11 +104,11 @@ export async function fetchAndSummarize(url: string): Promise<string> {
     const text = await response.text();
 
     // Sammanfatta innehållet
-    logger.info('Summarizing using gpt4', url)
+    logger.info('Summarizing using GPT4', url)
     return await summarizeWithChatGPT(text);
 }
 
-export const importRecepie = region('europe-west3')
+export const importUrl = region('europe-west3')
     .runWith({ secrets: [openAiApiKey], timeoutSeconds: 120 })
     .https
     .onCall(async ({url}) => {
@@ -121,6 +121,19 @@ export const importRecepie = region('europe-west3')
         return null
     })
 
+export const importText = region('europe-west3')
+    .runWith({ secrets: [openAiApiKey], timeoutSeconds: 120 })
+    .https
+    .onCall(async ({text}) => {
+        try {
+            logger.info('Summarizing using GPT4')
+            const summary = await summarizeWithChatGPT(text)
+            return summary
+        } catch (error) {
+            console.error("Ett fel uppstod:", error);
+        }
+        return null
+    })
 
 export const prefillUpdate = region('europe-west3')
     .firestore

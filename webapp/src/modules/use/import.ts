@@ -9,13 +9,16 @@ export function useImportUrl(recipe: Ref<Recipe>) {
   const functions = getFunctions(app, 'europe-west3')
 
   const isImporting = ref(false)
-  const importUrl = ref('https://yipin.se/recept/vegansk-chokladmousse/')
+  const importUrl = ref('')
+  const importText = ref('')
+  const importError = ref<Error>()
 
   async function onImportUrl() {
     if (isImporting.value) return console.warn('Already running...')
     isImporting.value = true
+    importError.value = undefined
     try {
-      const importRecipie = httpsCallable<{ url: string }, string>(functions, 'importRecepie')
+      const importRecipie = httpsCallable<{ url: string }, string>(functions, 'importUrl')
 
       const result = await importRecipie({ url: importUrl.value })
       const imported = JSON.parse(result.data) as Pick<Recipe, 'title' | 'text'> & { ingredients: Omit<Ingredient, 'id'>[] }
@@ -26,10 +29,39 @@ export function useImportUrl(recipe: Ref<Recipe>) {
         title: imported.title,
         text: imported.text
       }
+      importUrl.value = ''
+    } catch (e: unknown) {
+      importError.value = e as Error
+      console.error('Unable to import', e)
     } finally {
       isImporting.value = false
     }
   }
 
-  return { importUrl, onImportUrl, isImporting }
+  async function onImportText() {
+    if (isImporting.value) return console.warn('Already running...')
+    isImporting.value = true
+    importError.value = undefined
+    try {
+      const importRecipie = httpsCallable<{ text: string }, string>(functions, 'importText')
+
+      const result = await importRecipie({ text: importText.value })
+      const imported = JSON.parse(result.data) as Pick<Recipe, 'title' | 'text'> & { ingredients: Omit<Ingredient, 'id'>[] }
+
+      recipe.value = {
+        ...recipe.value,
+        ingredients: imported.ingredients.map(r => ({ ...r, id: uuidv4() })),
+        title: imported.title,
+        text: imported.text
+      }
+      importText.value = ''
+    } catch (e: unknown) {
+      importError.value = e as Error
+      console.error('Unable to import', e)
+    } finally {
+      isImporting.value = false
+    }
+  }
+
+  return { importUrl, onImportUrl, isImporting, importText, onImportText, importError }
 }

@@ -48,6 +48,10 @@
 
     </div>
 
+    <div>
+      {{ importError }}
+    </div>
+
     <b-form
       v-if="recipe"
       @submit.prevent="save"
@@ -167,6 +171,14 @@
           Vilken url vill du importera?
           <b-form-input
             v-model.trim="importUrl"
+          />
+        </b-form-group>
+        <b>Eller</b>
+        <b-form-group class>
+          Klista in receptet:
+          <b-textarea
+            v-model.trim="importText"
+            rows="20"
           />
         </b-form-group>
       </b-modal>
@@ -346,7 +358,7 @@ import { Recipe, Ingredient, Tag } from '../components/types'
 import { useRoute, useRouter } from 'vue-router/composables'
 import { useAuth } from '@/modules/use/auth'
 import draggable from 'vuedraggable'
-import { useImportUrl } from '@/modules/use/import'
+import { useImportUrl as useImport } from '@/modules/use/import'
 
 export default defineComponent({
   name: 'RecipieEdit',
@@ -440,11 +452,14 @@ export default defineComponent({
       }
     }
 
-    const { importUrl, onImportUrl, isImporting } = useImportUrl(recipe)
+    const { importUrl, onImportUrl, isImporting, importText, onImportText, importError } = useImport(recipe)
 
     return {
       importUrl,
+      importText,
+      importError,
       onImportUrl,
+      onImportText,
       isImporting,
       key,
       recipe,
