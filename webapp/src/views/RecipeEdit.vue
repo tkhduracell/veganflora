@@ -32,7 +32,6 @@
         />
         <div v-else>
           <b-icon-file-earmark-arrow-down />
-          Importera
         </div>
       </b-button>
       <b-button
