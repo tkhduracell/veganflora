@@ -13,6 +13,16 @@ export function useImportUrl(recipe: Ref<Recipe>) {
   const importText = ref('')
   const importError = ref<Error>()
 
+  async function onImport() {
+    if (importUrl.value !== '') {
+      return await onImportUrl()
+    }
+    if (importText.value !== '') {
+      return await onImportText()
+    }
+    console.warn('Nothing to import')
+  }
+
   async function onImportUrl() {
     if (isImporting.value) return console.warn('Already running...')
     isImporting.value = true
@@ -63,5 +73,5 @@ export function useImportUrl(recipe: Ref<Recipe>) {
     }
   }
 
-  return { importUrl, onImportUrl, isImporting, importText, onImportText, importError }
+  return { importUrl, isImporting, importText, onImport, importError }
 }

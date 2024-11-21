@@ -164,7 +164,7 @@
       <b-modal
         id="modal-import"
         title="Importera recept"
-        @ok="onImportUrl"
+        @ok="onImport"
       >
         <b-form-group class>
           Vilken url vill du importera?
@@ -451,14 +451,13 @@ export default defineComponent({
       }
     }
 
-    const { importUrl, onImportUrl, isImporting, importText, onImportText, importError } = useImport(recipe)
+    const { importUrl, onImport, isImporting, importText, importError } = useImport(recipe)
 
     return {
       importUrl,
       importText,
       importError,
-      onImportUrl,
-      onImportText,
+      onImport,
       isImporting,
       key,
       recipe,
