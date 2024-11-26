@@ -56,7 +56,14 @@ const routes: Array<RouteConfig> = [
 
 const router = new VueRouter({
   routes,
-  mode: 'history'
+  mode: 'history',
+  scrollBehavior (to, from, savedPosition) {
+    if (savedPosition) {
+      return new Promise(resolve => setTimeout(() => resolve(savedPosition), 300))
+    } else {
+      return { y: 0, x: 0 }
+    }
+  }
 })
 
 export default router
