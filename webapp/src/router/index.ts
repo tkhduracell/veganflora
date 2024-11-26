@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 
-import Home from '@/views/Home.vue'
+import Index from '@/views/Index.vue'
 import Menu from '@/views/Menu.vue'
 import MenuShow from '@/views/MenuShow.vue'
 import RecipeEdit from '@/views/RecipeEdit.vue'
@@ -14,8 +14,8 @@ Vue.use(VueRouter)
 const routes: Array<RouteConfig> = [
   {
     path: '/',
-    name: 'home',
-    component: Home
+    name: 'index',
+    component: Index
   },
   {
     path: '/groceries',

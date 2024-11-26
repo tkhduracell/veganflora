@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <b-navbar type="dark" variant="primary">
-      <b-navbar-brand exact :to="{ name: 'home' }">
+      <b-navbar-brand exact :to="{ name: 'index' }">
         Veganflora
       </b-navbar-brand>
 
@@ -9,7 +9,7 @@
 
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav class="navbar-left">
-          <b-nav-item class="d-none d-sm-block" exact :to="{ name: 'home' }">
+          <b-nav-item class="d-none d-sm-block" exact :to="{ name: 'index' }">
             Hem
           </b-nav-item>
           <b-nav-item class="d-none d-sm-block" exact :to="{ name: 'units' }">
