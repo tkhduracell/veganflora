@@ -1,4 +1,6 @@
-import { initializeApp } from 'firebase/app'
+import { ArgumentsType } from '@vueuse/core'
+import { FirebaseOptions, initializeApp } from 'firebase/app'
+import { initializeFirestore, persistentLocalCache } from 'firebase/firestore'
 import { PluginObject } from 'vue'
 
 export default {
@@ -11,8 +13,11 @@ export default {
       storageBucket: 'veganflora.appspot.com',
       messagingSenderId: '520915943790',
       appId: '1:520915943790:web:fb1165582d009784ddc17f'
-    }
+    } satisfies FirebaseOptions
+
     console.log('Initializing firebase app...')
-    initializeApp(config)
+    const app = initializeApp(config)
+
+    initializeFirestore(app, { localCache: persistentLocalCache() })
   }
 } as PluginObject<never>
