@@ -34,7 +34,7 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent, ref, computed, getCurrentInstance } from 'vue'
+import { PropType, defineComponent, computed } from 'vue'
 
 import { Recipe, Tag } from './types'
 import { unique } from '../modules/common/set'

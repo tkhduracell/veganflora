@@ -113,7 +113,7 @@ export default defineComponent({
     item: { type: Object as PropType<Recipe>, required: true },
     showTitle: Boolean
   },
-  setup (props: { item: Recipe; showTitle: boolean }) {
+  setup () {
     const { enabled: convertEnabled, convert } = useAutoConvert()
     const multi = useMulti()
 
