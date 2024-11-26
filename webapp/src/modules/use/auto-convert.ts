@@ -37,7 +37,7 @@ export function useAutoConvert () {
     const norml = (s?: string) => (s ?? '').toLocaleLowerCase().trim()
 
     const grams = weights.value[norml(ingredient.name)]
-      .find(units => units.unit === ingredient.measure)
+      ?.find(units => units.unit === ingredient.measure)
       ?.grams ?? null
 
     if (grams !== null) {
