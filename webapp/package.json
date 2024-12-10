@@ -19,7 +19,7 @@
     "lodash.debounce": "^4.0.8",
     "markdown-it": "^14.1.0",
     "uuid": "^9.0.1",
-    "vue": "^2.7.16",
+    "vue": "^3.0.0",
     "vue-router": "^3.6.5",
     "vuedraggable": "^2.24.3"
   },
