@@ -177,7 +177,7 @@
           Klista in receptet:
           <b-textarea
             v-model.trim="importText"
-            rows="20"
+            rows="16"
           />
         </b-form-group>
       </b-modal>
