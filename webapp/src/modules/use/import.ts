@@ -31,13 +31,14 @@ export function useImportUrl(recipe: Ref<Recipe>) {
       const importRecipie = httpsCallable<{ url: string }, string>(functions, 'importUrl')
 
       const result = await importRecipie({ url: importUrl.value })
-      const imported = JSON.parse(result.data) as Pick<Recipe, 'title' | 'text'> & { ingredients: Omit<Ingredient, 'id'>[] }
+      const imported = JSON.parse(result.data) as Pick<Recipe, 'title' | 'text' | 'size'> & { ingredients: Omit<Ingredient, 'id'>[] }
 
       recipe.value = {
         ...recipe.value,
         ingredients: imported.ingredients.map(r => ({ ...r, id: uuidv4() })),
         title: imported.title,
-        text: imported.text
+        text: imported.text,
+        size: imported.size
       }
       importUrl.value = ''
     } catch (e: unknown) {

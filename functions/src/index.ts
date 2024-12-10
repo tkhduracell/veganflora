@@ -31,6 +31,7 @@ async function summarizeWithChatGPT(text: string): Promise<string> {
         * The step by step instruction should contain a list of steps in a Markdown language format.
         * The step by step instruction should not include any main header, but can contain several 
           Markdown sections if there are natual parts to the recepie instructions itself.
+        * Do not include "vegan" in the title, since everything is assumed to be vegan.
     `.replace(/\n/g, '')
     const USER_PROMPT = `
       Summarize this recipe in Swedish and provide it in JSON format: ${text}
@@ -65,6 +66,10 @@ async function summarizeWithChatGPT(text: string): Promise<string> {
                 "title": {
                   "type": "string",
                   "description": "The title of the recipe."
+                },
+                "size": {
+                  "type": "string",
+                  "description": "Size of the recepie (e.g. 6 portioner, 12 bullar, 9 bars)"
                 },
                 "ingredients": {
                   "type": "array",
