@@ -90,9 +90,7 @@
         />
       </div>
     </ul>
-    <p class="breaking">
-      {{ item.text }}
-    </p>
+    <p class="breaking" v-html="itemRendered" />
   </div>
   <div v-else>
     No Item
@@ -100,12 +98,15 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent, ref } from 'vue'
+import { PropType, computed, defineComponent, ref } from 'vue'
 
 import { useAutoConvert } from '../modules/use/auto-convert'
 import { useMulti } from '../modules/use/multi'
 import RecipeIngredient from './RecipeIngredient.vue'
 import { Recipe } from './types'
+import markdownit from 'markdown-it'
+
+const md = markdownit('commonmark')
 
 export default defineComponent({
   components: { RecipeIngredient },
@@ -113,11 +114,12 @@ export default defineComponent({
     item: { type: Object as PropType<Recipe>, required: true },
     showTitle: Boolean
   },
-  setup () {
+  setup (props) {
     const { enabled: convertEnabled, convert } = useAutoConvert()
     const multi = useMulti()
+    const itemRendered = computed(() => md.render(props.item.text))
 
-    return { ...multi, convertEnabled, convert }
+    return { ...multi, convertEnabled, convert, itemRendered }
   }
 })
 </script>
