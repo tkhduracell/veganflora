@@ -79,5 +79,5 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         run: |
           YYYYMMDD=$(date '+%Y-%m-%d %H:%M:%S')
-          MESSAGE=" ☘️ Veganflora functions has been deployed at: `${YYYYMMDD}`"
+          MESSAGE=" ☘️ Veganflora functions has been deployed at: \`${YYYYMMDD}\`"
           curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"${MESSAGE}\"}" ${SLACK_WEBHOOK}
