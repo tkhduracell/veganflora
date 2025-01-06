@@ -56,7 +56,8 @@ async function summarizeWithChatGPT(text: string): Promise<string> {
               "required": [
                 "ingredients",
                 "title",
-                "text"
+                "text",
+                "size"
               ],
               "properties": {
                 "text": {
@@ -69,7 +70,7 @@ async function summarizeWithChatGPT(text: string): Promise<string> {
                 },
                 "size": {
                   "type": "string",
-                  "description": "Size of the recepie (e.g. 6 portioner, 12 bullar, 9 bars)"
+                  "description": "Size of the recepie (e.g. 6 portioner, 12 bullar, 9 bars, 3 bitar)"
                 },
                 "ingredients": {
                   "type": "array",
