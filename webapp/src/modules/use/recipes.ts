@@ -45,6 +45,7 @@ export function useRecipe (key: string) {
         const data = result.data() as Recipe
         recipe.value = {
           ...data,
+          key,
           ingredients: (data.ingredients ?? []).map(i => ({ ...i, id: uuidv4() }))
         } as Recipe
       } else {
