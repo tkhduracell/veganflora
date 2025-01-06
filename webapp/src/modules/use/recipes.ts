@@ -90,6 +90,12 @@ export function useRecipe (key: string) {
       const store = getFirestore()
       const document = doc(store, 'veganflora', 'root', 'recipies', savekey)
       await setDoc(document, data, { merge: false })
+
+      // If we have a move
+      if (key && savekey !== key) {
+        const old = doc(store, 'veganflora', 'root', 'recipies', key)
+        await deleteDoc(old)
+      }
     }
     return { savekey }
   }
