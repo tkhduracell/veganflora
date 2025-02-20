@@ -20,6 +20,7 @@
     "predeploy": "npm --prefix \"$RESOURCE_DIR\" run build",
     "ignore": [
       ".git",
+      ".env",
       ".runtimeconfig.json",
       "firebase-debug.log",
       "firebase-debug.*.log",

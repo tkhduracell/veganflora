@@ -1,6 +1,7 @@
-import * as readline from 'readline';
-
+import * as readline from 'node:readline/promises';
 import {fetchAndSummarize} from '../src/index'
+
+import "dotenv/config";
 
 async function summarize(url: string): Promise<void> {
     // Your summarize logic here
@@ -15,7 +16,12 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 
-rl.question('Please enter a URL: ', async (url) => {
-    await summarize(url);
-    rl.close();
-});
+
+while (true) {
+    const url = await rl.question('Enter a URL to summarize: ');
+    if (url) {
+        await summarize(url);
+    } else {
+        console.log('Ctrl+C to exit.');
+    }
+}

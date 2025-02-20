@@ -5,8 +5,7 @@ import { getFirestore } from "firebase-admin/firestore";
 
 import{ defineSecret } from 'firebase-functions/params'
 
-const openAiApiKey = defineSecret('OPENAI_API_KEY');
-
+const apiKey = defineSecret('GCLOUD_API_KEY');
 
 import OpenAI from "openai";
 
@@ -18,8 +17,11 @@ const root = db.collection('veganflora').doc('root')
 const randomColor = () => `#${Math.floor(Math.random()*16777215).toString(16)}`
 
 async function summarizeWithChatGPT(text: string): Promise<string> {
-    const openai = new OpenAI({
-        apiKey: openAiApiKey.value(),
+  const apiKeyValue = apiKey.value() ?? process.env.GCLOUD_API_KEY
+  
+  const openai = new OpenAI({
+        apiKey: apiKeyValue,
+        baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/"
     });
     const SYSTEM_PROMPT = `
        You are a helpful AI assistant that can summarize recipes in Swedish
@@ -37,16 +39,11 @@ async function summarizeWithChatGPT(text: string): Promise<string> {
       Summarize this recipe in Swedish and provide it in JSON format: ${text}
     `.trim()
     const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: "gemini-2.0-flash",
         messages: [
           { role: "system", content: [{"text": SYSTEM_PROMPT, type: "text"}] },
           { role: "user", content: [{ "text": USER_PROMPT, type: "text" }] }
         ],
-        temperature: 0.2,
-        max_tokens: 2048,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0,
         response_format: {
           "type": "json_schema",
           "json_schema": {
@@ -124,7 +121,7 @@ export async function fetchAndSummarize(url: string): Promise<string> {
 }
 
 export const importUrl = region('europe-west3')
-    .runWith({ secrets: [openAiApiKey], timeoutSeconds: 120 })
+    .runWith({ secrets: [apiKey], timeoutSeconds: 120 })
     .https
     .onCall(async ({url}) => {
         try {
@@ -137,7 +134,7 @@ export const importUrl = region('europe-west3')
     })
 
 export const importText = region('europe-west3')
-    .runWith({ secrets: [openAiApiKey], timeoutSeconds: 120 })
+    .runWith({ secrets: [apiKey], timeoutSeconds: 120 })
     .https
     .onCall(async ({text}) => {
         try {
