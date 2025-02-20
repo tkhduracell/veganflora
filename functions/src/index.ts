@@ -16,7 +16,7 @@ const root = db.collection('veganflora').doc('root')
 
 const randomColor = () => `#${Math.floor(Math.random()*16777215).toString(16)}`
 
-async function summarizeWithChatGPT(text: string): Promise<string> {
+async function summarizeWithChatLLM(text: string): Promise<string> {
   const apiKeyValue = apiKey.value() ?? process.env.GCLOUD_API_KEY
   
   const openai = new OpenAI({
@@ -116,8 +116,8 @@ export async function fetchAndSummarize(url: string): Promise<string> {
     const text = await response.text();
 
     // Sammanfatta innehållet
-    logger.info('Summarizing using GPT4', url)
-    return await summarizeWithChatGPT(text);
+    logger.info('Summarizing using LLM', url)
+    return await summarizeWithChatLLM(text);
 }
 
 export const importUrl = region('europe-west3')
@@ -138,8 +138,8 @@ export const importText = region('europe-west3')
     .https
     .onCall(async ({text}) => {
         try {
-            logger.info('Summarizing using GPT4')
-            const summary = await summarizeWithChatGPT(text)
+            logger.info('Summarizing using LLM')
+            const summary = await summarizeWithChatLLM(text)
             return summary
         } catch (error) {
             console.error("Ett fel uppstod:", error);
