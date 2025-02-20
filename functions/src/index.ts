@@ -30,18 +30,18 @@ async function summarizeWithChatLLM(text: string): Promise<string> {
        Instructions: 
         * Do not include ingredients used only for serving or granish in the ingredient list, mearly mention them in 
        the text at the last step. 
-        * The step by step instruction should contain a list of steps in a Markdown language format.
-        * The step by step instruction should not include any main header, but can contain several 
-          Markdown sections if there are natual parts to the recepie instructions itself.
-        * Do not include "vegan" in the title, since everything is assumed to be vegan.
+        * The step by step text instruction should contain a list of steps in a Markdown language format.
+        * The step by step text instruction should not include any main header, but can contain several 
+          Markdown sections if there are natual parts to the recepie text instructions itself.
+        * Do not include "vegan" in the title or ingredients, since everything is assumed to be vegan.
     `.replace(/\n/g, '')
     const USER_PROMPT = `
-      Summarize this recipe in Swedish and provide it in JSON format: ${text}
+      Summarize this recipe in Swedish with Swedish units: ${text}
     `.trim()
     const response = await openai.chat.completions.create({
         model: "gemini-2.0-flash",
         messages: [
-          { role: "system", content: [{"text": SYSTEM_PROMPT, type: "text"}] },
+          { role: "system", content: [{ "text": SYSTEM_PROMPT, type: "text" }] },
           { role: "user", content: [{ "text": USER_PROMPT, type: "text" }] }
         ],
         response_format: {
@@ -59,7 +59,7 @@ async function summarizeWithChatLLM(text: string): Promise<string> {
               "properties": {
                 "text": {
                   "type": "string",
-                  "description": "Step-by-step instructions for preparing the recipe."
+                  "description": "Step-by-step instructions of the recipe."
                 },
                 "title": {
                   "type": "string",

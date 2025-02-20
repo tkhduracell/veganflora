@@ -3,12 +3,41 @@ import {fetchAndSummarize} from '../src/index'
 
 import "dotenv/config";
 
+interface Ingredient {
+    name: string;
+    measure: string;
+    amount: string;
+}
+
+interface Recipe {
+    size: string;
+    title: string;
+    text: string;
+    ingredients: Ingredient[];
+}
+
 async function summarize(url: string): Promise<void> {
     // Your summarize logic here
     console.log(`Summarizing the content of: ${url}`);
 
-    const out = await fetchAndSummarize(url);
-    console.log(out)
+    const json = await fetchAndSummarize(url);
+    const out = JSON.parse(json) as Recipe;
+
+    console.log();
+    console.log('----------------------------------------');
+    console.log(out.title)
+    console.log('----------------------------------------');
+    console.log('Portions:', out.size);
+    console.log();
+    console.log(out.text);
+    console.log();
+    console.log('Ingredients:');
+    out.ingredients.forEach(i => {
+        console.log(`- ${i.amount} ${i.measure} ${i.name}`);
+    })
+    console.log();
+    console.log('----------------------------------------');
+    console.log();
 }
 
 const rl = readline.createInterface({
