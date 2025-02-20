@@ -31,6 +31,9 @@ export function useImportUrl(recipe: Ref<Recipe>) {
       const importRecipie = httpsCallable<{ url: string }, string>(functions, 'importUrl')
 
       const result = await importRecipie({ url: importUrl.value })
+      if (result.data === null) {
+        throw new Error('No data returned from API')
+      }
       const imported = JSON.parse(result.data) as Pick<Recipe, 'title' | 'text' | 'size'> & { ingredients: Omit<Ingredient, 'id'>[] }
 
       recipe.value = {
@@ -43,7 +46,7 @@ export function useImportUrl(recipe: Ref<Recipe>) {
       importUrl.value = ''
     } catch (e: unknown) {
       importError.value = e as Error
-      console.error('Unable to import', e)
+      console.error('Unable to import, propbably a backend error, check the logs...', e)
     } finally {
       isImporting.value = false
     }
