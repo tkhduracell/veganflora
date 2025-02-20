@@ -5,7 +5,7 @@ import { getFirestore } from "firebase-admin/firestore";
 
 import{ defineSecret } from 'firebase-functions/params'
 
-const apiKey = defineSecret('GCLOUD_API_KEY');
+const apiKey = defineSecret('GEMINI_API_KEY');
 
 import OpenAI from "openai";
 
@@ -17,7 +17,7 @@ const root = db.collection('veganflora').doc('root')
 const randomColor = () => `#${Math.floor(Math.random()*16777215).toString(16)}`
 
 async function summarizeWithChatLLM(text: string): Promise<string> {
-  const apiKeyValue = apiKey.value() ?? process.env.GCLOUD_API_KEY
+  const apiKeyValue = apiKey.value() ?? process.env.GEMINI_API_KEY
   
   const openai = new OpenAI({
         apiKey: apiKeyValue,
