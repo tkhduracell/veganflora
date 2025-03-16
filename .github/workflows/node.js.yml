@@ -1,7 +1,7 @@
 # This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Node.js CI
+name: Deploy
 
 on:
   push:
@@ -32,11 +32,15 @@ jobs:
 
       - name: Install dependencies
         run: npm ci && npm ci --prefix functions 
+
+      
+      - name: Build functions
+        run: npm run build --prefix functions 
       
       - name: Setup gcloud Cloud SDK auth
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: projects/520915943790/locations/global/workloadIdentityPools/github-deployer-auth-pool/providers/github-deployer-auth-provider
+          workload_identity_provider: projects/520915943790/locations/global/workloadIdentityPools/github-deploy-auth-pool/providers/github-deploy-auth-provider
           service_account: firebase-adminsdk-lvpkc@veganflora.iam.gserviceaccount.com
 
       - name: Firebase Deploy (functions)
@@ -70,7 +74,7 @@ jobs:
       - name: Setup gcloud Cloud SDK auth
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: projects/520915943790/locations/global/workloadIdentityPools/github-deployer-auth-pool/providers/github-deployer-auth-provider
+          workload_identity_provider: projects/520915943790/locations/global/workloadIdentityPools/github-deploy-auth-pool/providers/github-deploy-auth-provider
           service_account: firebase-adminsdk-lvpkc@veganflora.iam.gserviceaccount.com
 
       - name: Firebase Deploy (hosting)
