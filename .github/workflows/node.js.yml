@@ -51,8 +51,8 @@ jobs:
 
       - name: Firebase Deploy (functions)
         run: |
-          npm exec -- firebase projects:list
-          npm exec -- firebase deploy --only functions
+          npm exec -- firebase projects:list --debug
+          npm exec -- firebase deploy --only functions --debug
 
   deploy-webapp:
     concurrency:
