@@ -49,9 +49,6 @@ jobs:
           create_credentials_file: true
           export_environment_variables: true
 
-      - name: Firebase Login
-        run: npm exec -- firebase login
-
       - name: Firebase Deploy (functions)
         run: npm exec -- firebase deploy --only functions
 
