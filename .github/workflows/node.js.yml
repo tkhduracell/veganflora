@@ -46,6 +46,8 @@ jobs:
         with:
           workload_identity_provider: projects/520915943790/locations/global/workloadIdentityPools/github-deploy-auth-pool/providers/github-deploy-auth-provider
           service_account: firebase-adminsdk-lvpkc@veganflora.iam.gserviceaccount.com
+          create_credentials_file: true
+          export_environment_variables: true
 
       - name: Firebase Login
         run: npm exec -- firebase login
