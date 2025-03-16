@@ -50,7 +50,9 @@ jobs:
           export_environment_variables: true
 
       - name: Firebase Deploy (functions)
-        run: npm exec -- firebase deploy --only functions
+        run: |
+          npm exec -- firebase projects:list
+          npm exec -- firebase deploy --only functions
 
   deploy-webapp:
     concurrency:
