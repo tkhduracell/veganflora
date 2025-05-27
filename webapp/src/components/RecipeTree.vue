@@ -48,8 +48,8 @@ export default defineComponent({
 	setup(props) {
 		const tree = computed(() => {
 			const tree = {} as Record<string, { key: string; title: string; tags?: Tag[] }[]>
-			
-      for (const c of unique(props.recipes.map((r) => r.category))) {
+
+			for (const c of unique(props.recipes.map((r) => r.category))) {
 				tree[c.join(" / ")] = props.recipes
 					.filter((r) => {
 						return r.category.join("") === c.join("")

@@ -59,12 +59,16 @@ const Component = defineComponent({
 
 		function add({ item, weekday, meal }: { item: string; weekday: WeekDay; meal: Meal }) {
 			const recipe = (recipes.value || []).find((r) => r.key === item)
-			if (recipe) {addMenuItem(week.value, recipe.key, weekday, meal)}
+			if (recipe) {
+				addMenuItem(week.value, recipe.key, weekday, meal)
+			}
 		}
 
 		function remove({ item, weekday, meal }: { item: string; weekday: WeekDay; meal: Meal }) {
 			const recipe = (recipes.value || []).find((r) => r.key === item)
-			if (recipe) {removeMenuItem(week.value, recipe.key, weekday, meal)}
+			if (recipe) {
+				removeMenuItem(week.value, recipe.key, weekday, meal)
+			}
 		}
 
 		return {

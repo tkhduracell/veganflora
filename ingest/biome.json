@@ -80,10 +80,20 @@
 			"window"
 		]
 	},
-	"overrides": [{ 
-		"include": ["test/**/*.spec.*"],
-		"javascript": {
-			"globals": ["expect", "it" ,"describe", "beforeEach", "afterEach", "beforeAll", "afterAll"]
+	"overrides": [
+		{
+			"include": ["test/**/*.spec.*"],
+			"javascript": {
+				"globals": [
+					"expect",
+					"it",
+					"describe",
+					"beforeEach",
+					"afterEach",
+					"beforeAll",
+					"afterAll"
+				]
+			}
 		}
-	}]
+	]
 }

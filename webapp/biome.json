@@ -82,7 +82,7 @@
 						"noUndeclaredVariables": "off",
 						"noUnusedVariables": "warn"
 					},
-					"performance": {"noDelete": "off"}
+					"performance": { "noDelete": "off" }
 				}
 			}
 		}

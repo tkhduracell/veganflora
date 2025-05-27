@@ -76,8 +76,8 @@ export default defineComponent({
 		function complete() {
 			const addition = custom.value ? newValue.value : suggestion.value
 			if (!addition || addition.trim().length === 0) {
-        return
-      }
+				return
+			}
 			custom.value = false
 
 			const out: Category[] = [...(props.category ?? []), addition]
