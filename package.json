@@ -5,7 +5,7 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "format": "pnpm -r format",
+    "format": "pnpm -r format --write",
     "lint": "pnpm -r lint --write",
     "check": "pnpm -r check",
     "build": "pnpm -r build"
