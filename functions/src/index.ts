@@ -1,29 +1,30 @@
-import {region, logger} from 'firebase-functions';
+import { region, logger } from "firebase-functions";
 
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 
-import{ defineSecret } from 'firebase-functions/params'
+import { defineSecret } from "firebase-functions/params";
 
-const apiKey = defineSecret('GEMINI_API_KEY');
+const apiKey = defineSecret("GEMINI_API_KEY");
 
 import OpenAI from "openai";
 
 initializeApp();
 
 const db = getFirestore();
-const root = db.collection('veganflora').doc('root')
+const root = db.collection("veganflora").doc("root");
 
-const randomColor = () => `#${Math.floor(Math.random()*16777215).toString(16)}`
+const randomColor = () =>
+	`#${Math.floor(Math.random() * 16777215).toString(16)}`;
 
 async function summarizeWithChatLLM(text: string): Promise<string> {
-  const apiKeyValue = apiKey.value() ?? process.env.GEMINI_API_KEY
-  
-  const openai = new OpenAI({
-        apiKey: apiKeyValue,
-        baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/"
-    });
-    const SYSTEM_PROMPT = `
+	const apiKeyValue = apiKey.value() ?? process.env.GEMINI_API_KEY;
+
+	const openai = new OpenAI({
+		apiKey: apiKeyValue,
+		baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
+	});
+	const SYSTEM_PROMPT = `
        You are a helpful AI assistant that can summarize recipes in Swedish
        and provide them in JSON format. 
        
@@ -34,170 +35,181 @@ async function summarizeWithChatLLM(text: string): Promise<string> {
         * The step by step text instruction should not include any main header, but can contain several 
           Markdown sections if there are natual parts to the recepie text instructions itself.
         * Do not include "vegan" in the title or ingredients, since everything is assumed to be vegan.
-    `.replace(/\n/g, '')
-    const USER_PROMPT = `
+    `.replace(/\n/g, "");
+	const USER_PROMPT = `
       Summarize this recipe in Swedish with Swedish units: ${text}
-    `.trim()
-    const response = await openai.chat.completions.create({
-        model: "gemini-2.0-flash",
-        messages: [
-          { role: "system", content: [{ "text": SYSTEM_PROMPT, type: "text" }] },
-          { role: "user", content: [{ "text": USER_PROMPT, type: "text" }] }
-        ],
-        response_format: {
-          "type": "json_schema",
-          "json_schema": {
-            "name": "recipe",
-            "schema": {
-              "type": "object",
-              "required": [
-                "ingredients",
-                "title",
-                "text",
-                "size"
-              ],
-              "properties": {
-                "text": {
-                  "type": "string",
-                  "description": "Step-by-step instructions of the recipe."
-                },
-                "title": {
-                  "type": "string",
-                  "description": "The title of the recipe."
-                },
-                "size": {
-                  "type": "string",
-                  "description": "Size of the recepie (e.g. 6 portioner, 12 bullar, 9 bars, 3 bitar)"
-                },
-                "ingredients": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "required": [
-                      "name",
-                      "amount",
-                      "measure"
-                    ],
-                    "properties": {
-                      "name": {
-                        "type": "string",
-                        "description": "The name of the ingredient."
-                      },
-                      "amount": {
-                        "type": "string",
-                        "description": "The quantity of the ingredient needed."
-                      },
-                      "measure": {
-                        "type": "string",
-                        "description": "The measurement unit for the ingredient (e.g., tsk, dl, cups, gram)."
-                      }
-                    },
-                    "additionalProperties": false
-                  },
-                  "description": "A list of ingredients used in the recipe, excluding optional items. Use items with {name: *Section*} to create a section."
-                }
-              },
-              "additionalProperties": false
-            },
-            "strict": true
-          }
-        },
-      });
-    return response.choices[0]?.message?.content ?? ''
+    `.trim();
+	const response = await openai.chat.completions.create({
+		model: "gemini-2.0-flash",
+		messages: [
+			{ role: "system", content: [{ text: SYSTEM_PROMPT, type: "text" }] },
+			{ role: "user", content: [{ text: USER_PROMPT, type: "text" }] },
+		],
+		response_format: {
+			type: "json_schema",
+			json_schema: {
+				name: "recipe",
+				schema: {
+					type: "object",
+					required: ["ingredients", "title", "text", "size"],
+					properties: {
+						text: {
+							type: "string",
+							description: "Step-by-step instructions of the recipe.",
+						},
+						title: {
+							type: "string",
+							description: "The title of the recipe.",
+						},
+						size: {
+							type: "string",
+							description:
+								"Size of the recepie (e.g. 6 portioner, 12 bullar, 9 bars, 3 bitar)",
+						},
+						ingredients: {
+							type: "array",
+							items: {
+								type: "object",
+								required: ["name", "amount", "measure"],
+								properties: {
+									name: {
+										type: "string",
+										description: "The name of the ingredient.",
+									},
+									amount: {
+										type: "string",
+										description: "The quantity of the ingredient needed.",
+									},
+									measure: {
+										type: "string",
+										description:
+											"The measurement unit for the ingredient (e.g., tsk, dl, cups, gram).",
+									},
+								},
+								additionalProperties: false,
+							},
+							description:
+								"A list of ingredients used in the recipe, excluding optional items. Use items with {name: *Section*} to create a section.",
+						},
+					},
+					additionalProperties: false,
+				},
+				strict: true,
+			},
+		},
+	});
+	return response.choices[0]?.message?.content ?? "";
 }
 
 export async function fetchAndSummarize(url: string): Promise<string> {
-    // Hämta innehållet från URL
-    logger.info('Fetching url', url)
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error(`HTTP-fel! Status: ${response.status}`);
-    }
-    const text = await response.text();
+	// Hämta innehållet från URL
+	logger.info("Fetching url", url);
+	const response = await fetch(url);
+	if (!response.ok) {
+		throw new Error(`HTTP-fel! Status: ${response.status}`);
+	}
+	const text = await response.text();
 
-    // Sammanfatta innehållet
-    logger.info('Summarizing using LLM', url)
-    return await summarizeWithChatLLM(text);
+	// Sammanfatta innehållet
+	logger.info("Summarizing using LLM", url);
+	return await summarizeWithChatLLM(text);
 }
 
-export const importUrl = region('europe-west3')
-    .runWith({ secrets: [apiKey], timeoutSeconds: 120 })
-    .https
-    .onCall(async ({url}) => {
-        try {
-            const summary = await fetchAndSummarize(url)
-            return summary
-        } catch (error) {
-            console.error("Ett fel uppstod:", error);
-        }
-        return null
-    })
+export const importUrl = region("europe-west3")
+	.runWith({ secrets: [apiKey], timeoutSeconds: 120 })
+	.https.onCall(async ({ url }) => {
+		try {
+			const summary = await fetchAndSummarize(url);
+			return summary;
+		} catch (error) {
+			console.error("Ett fel uppstod:", error);
+		}
+		return null;
+	});
 
-export const importText = region('europe-west3')
-    .runWith({ secrets: [apiKey], timeoutSeconds: 120 })
-    .https
-    .onCall(async ({text}) => {
-        try {
-            logger.info('Summarizing using LLM')
-            const summary = await summarizeWithChatLLM(text)
-            return summary
-        } catch (error) {
-            console.error("Ett fel uppstod:", error);
-        }
-        return null
-    })
+export const importText = region("europe-west3")
+	.runWith({ secrets: [apiKey], timeoutSeconds: 120 })
+	.https.onCall(async ({ text }) => {
+		try {
+			logger.info("Summarizing using LLM");
+			const summary = await summarizeWithChatLLM(text);
+			return summary;
+		} catch (error) {
+			console.error("Ett fel uppstod:", error);
+		}
+		return null;
+	});
 
-export const prefillUpdate = region('europe-west3')
-    .firestore
-    .document('/veganflora/root/recipies/{id}')
-    .onWrite(async (_, ctx) => {
-        logger.info(`${ctx.params.id}:onWrite()`);
+export const prefillUpdate = region("europe-west3")
+	.firestore.document("/veganflora/root/recipies/{id}")
+	.onWrite(async (_, ctx) => {
+		logger.info(`${ctx.params.id}:onWrite()`);
 
-        type TagInfo = { text: string, color: string }
-        type TagKey = string
+		type TagInfo = { text: string; color: string };
+		type TagKey = string;
 
-        type Category = string
-        type CompatTags = (TagKey | TagInfo)[]
+		type Category = string;
+		type CompatTags = (TagKey | TagInfo)[];
 
-        const tagsByName = new Map<TagKey, TagInfo>()
-        const categorySet = new Set<Category>()
+		const tagsByName = new Map<TagKey, TagInfo>();
+		const categorySet = new Set<Category>();
 
-        {
-            const { prefill } = await root.get().then(itm => itm.data() as { prefill?: { tags: TagInfo[], categories: Category[] } })
-            if (prefill) {
-                prefill.tags.forEach(t => tagsByName.set(t.text, t))
-                prefill.categories.forEach(c => categorySet.add(c))
-            }
-        }
+		{
+			const { prefill } = await root.get().then(
+				(itm) =>
+					itm.data() as {
+						prefill?: { tags: TagInfo[]; categories: Category[] };
+					},
+			);
+			if (prefill) {
+				prefill.tags.forEach((t) => tagsByName.set(t.text, t));
+				prefill.categories.forEach((c) => categorySet.add(c));
+			}
+		}
 
-        {
-            const current = await root.collection('recipies').doc(ctx.params.id).get()
-            if (!current.exists) return logger.warn(`Document ${ctx.params.id} does not exist`)
+		{
+			const current = await root
+				.collection("recipies")
+				.doc(ctx.params.id)
+				.get();
+			if (!current.exists)
+				return logger.warn(`Document ${ctx.params.id} does not exist`);
 
-            logger.info(`Updating updated doc with tags`, {  });
-            const tags: TagKey[] = (current.data()!.tags as CompatTags).map(t => typeof t === 'string' ? t : t.text)
-            await current.ref.update({ tags })
-        }
+			logger.info(`Updating updated doc with tags`, {});
+			const tags: TagKey[] = (current.data()!.tags as CompatTags).map((t) =>
+				typeof t === "string" ? t : t.text,
+			);
+			await current.ref.update({ tags });
+		}
 
-        const cursor = await root.collection('recipies').get()
-        cursor.forEach(doc => {
-            const { tags, category } = doc.data() as { tags?: CompatTags, category?: Category[] }
+		const cursor = await root.collection("recipies").get();
+		cursor.forEach((doc) => {
+			const { tags, category } = doc.data() as {
+				tags?: CompatTags;
+				category?: Category[];
+			};
 
-            if (!category)  return logger.error(`Document ${doc.id} has no category`)
-            categorySet.add(category.join(' / '))
+			if (!category) return logger.error(`Document ${doc.id} has no category`);
+			categorySet.add(category.join(" / "));
 
-            if (!tags) return logger.warn(`Document ${doc.id} has no tags`)
-            tags
-                .map(t => typeof t === 'string' ? t : t.text ?? '')
-                .filter(tag => tag !== '')
-                .filter(tag => !tagsByName.has(tag))
-                .forEach(tag => tagsByName.set(tag, { text: tag, color: randomColor() }))
+			if (!tags) return logger.warn(`Document ${doc.id} has no tags`);
+			tags
+				.map((t) => (typeof t === "string" ? t : (t.text ?? "")))
+				.filter((tag) => tag !== "")
+				.filter((tag) => !tagsByName.has(tag))
+				.forEach((tag) =>
+					tagsByName.set(tag, { text: tag, color: randomColor() }),
+				);
+		});
 
-        })
+		const tags = [...tagsByName.values()].sort((a, b) =>
+			a.text.localeCompare(b.text),
+		);
+		const categories = [...categorySet.values()].sort();
 
-        const tags = [...tagsByName.values()].sort((a,b) => a.text.localeCompare(b.text))
-        const categories = [...categorySet.values()].sort()
-
-        logger.info(`Updating prefill`, { tags, categories });
-        await root.update({ "prefill.tags": tags, "prefill.categories": categories })
-    });
+		logger.info(`Updating prefill`, { tags, categories });
+		await root.update({
+			"prefill.tags": tags,
+			"prefill.categories": categories,
+		});
+	});

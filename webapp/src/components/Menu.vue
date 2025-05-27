@@ -40,36 +40,36 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
+import { defineComponent, type PropType } from "vue"
 
-import MenuItem from '@/components/MenuItem.vue'
-import { Menu, WeekDay, Meal, Recipe, WeekDays } from './types'
-import { useRecipes } from '../modules/use/recipes'
+import MenuItem from "@/components/MenuItem.vue"
+import { type Menu, type WeekDay, Meal, type Recipe, WeekDays } from "./types"
+import { useRecipes } from "../modules/use/recipes"
 
 export default defineComponent({
-  props: {
-    menu: { type: Object as PropType<Menu>, required: true }
-  },
-  components: {
-    MenuItem
-  },
-  setup (props, context) {
-    const { findRecipe } = useRecipes()
-    function removeItem (week: string, weekday: WeekDay, meal: Meal, item: string) {
-      context.emit('remove-item', { week, weekday, meal, item })
-    }
+	props: {
+		menu: { type: Object as PropType<Menu>, required: true },
+	},
+	components: {
+		MenuItem,
+	},
+	setup(_props, context) {
+		const { findRecipe } = useRecipes()
+		function removeItem(week: string, weekday: WeekDay, meal: Meal, item: string) {
+			context.emit("remove-item", { week, weekday, meal, item })
+		}
 
-    function decorate (res: string[]): Recipe[] {
-      return res.map(findRecipe).filter(r => r) as Recipe[]
-    }
+		function decorate(res: string[]): Recipe[] {
+			return res.map(findRecipe).filter((r) => r) as Recipe[]
+		}
 
-    return {
-      removeItem,
-      decorate,
-      WeekDays,
-      Meal
-    }
-  }
+		return {
+			removeItem,
+			decorate,
+			WeekDays,
+			Meal,
+		}
+	},
 })
 </script>
 

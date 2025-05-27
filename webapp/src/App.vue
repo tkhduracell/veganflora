@@ -57,36 +57,40 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue'
-import { useWakeLock, useFullscreen } from '@vueuse/core'
-import { useAuth } from './modules/use/auth'
+import { defineComponent, onMounted } from "vue"
+import { useWakeLock, useFullscreen } from "@vueuse/core"
+import { useAuth } from "./modules/use/auth"
 
 export default defineComponent({
-  setup() {
-    const { isActive, isSupported, release, request } = useWakeLock()
-    const { isFullscreen, toggle } = useFullscreen()
+	setup() {
+		const { isActive, isSupported, release, request } = useWakeLock()
+		const { isFullscreen, toggle } = useFullscreen()
 
-    onMounted(() => request('screen').catch(() => console.warn('Unable active wakelock')))
+		onMounted(() => request("screen").catch(() => console.warn("Unable active wakelock")))
 
-    const { user, startLogin, logout } = useAuth()
+		const { user, startLogin, logout } = useAuth()
 
-    return {
-      isActive,
-      isSupported,
-      release,
-      request,
-      toggle,
-      isFullscreen,
-      user,
-      startLogin,
-      logout,
-      buildTimestamp: new Date(process.env.VUE_APP_BUILD_TIMESTAMP ?? 0).toLocaleDateString('sv-SE', {
-        year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
-      }),
-      buildGitVersion: process.env.VUE_APP_GIT_VERSION,
-      buildGitVersionLink: `https://github.com/tkhduracell/veganflora/commit/${process.env.VUE_APP_GIT_VERSION}`
-    }
-  }
+		return {
+			isActive,
+			isSupported,
+			release,
+			request,
+			toggle,
+			isFullscreen,
+			user,
+			startLogin,
+			logout,
+			buildTimestamp: new Date(process.env.VUE_APP_BUILD_TIMESTAMP ?? 0).toLocaleDateString("sv-SE", {
+				year: "numeric",
+				month: "2-digit",
+				day: "2-digit",
+				hour: "2-digit",
+				minute: "2-digit",
+			}),
+			buildGitVersion: process.env.VUE_APP_GIT_VERSION,
+			buildGitVersionLink: `https://github.com/tkhduracell/veganflora/commit/${process.env.VUE_APP_GIT_VERSION}`,
+		}
+	},
 })
 </script>
 

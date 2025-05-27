@@ -15,21 +15,21 @@
 </template>
 
 <script lang="ts">
-import { useMulti, Multi } from '@/modules/use/multi'
-import { PropType, defineComponent, ref } from 'vue'
+import { useMulti, type Multi } from "@/modules/use/multi"
+import { type PropType, defineComponent, ref } from "vue"
 
-import { Ingredient } from './types'
+import type { Ingredient } from "./types"
 
 export default defineComponent({
-  props: {
-    i: { type: Object as PropType<Ingredient>, required: true },
-    multiplier: { type: Number as PropType<Multi>, required: true }
-  },
-  setup () {
-    const { prettyMulti } = useMulti()
+	props: {
+		i: { type: Object as PropType<Ingredient>, required: true },
+		multiplier: { type: Number as PropType<Multi>, required: true },
+	},
+	setup() {
+		const { prettyMulti } = useMulti()
 
-    return { prettyMulti }
-  }
+		return { prettyMulti }
+	},
 })
 </script>
 

@@ -34,33 +34,34 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent, computed } from 'vue'
+import { type PropType, defineComponent, computed } from "vue"
 
-import { Recipe, Tag } from './types'
-import { unique } from '../modules/common/set'
+import type { Recipe, Tag } from "./types"
+import { unique } from "../modules/common/set"
 
 export default defineComponent({
-  name: 'RecipieTree',
-  props: {
-    recipes: { required: true, type: Array as PropType<Recipe[]> }
-  },
-  components: {},
-  setup (props) {
-    const tree = computed(() => {
-      const tree = {} as Record<string, { key: string; title: string; tags?: Tag[] }[]>
-      unique(props.recipes.map(r => r.category)).forEach(c => {
-        tree[c.join(' / ')] = props.recipes
-          .filter(r => {
-            return r.category.join('') === c.join('')
-          })
-          .map(({ title, key, tags }) => ({ key, title, tags }))
-      })
-      return tree
-    })
-    return {
-      tree
-    }
-  }
+	name: "RecipieTree",
+	props: {
+		recipes: { required: true, type: Array as PropType<Recipe[]> },
+	},
+	components: {},
+	setup(props) {
+		const tree = computed(() => {
+			const tree = {} as Record<string, { key: string; title: string; tags?: Tag[] }[]>
+			
+      for (const c of unique(props.recipes.map((r) => r.category))) {
+				tree[c.join(" / ")] = props.recipes
+					.filter((r) => {
+						return r.category.join("") === c.join("")
+					})
+					.map(({ title, key, tags }) => ({ key, title, tags }))
+			}
+			return tree
+		})
+		return {
+			tree,
+		}
+	},
 })
 </script>
 

@@ -40,7 +40,7 @@
 			"style": {
 				"noCommaOperator": "error",
 				"noYodaExpression": "error",
-				"useBlockStatements": "error",
+				"useBlockStatements": "off",
 				"useConsistentBuiltinInstantiation": "error",
 				"useConst": "error",
 				"useSingleVarDeclarator": "error"
@@ -80,5 +80,10 @@
 			"window"
 		]
 	},
-	"overrides": [{ "include": ["test/**/*.spec.*"] }]
+	"overrides": [{ 
+		"include": ["test/**/*.spec.*"],
+		"javascript": {
+			"globals": ["expect", "it" ,"describe", "beforeEach", "afterEach", "beforeAll", "afterAll"]
+		}
+	}]
 }

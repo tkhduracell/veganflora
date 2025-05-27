@@ -19,30 +19,30 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent } from "vue"
 
-import Groceries from '@/components/Groceries.vue'
+import Groceries from "@/components/Groceries.vue"
 
-import { useRecipes } from '../modules/use/recipes'
-import { useMenu } from '../modules/use/menu'
-import { useAuth } from '@/modules/use/auth'
+import { useRecipes } from "../modules/use/recipes"
+import { useMenu } from "../modules/use/menu"
+import { useAuth } from "@/modules/use/auth"
 
 const Component = defineComponent({
-  components: {
-    Groceries
-  },
-  setup () {
-    const { user } = useAuth()
-    const { menu } = useMenu()
-    const { recipes, findRecipe } = useRecipes()
+	components: {
+		Groceries,
+	},
+	setup() {
+		const { user } = useAuth()
+		const { menu } = useMenu()
+		const { recipes, findRecipe } = useRecipes()
 
-    return {
-      recipes,
-      findRecipe,
-      menu,
-      user
-    }
-  }
+		return {
+			recipes,
+			findRecipe,
+			menu,
+			user,
+		}
+	},
 })
 
 export default Component

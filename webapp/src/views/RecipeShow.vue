@@ -52,34 +52,34 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, SetupContext, computed } from 'vue'
+import { defineComponent, SetupContext, computed } from "vue"
 
-import { useRecipe } from '../modules/use/recipes'
+import { useRecipe } from "../modules/use/recipes"
 
-import RecipeItem from '@/components/RecipeItem.vue'
-import { useRoute, useRouter } from 'vue-router/composables'
-import { useAuth } from '@/modules/use/auth'
+import RecipeItem from "@/components/RecipeItem.vue"
+import { useRoute, useRouter } from "vue-router/composables"
+import { useAuth } from "@/modules/use/auth"
 
 export default defineComponent({
-  name: 'RecipeShow',
-  components: {
-    RecipeItem
-  },
-  setup () {
-    const { params } = useRoute()
-    const key = params.key
-    const { recipe, remove } = useRecipe(key)
-    const isLoaded = computed(() => !!(recipe.value && recipe.value.title))
-    const router = useRouter()
-    const { user } = useAuth()
-    return {
-      key,
-      recipe,
-      user,
-      remove: () => remove().then(x => router.push('/')),
-      isLoaded
-    }
-  }
+	name: "RecipeShow",
+	components: {
+		RecipeItem,
+	},
+	setup() {
+		const { params } = useRoute()
+		const key = params.key
+		const { recipe, remove } = useRecipe(key)
+		const isLoaded = computed(() => !!(recipe?.value?.title))
+		const router = useRouter()
+		const { user } = useAuth()
+		return {
+			key,
+			recipe,
+			user,
+			remove: () => remove().then(() => router.push("/")),
+			isLoaded,
+		}
+	},
 })
 </script>
 

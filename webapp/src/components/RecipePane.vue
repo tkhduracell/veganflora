@@ -10,19 +10,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
+import { defineComponent, type PropType } from "vue"
 
-import RecipeItem from '@/components/RecipeItem.vue'
-import { Recipe } from './types'
+import RecipeItem from "@/components/RecipeItem.vue"
+import type { Recipe } from "./types"
 
 export default defineComponent({
-  naem: 'RecipePane',
-  props: {
-    items: { type: Array as PropType<Recipe[]>, required: true }
-  },
-  components: {
-    RecipeItem
-  }
+	naem: "RecipePane",
+	props: {
+		items: { type: Array as PropType<Recipe[]>, required: true },
+	},
+	components: {
+		RecipeItem,
+	},
 })
 </script>
 

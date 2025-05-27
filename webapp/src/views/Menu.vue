@@ -26,57 +26,57 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch } from 'vue'
+import { defineComponent, ref, computed, watch } from "vue"
 
-import MenuAdder from '@/components/MenuAdder.vue'
-import MenuComp from '@/components/Menu.vue'
+import MenuAdder from "@/components/MenuAdder.vue"
+import MenuComp from "@/components/Menu.vue"
 
-import { useRecipes } from '../modules/use/recipes'
-import { useMenu } from '../modules/use/menu'
-import { WeekDay, Meal } from '../components/types'
-import { useAuth } from '@/modules/use/auth'
+import { useRecipes } from "../modules/use/recipes"
+import { useMenu } from "../modules/use/menu"
+import type { WeekDay, Meal } from "../components/types"
+import { useAuth } from "@/modules/use/auth"
 
 const Component = defineComponent({
-  components: {
-    MenuAdder,
-    MenuComp
-  },
-  setup () {
-    const { user } = useAuth()
-    const { recipes } = useRecipes()
-    const { menu, removeMenuItem, addMenuItem } = useMenu()
+	components: {
+		MenuAdder,
+		MenuComp,
+	},
+	setup() {
+		const { user } = useAuth()
+		const { recipes } = useRecipes()
+		const { menu, removeMenuItem, addMenuItem } = useMenu()
 
-    const week = ref<string>('')
+		const week = ref<string>("")
 
-    watch(menu, newer => {
-      if (!week.value && newer && Object.keys(newer).length > 0) {
-        const [first] = Object.keys(newer)
-        week.value = first
-      }
-    })
+		watch(menu, (newer) => {
+			if (!week.value && newer && Object.keys(newer).length > 0) {
+				const [first] = Object.keys(newer)
+				week.value = first
+			}
+		})
 
-    const weeks = computed(() => Object.keys(menu.value))
+		const weeks = computed(() => Object.keys(menu.value))
 
-    function add ({ item, weekday, meal }: { item: string; weekday: WeekDay; meal: Meal }) {
-      const recipe = (recipes.value || []).find(r => r.key === item)
-      if (recipe) addMenuItem(week.value, recipe.key, weekday, meal)
-    }
+		function add({ item, weekday, meal }: { item: string; weekday: WeekDay; meal: Meal }) {
+			const recipe = (recipes.value || []).find((r) => r.key === item)
+			if (recipe) {addMenuItem(week.value, recipe.key, weekday, meal)}
+		}
 
-    function remove ({ item, weekday, meal }: { item: string; weekday: WeekDay; meal: Meal }) {
-      const recipe = (recipes.value || []).find(r => r.key === item)
-      if (recipe) removeMenuItem(week.value, recipe.key, weekday, meal)
-    }
+		function remove({ item, weekday, meal }: { item: string; weekday: WeekDay; meal: Meal }) {
+			const recipe = (recipes.value || []).find((r) => r.key === item)
+			if (recipe) {removeMenuItem(week.value, recipe.key, weekday, meal)}
+		}
 
-    return {
-      add,
-      remove,
-      recipes,
-      menu,
-      week,
-      weeks,
-      user
-    }
-  }
+		return {
+			add,
+			remove,
+			recipes,
+			menu,
+			week,
+			weeks,
+			user,
+		}
+	},
 })
 
 export default Component

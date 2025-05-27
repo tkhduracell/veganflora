@@ -98,29 +98,29 @@
 </template>
 
 <script lang="ts">
-import { PropType, computed, defineComponent, ref } from 'vue'
+import { type PropType, computed, defineComponent, ref } from "vue"
 
-import { useAutoConvert } from '../modules/use/auto-convert'
-import { useMulti } from '../modules/use/multi'
-import RecipeIngredient from './RecipeIngredient.vue'
-import { Recipe } from './types'
-import markdownit from 'markdown-it'
+import { useAutoConvert } from "../modules/use/auto-convert"
+import { useMulti } from "../modules/use/multi"
+import RecipeIngredient from "./RecipeIngredient.vue"
+import type { Recipe } from "./types"
+import markdownit from "markdown-it"
 
-const md = markdownit('commonmark')
+const md = markdownit("commonmark")
 
 export default defineComponent({
-  components: { RecipeIngredient },
-  props: {
-    item: { type: Object as PropType<Recipe>, required: true },
-    showTitle: Boolean
-  },
-  setup (props) {
-    const { enabled: convertEnabled, convert } = useAutoConvert()
-    const multi = useMulti()
-    const itemRendered = computed(() => md.render(props.item.text))
+	components: { RecipeIngredient },
+	props: {
+		item: { type: Object as PropType<Recipe>, required: true },
+		showTitle: Boolean,
+	},
+	setup(props) {
+		const { enabled: convertEnabled, convert } = useAutoConvert()
+		const multi = useMulti()
+		const itemRendered = computed(() => md.render(props.item.text))
 
-    return { ...multi, convertEnabled, convert, itemRendered }
-  }
+		return { ...multi, convertEnabled, convert, itemRendered }
+	},
 })
 </script>
 

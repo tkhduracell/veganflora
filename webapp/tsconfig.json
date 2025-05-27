@@ -1,54 +1,31 @@
 {
-  "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
-    "strict": true,
-    "jsx": "preserve",
-    "importHelpers": true,
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "sourceMap": true,
-    "baseUrl": ".",
-    "types": [
-      "webpack-env",
-      "jest",
-      "node"
-    ],
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    },
-    "lib": [
-      "esnext",
-      "ES2015",
-      "ES2016",
-      "ES2017",
-      "ES2018",
-      "ES2019",
-      "ES2020",
-      "dom",
-      "dom.iterable",
-      "scripthost"
-    ]
-  },
-  "vueCompilerOptions": {
-    "target": 2.7
-  },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "tests/**/*.ts",
-    "tests/**/*.tsx"
-  ],
-  "plugins": [
-    {
-      "name": "typescript-eslint-plugin",
-      "ignoreJavaScript": true,
-      "configFile": ".eslintrc.js"
-    }
-  ],
+	"compilerOptions": {
+		"target": "esnext",
+		"module": "esnext",
+		"strict": true,
+		"jsx": "preserve",
+		"importHelpers": true,
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"resolveJsonModule": true,
+		"sourceMap": true,
+		"baseUrl": ".",
+		"types": ["webpack-env", "jest", "node"],
+		"paths": {
+			"@/*": ["src/*"]
+		},
+		"lib": ["esnext", "ES2015", "ES2016", "ES2017", "ES2018", "ES2019", "ES2020", "dom", "dom.iterable", "scripthost"]
+	},
+	"vueCompilerOptions": {
+		"target": 2.7
+	},
+	"include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "tests/**/*.ts", "tests/**/*.tsx"],
+	"plugins": [
+		{
+			"name": "typescript-eslint-plugin",
+			"ignoreJavaScript": true,
+			"configFile": ".eslintrc.js"
+		}
+	]
 }

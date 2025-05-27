@@ -4,6 +4,10 @@
     "turbo": "^2.5.3"
   },
   "scripts": {
-    "preinstall": "npx only-allow pnpm"
+    "preinstall": "npx only-allow pnpm",
+    "format": "pnpm -r format",
+    "lint": "pnpm -r lint --write",
+    "check": "pnpm -r check",
+    "build": "pnpm -r build"
   }
 }

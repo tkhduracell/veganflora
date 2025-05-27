@@ -1,83 +1,79 @@
 /* eslint-disable camelcase */
-import { Timestamp } from 'firebase/firestore'
+import type { Timestamp } from "firebase/firestore"
 
 export type Tag = {
-  text: string;
-  color: string;
+	text: string
+	color: string
 }
 export type Category = string
 
 export type Ingredient = {
-  id: string;
-  name: string;
-  amount?: string;
-  measure?: string;
+	id: string
+	name: string
+	amount?: string
+	measure?: string
 }
 
 export type Recipe = {
-  size: string;
-  text: string;
-  category: Category[];
-  tags?: Tag[];
-  ingredients: Ingredient[];
-  title: string;
-  key: string;
-  image?: File
-  created_at?: Timestamp;
-  updated_at?: Timestamp;
+	size: string
+	text: string
+	category: Category[]
+	tags?: Tag[]
+	ingredients: Ingredient[]
+	title: string
+	key: string
+	image?: File
+	created_at?: Timestamp
+	updated_at?: Timestamp
 }
 
 export enum WeekDay {
-  monday = 'Måndag',
-  tuesday = 'Tisdag',
-  wednesday = 'Onsdag',
-  thursday = 'Torsdag',
-  friday = 'Fredag',
-  saturday = 'Lördag',
-  sunday = 'Söndag'
+	monday = "Måndag",
+	tuesday = "Tisdag",
+	wednesday = "Onsdag",
+	thursday = "Torsdag",
+	friday = "Fredag",
+	saturday = "Lördag",
+	sunday = "Söndag",
 }
 
 export const WeekDays = [
-  WeekDay.monday,
-  WeekDay.tuesday,
-  WeekDay.wednesday,
-  WeekDay.thursday,
-  WeekDay.friday,
-  WeekDay.saturday,
-  WeekDay.sunday
+	WeekDay.monday,
+	WeekDay.tuesday,
+	WeekDay.wednesday,
+	WeekDay.thursday,
+	WeekDay.friday,
+	WeekDay.saturday,
+	WeekDay.sunday,
 ]
 
 export enum Meal {
-  breakfast = 'Frukost',
-  lunch = 'Lunch',
-  dinner = 'Middag'
+	breakfast = "Frukost",
+	lunch = "Lunch",
+	dinner = "Middag",
 }
 
-export const Meals = [
-  Meal.breakfast,
-  Meal.dinner,
-  Meal.lunch
-]
+export const Meals = [Meal.breakfast, Meal.dinner, Meal.lunch]
 
 export type Day = {
-  [Meal.breakfast]: string[];
-  [Meal.lunch]: string[];
-  [Meal.dinner]: string[];
+	[Meal.breakfast]: string[]
+	[Meal.lunch]: string[]
+	[Meal.dinner]: string[]
 }
 
 export type Week = {
-  days: { [key: string]: Day };
+	days: { [key: string]: Day }
 }
 
 export type Menu = {
-  [key: string]: Week;
+	[key: string]: Week
 }
 
 export type Context<T> = {
-  week: number;
-  weekday: WeekDay;
-  meal: Meal;
-  source: T;
+	week: number
+	weekday: WeekDay
+	meal: Meal
+	source: T
 }
 
 export type IngredientWithContext = Ingredient & Context<Recipe>
