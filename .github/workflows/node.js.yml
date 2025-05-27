@@ -16,65 +16,57 @@ jobs:
   deploy-functions:
     concurrency:
       group: 'functions'
-
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         node-version: [22]
-
     steps:
       - uses: actions/checkout@v4
-
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+          run_install: false
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            functions/package-lock.json
-
+          cache: pnpm
       - name: Install dependencies
-        run: npm ci && npm ci --prefix functions 
-
+        run: pnpm install
       - name: Build functions
-        run: npm run build --prefix functions 
-      
+        run: pnpm --filter functions... build
       - name: Firebase Deploy (functions)
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         run: |
-          npm exec -- firebase deploy --only functions --debug --token ${{ secrets.FIREBASE_TOKEN }}
+          pnpm exec firebase deploy --only functions --debug --token ${{ secrets.FIREBASE_TOKEN }}
 
   deploy-webapp:
     concurrency:
       group: 'web'
-
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         node-version: [20]
-
     steps:
       - uses: actions/checkout@v4
-
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+          run_install: false
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: npm
-          cache-dependency-path: |
-            package-lock.json  
-            webapp/package-lock.json
-
+          cache: pnpm
       - name: Install dependencies
-        run: npm ci && npm ci --prefix webapp
-
+        run: pnpm install
+      - name: Build webapp
+        run: pnpm --filter webapp... build
       - name: Firebase Deploy (hosting)
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-        run: npm exec -- firebase deploy --only hosting --token ${{ secrets.FIREBASE_TOKEN }}
-
+        run: pnpm exec firebase deploy --only hosting --token ${{ secrets.FIREBASE_TOKEN }}
       - name: Send deploy message to slack
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         env:
