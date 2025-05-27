@@ -1,9 +1,11 @@
-import { region, logger } from "firebase-functions";
+import { logger } from "firebase-functions";
 
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 
 import { defineSecret } from "firebase-functions/params";
+import { onCall } from "firebase-functions/https";
+import { onDocumentWritten } from "firebase-functions/v2/firestore";
 
 const apiKey = defineSecret("GEMINI_API_KEY");
 
@@ -115,11 +117,13 @@ export async function fetchAndSummarize(url: string): Promise<string> {
 	return await summarizeWithChatLLM(text);
 }
 
-export const importUrl = region("europe-west3")
-	.runWith({ secrets: [apiKey], timeoutSeconds: 120 })
-	.https.onCall(async ({ url }) => {
+export const importUrl = onCall({
+	 secrets: [apiKey],
+	 timeoutSeconds: 120,
+	 region: "europe-west3"
+}, async ({ data }) => {
 		try {
-			const summary = await fetchAndSummarize(url);
+			const summary = await fetchAndSummarize(data.url);
 			return summary;
 		} catch (error) {
 			console.error("Ett fel uppstod:", error);
@@ -127,12 +131,15 @@ export const importUrl = region("europe-west3")
 		return null;
 	});
 
-export const importText = region("europe-west3")
-	.runWith({ secrets: [apiKey], timeoutSeconds: 120 })
-	.https.onCall(async ({ text }) => {
+	
+export const importText = onCall({
+	 secrets: [apiKey], 
+	 timeoutSeconds: 120,
+	 region: "europe-west3",
+}, async () => {
 		try {
 			logger.info("Summarizing using LLM");
-			const summary = await summarizeWithChatLLM(text);
+			const summary = await summarizeWithChatLLM(apiKey.value());
 			return summary;
 		} catch (error) {
 			console.error("Ett fel uppstod:", error);
@@ -140,10 +147,8 @@ export const importText = region("europe-west3")
 		return null;
 	});
 
-export const prefillUpdate = region("europe-west3")
-	.firestore.document("/veganflora/root/recipies/{id}")
-	.onWrite(async (_, ctx) => {
-		logger.info(`${ctx.params.id}:onWrite()`);
+export const prefillUpdate = onDocumentWritten("/veganflora/root/recipies/{id}", async ({params}) => {
+		logger.info(`${params.id}:onWrite()`);
 
 		type TagInfo = { text: string; color: string };
 		type TagKey = string;
@@ -170,10 +175,10 @@ export const prefillUpdate = region("europe-west3")
 		{
 			const current = await root
 				.collection("recipies")
-				.doc(ctx.params.id)
+				.doc(params.id)
 				.get();
 			if (!current.exists)
-				return logger.warn(`Document ${ctx.params.id} does not exist`);
+				return logger.warn(`Document ${params.id} does not exist`);
 
 			logger.info(`Updating updated doc with tags`, {});
 			const tags: TagKey[] = (current.data()!.tags as CompatTags).map((t) =>
