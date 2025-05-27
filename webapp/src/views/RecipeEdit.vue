@@ -341,7 +341,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted } from "vue"
-import debounce from "lodash.debounce"
+import {debounce} from "lodash"
 
 import { BIconClipboard } from "bootstrap-vue"
 
