@@ -44,9 +44,6 @@
     "tests/**/*.ts",
     "tests/**/*.tsx"
   ],
-  "exclude": [
-    "**/node_modules"
-  ],
   "plugins": [
     {
       "name": "typescript-eslint-plugin",

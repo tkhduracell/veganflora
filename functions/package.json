@@ -9,7 +9,10 @@
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
     "typecheck": "tsc --noEmit",
-    "script:summarize": "NODE_OPTIONS='--no-deprecation' tsx scripts/summarize.ts"
+    "script:summarize": "NODE_OPTIONS='--no-deprecation' tsx scripts/summarize.ts",
+    "lint": "biome lint",
+    "format": "biome format",
+    "check": "biome check"
   },
   "engines": {
     "node": "22"
@@ -21,10 +24,12 @@
     "openai": "^4.103.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "catalog:",
+    "@tsconfig/node22": "^22.0.2",
     "dotenv": "^16.4.7",
     "firebase-functions-test": "^3.4.1",
-    "tsx": "^4.19.3",
-    "typescript": "^4.9.5"
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
   },
   "private": true
 }

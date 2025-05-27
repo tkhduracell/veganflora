@@ -1,0 +1,15 @@
+packages:
+  - webapp
+  - ingest
+  - functions
+
+onlyBuiltDependencies:
+  - '@biomejs/biome'
+  - bootstrap-vue
+  - core-js
+  - esbuild
+  - protobufjs
+  - vue-demi
+
+catalog:
+  '@biomejs/biome': "^1.9.4"
