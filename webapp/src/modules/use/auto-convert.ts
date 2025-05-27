@@ -55,12 +55,10 @@ export function useAutoConvert() {
 function tryMultiply(weight: number | string | undefined, amount: number | string | undefined): string {
 	try {
 		const nomalized = normalizeValue(amount ?? "")
-		return (
-			`${(
-				(typeof weight === "number" ? weight : Number.parseFloat(weight ?? "")) *
+		return `${(
+			(typeof weight === "number" ? weight : Number.parseFloat(weight ?? "")) *
 				(typeof nomalized === "number" ? nomalized : Number.parseFloat(nomalized.replace(",", ".")))
-			).toFixed(1)}`
-		)
+		).toFixed(1)}`
 	} catch (_e) {
 		return `${weight} x ${amount}`
 	}

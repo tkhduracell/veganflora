@@ -69,7 +69,7 @@ export default defineComponent({
 		const { params } = useRoute()
 		const key = params.key
 		const { recipe, remove } = useRecipe(key)
-		const isLoaded = computed(() => !!(recipe?.value?.title))
+		const isLoaded = computed(() => !!recipe?.value?.title)
 		const router = useRouter()
 		const { user } = useAuth()
 		return {
