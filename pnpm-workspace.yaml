@@ -5,6 +5,7 @@ packages:
 
 onlyBuiltDependencies:
   - '@biomejs/biome'
+  - '@firebase/util'
   - bootstrap-vue
   - core-js
   - esbuild
@@ -12,4 +13,4 @@ onlyBuiltDependencies:
   - vue-demi
 
 catalog:
-  '@biomejs/biome': "^1.9.4"
+  '@biomejs/biome': ^1.9.4
