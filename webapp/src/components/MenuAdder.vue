@@ -59,48 +59,54 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref, computed } from 'vue'
-import { Meal, Meals, WeekDay, WeekDays, Recipe } from './types'
+import { defineComponent, type PropType, ref, computed } from "vue"
+import { Meal, Meals, WeekDay, WeekDays, type Recipe } from "./types"
 
 export default defineComponent({
-  props: {
-    recipes: Array as PropType<Recipe[]>,
-    canEdit: Boolean
-  },
-  setup (props, context) {
-    const selected = ref<string>('Ölmjöl')
-    const weekday = ref<WeekDay>(WeekDay.tuesday)
-    const meal = ref<Meal>(Meal.lunch)
+	props: {
+		recipes: Array as PropType<Recipe[]>,
+		canEdit: Boolean,
+	},
+	setup(props, context) {
+		const selected = ref<string>("Ölmjöl")
+		const weekday = ref<WeekDay>(WeekDay.tuesday)
+		const meal = ref<Meal>(Meal.lunch)
 
-    function add (item: string) {
-      context.emit('add-item', { item, weekday: weekday.value, meal: meal.value })
-      selected.value = ''
-    }
+		function add(item: string) {
+			context.emit("add-item", {
+				item,
+				weekday: weekday.value,
+				meal: meal.value,
+			})
+			selected.value = ""
+		}
 
-    const searchterm = ref<string>('')
-    const result = computed(() => {
-      return props.recipes
-        ? (props.recipes as Recipe[])
-            .filter(r => {
-              return !searchterm.value ||
-            r.key.toLocaleLowerCase().includes(searchterm.value.toLocaleLowerCase()) ||
-            r.title.toLocaleLowerCase().includes(searchterm.value.toLocaleLowerCase())
-            })
-            .slice(-20)
-        : null
-    })
+		const searchterm = ref<string>("")
+		const result = computed(() => {
+			return props.recipes
+				? (props.recipes as Recipe[])
+						.filter((r) => {
+							return (
+								!searchterm.value ||
+								r.key.toLocaleLowerCase().includes(searchterm.value.toLocaleLowerCase()) ||
+								r.title.toLocaleLowerCase().includes(searchterm.value.toLocaleLowerCase())
+							)
+						})
+						.slice(-20)
+				: null
+		})
 
-    return {
-      selected,
-      add,
-      result,
-      searchterm,
-      weekday,
-      weekdays: WeekDays,
-      meal,
-      meals: Meals
-    }
-  }
+		return {
+			selected,
+			add,
+			result,
+			searchterm,
+			weekday,
+			weekdays: WeekDays,
+			meal,
+			meals: Meals,
+		}
+	},
 })
 </script>
 

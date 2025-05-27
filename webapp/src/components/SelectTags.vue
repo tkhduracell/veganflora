@@ -54,44 +54,49 @@
 </template>
 
 <script lang="ts">
-import { BFormTag, BLink } from 'bootstrap-vue'
-import { remove, uniqBy } from 'lodash'
-import { defineComponent, PropType, ref } from 'vue'
-import { Tag } from './types'
+import { BFormTag, BLink } from "bootstrap-vue"
+import { remove, uniqBy } from "lodash"
+import { defineComponent, type PropType, ref } from "vue"
+import type { Tag } from "./types"
 
 export default defineComponent({
-  name: 'SelectTags',
-  props: {
-    tags: { type: Array as PropType<Tag[]> },
-    separator: { type: String, default: ' , ' },
-    suggestions: { required: true, type: Array as PropType<Tag[]> }
-  },
-  setup (props, { emit }) {
-    const custom = ref<boolean>(false)
-    const newTag = ref<string>('')
-    const suggestion = ref<string>('')
+	name: "SelectTags",
+	props: {
+		tags: { type: Array as PropType<Tag[]> },
+		separator: { type: String, default: " , " },
+		suggestions: { required: true, type: Array as PropType<Tag[]> },
+	},
+	setup(props, { emit }) {
+		const custom = ref<boolean>(false)
+		const newTag = ref<string>("")
+		const suggestion = ref<string>("")
 
-    function complete () {
-      const addition = custom.value ? newTag.value : suggestion.value
-      if (!addition || addition.trim().length === 0) return
-      custom.value = false
+		function complete() {
+			const addition = custom.value ? newTag.value : suggestion.value
+			if (!addition || addition.trim().length === 0) return
+			custom.value = false
 
-      const newValue: Tag[] = [...(props.tags ?? []), { text: addition, color: '' }]
-      emit('update:tags', newValue)
+			const newValue: Tag[] = [...(props.tags ?? []), { text: addition, color: "" }]
+			emit("update:tags", newValue)
 
-      newTag.value = ''
-      suggestion.value = ''
-    }
+			newTag.value = ""
+			suggestion.value = ""
+		}
 
-    function remove (idx: number) {
-      const newValue: Tag[] = props.tags?.filter((itm, i) => i !== idx) ?? []
-      emit('update:tags', newValue)
-    }
+		function remove(idx: number) {
+			const newValue: Tag[] = props.tags?.filter((_itm, i) => i !== idx) ?? []
+			emit("update:tags", newValue)
+		}
 
-    return {
-      custom, complete, newTag, suggestion, remove, uniqBy
-    }
-  }
+		return {
+			custom,
+			complete,
+			newTag,
+			suggestion,
+			remove,
+			uniqBy,
+		}
+	},
 })
 </script>
 

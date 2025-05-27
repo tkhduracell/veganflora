@@ -1,33 +1,35 @@
-import { unique } from './common/set'
+import { unique } from "./common/set"
 
 // Given: ['A / B', 'A / C'], ['A']
 // Returns: ['B', 'C']
-function categories (categories: string[], current?: string[], delim = ' / ') {
-  if (!categories) return []
+function categories(categories: string[], current?: string[], delim = " / ") {
+	if (!categories) return []
 
-  const currentJoined = current ? current.join(delim) : ''
+	const currentJoined = current ? current.join(delim) : ""
 
-  // Find all with common parent categories
-  const withSameParent = current ? categories.filter(c => c.startsWith(currentJoined)) : categories
+	// Find all with common parent categories
+	const withSameParent = current ? categories.filter((c) => c.startsWith(currentJoined)) : categories
 
-  // Remove parent category as prefix
-  const withoutTheParent = current ? withSameParent.map(c => c.split(delim).slice(current.length).join(delim)) : withSameParent
+	// Remove parent category as prefix
+	const withoutTheParent = current
+		? withSameParent.map((c) => c.split(delim).slice(current.length).join(delim))
+		: withSameParent
 
-  // Keep only category below current level
-  const onlyChilds = withoutTheParent.filter(c => c.length > 0)
+	// Keep only category below current level
+	const onlyChilds = withoutTheParent.filter((c) => c.length > 0)
 
-  // Only suggest first subcategory of a path
-  const onlyFirstName = onlyChilds.map(c => c.split(delim).slice(0, 1).join(delim))
+	// Only suggest first subcategory of a path
+	const onlyFirstName = onlyChilds.map((c) => c.split(delim).slice(0, 1).join(delim))
 
-  // Get only unique output
-  return unique(onlyFirstName)
+	// Get only unique output
+	return unique(onlyFirstName)
 }
 
-function tags (tags: string[], current?: string[]) {
-  return current ? tags.filter(s => !current.includes(s)) : tags
+function tags(tags: string[], current?: string[]) {
+	return current ? tags.filter((s) => !current.includes(s)) : tags
 }
 
 export class Suggest {
-  static tags = tags
-  static categories = categories
+	static tags = tags
+	static categories = categories
 }

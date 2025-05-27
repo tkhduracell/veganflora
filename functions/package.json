@@ -1,35 +1,35 @@
 {
-  "name": "functions",
-  "type": "module",
-  "scripts": {
-    "build": "tsc",
-    "serve": "npm run build && firebase emulators:start --only functions",
-    "shell": "npm run build && firebase functions:shell",
-    "start": "npm run shell",
-    "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log",
-    "typecheck": "tsc --noEmit",
-    "script:summarize": "NODE_OPTIONS='--no-deprecation' tsx scripts/summarize.ts",
-    "lint": "biome lint",
-    "format": "biome format",
-    "check": "biome check"
-  },
-  "engines": {
-    "node": "22"
-  },
-  "main": "dist/index.js",
-  "dependencies": {
-    "firebase-admin": "^11.11.1",
-    "firebase-functions": "^4.9.0",
-    "openai": "^4.103.0"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "catalog:",
-    "@tsconfig/node22": "^22.0.2",
-    "dotenv": "^16.4.7",
-    "firebase-functions-test": "^3.4.1",
-    "tsx": "^4.19.4",
-    "typescript": "^5.8.3"
-  },
-  "private": true
+	"name": "functions",
+	"type": "module",
+	"scripts": {
+		"build": "tsc",
+		"serve": "npm run build && firebase emulators:start --only functions",
+		"shell": "npm run build && firebase functions:shell",
+		"start": "npm run shell",
+		"deploy": "firebase deploy --only functions",
+		"logs": "firebase functions:log",
+		"typecheck": "tsc --noEmit",
+		"script:summarize": "NODE_OPTIONS='--no-deprecation' tsx scripts/summarize.ts",
+		"lint": "biome lint",
+		"format": "biome format",
+		"check": "biome check"
+	},
+	"engines": {
+		"node": "22"
+	},
+	"main": "dist/index.js",
+	"dependencies": {
+		"firebase-admin": "^11.11.1",
+		"firebase-functions": "^4.9.0",
+		"openai": "^4.103.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "catalog:",
+		"@tsconfig/node22": "^22.0.2",
+		"dotenv": "^16.4.7",
+		"firebase-functions-test": "^3.4.1",
+		"tsx": "^4.19.4",
+		"typescript": "^5.8.3"
+	},
+	"private": true
 }

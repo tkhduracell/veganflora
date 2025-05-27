@@ -35,53 +35,61 @@
 </template>
 
 <script lang="ts">
-import { useAuth } from '@/modules/use/auth'
-import { Weights } from '@/modules/use/auto-convert'
-import { doc, getFirestore, onSnapshot } from '@firebase/firestore'
-import { debouncedWatch } from '@vueuse/core'
-import { setDoc } from 'firebase/firestore'
-import { sortBy } from 'lodash'
-import { computed, defineComponent, ref } from 'vue'
+import { useAuth } from "@/modules/use/auth"
+import type { Weights } from "@/modules/use/auto-convert"
+import { doc, getFirestore, onSnapshot } from "@firebase/firestore"
+import { debouncedWatch } from "@vueuse/core"
+import { setDoc } from "firebase/firestore"
+import { sortBy } from "lodash"
+import { computed, defineComponent, ref } from "vue"
 
 const Component = defineComponent({
-  components: {
-  },
-  setup() {
-    const store = getFirestore()
-    const { user } = useAuth()
+	components: {},
+	setup() {
+		const store = getFirestore()
+		const { user } = useAuth()
 
-    const data = ref<Weights>({})
+		const data = ref<Weights>({})
 
-    const inputError = ref()
-    const manual = computed<string>({
-      get: () => JSON.stringify(data.value, null, 2),
-      set: (s: string) => {
-        try { data.value = JSON.parse(s); inputError.value = null } catch (e) { inputError.value = e }
-      }
-    })
+		const inputError = ref()
+		const manual = computed<string>({
+			get: () => JSON.stringify(data.value, null, 2),
+			set: (s: string) => {
+				try {
+					data.value = JSON.parse(s)
+					inputError.value = null
+				} catch (e) {
+					inputError.value = e
+				}
+			},
+		})
 
-    const weightsRef = doc(store, 'veganflora', 'root', 'converts', 'weight-v2')
-    onSnapshot(weightsRef, result => {
-      if (result.exists()) {
-        data.value = result.data()
-      }
-    })
+		const weightsRef = doc(store, "veganflora", "root", "converts", "weight-v2")
+		onSnapshot(weightsRef, (result) => {
+			if (result.exists()) {
+				data.value = result.data()
+			}
+		})
 
-    debouncedWatch(data, async (x, prev) => {
-      if (Object.keys(prev).length === 0) return
+		debouncedWatch(
+			data,
+			async (x, prev) => {
+				if (Object.keys(prev).length === 0) return
 
-      console.log('Saving document')
-      await setDoc(weightsRef, x)
-    }, { maxWait: 5000, debounce: 1000 })
+				console.log("Saving document")
+				await setDoc(weightsRef, x)
+			},
+			{ maxWait: 5000, debounce: 1000 },
+		)
 
-    return {
-      data,
-      manual,
-      inputError,
-      sortBy,
-      user
-    }
-  }
+		return {
+			data,
+			manual,
+			inputError,
+			sortBy,
+			user,
+		}
+	},
 })
 
 export default Component

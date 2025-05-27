@@ -30,16 +30,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
-import { Recipe } from './types'
+import { defineComponent, type PropType } from "vue"
+import type { Recipe } from "./types"
 
 export default defineComponent({
-  props: {
-    items: { required: true, type: Array as PropType<Recipe[]> },
-    meal: { required: true, type: String },
-    week: { required: true, type: String },
-    weekday: { required: true, type: String }
-  }
+	props: {
+		items: { required: true, type: Array as PropType<Recipe[]> },
+		meal: { required: true, type: String },
+		week: { required: true, type: String },
+		weekday: { required: true, type: String },
+	},
 })
 </script>
 

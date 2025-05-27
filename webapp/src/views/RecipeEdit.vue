@@ -340,143 +340,139 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted } from 'vue'
-import debounce from 'lodash.debounce'
+import { defineComponent, ref, computed, onMounted } from "vue"
+import debounce from "lodash.debounce"
 
-import { BIconClipboard } from 'bootstrap-vue'
+import { BIconClipboard } from "bootstrap-vue"
 
-import SelectTags from '../components/SelectTags.vue'
-import SelectCategory from '../components/SelectCategory.vue'
+import SelectTags from "../components/SelectTags.vue"
+import SelectCategory from "../components/SelectCategory.vue"
 
-import { AutoTag, AutoTags } from '../modules/tags'
-import { Suggest } from '../modules/suggestions'
-import { useRecipe } from '../modules/use/recipes'
-import { usePrefill } from '../modules/use/prefill'
-import { parseIngredient } from '../modules/ingredients'
-import { Recipe, Ingredient, Tag } from '../components/types'
-import { useRoute, useRouter } from 'vue-router/composables'
-import { useAuth } from '@/modules/use/auth'
-import draggable from 'vuedraggable'
-import { useImportUrl as useImport } from '@/modules/use/import'
+import { type AutoTag, AutoTags } from "../modules/tags"
+import { Suggest } from "../modules/suggestions"
+import { useRecipe } from "../modules/use/recipes"
+import { usePrefill } from "../modules/use/prefill"
+import { parseIngredient } from "../modules/ingredients"
+import { type Recipe, Ingredient, type Tag } from "../components/types"
+import { useRoute, useRouter } from "vue-router/composables"
+import { useAuth } from "@/modules/use/auth"
+import draggable from "vuedraggable"
+import { useImportUrl as useImport } from "@/modules/use/import"
 
 export default defineComponent({
-  name: 'RecipieEdit',
-  components: { SelectTags, BIconClipboard, SelectCategory, draggable },
-  setup () {
-    const { params } = useRoute()
-    const router = useRouter()
-    const key = params.key || false
-    const { user } = useAuth()
+	name: "RecipieEdit",
+	components: { SelectTags, BIconClipboard, SelectCategory, draggable },
+	setup() {
+		const { params } = useRoute()
+		const router = useRouter()
+		const key = params.key || false
+		const { user } = useAuth()
 
-    const saving = ref(false)
-    const {
-      recipe,
-      onSave,
-      addIngredientRow,
-      addIngredientRows,
-      removeIngredientRow,
-      updateCategory,
-      updateTags
-    } = useRecipe(key || '')
-    const prefill = usePrefill()
+		const saving = ref(false)
+		const { recipe, onSave, addIngredientRow, addIngredientRows, removeIngredientRow, updateCategory, updateTags } =
+			useRecipe(key || "")
+		const prefill = usePrefill()
 
-    const tags = computed<Tag[]>(() => {
-      return Suggest.tags(
-        prefill.tags.value.map(x => x.text),
-        (recipe.value.tags || []).map(t => typeof t === 'object' ? t.text : t)
-      ).filter(s => !AutoTags.includes(s as AutoTag)).map(x => ({ text: x, color: '' }))
-    })
+		const tags = computed<Tag[]>(() => {
+			return Suggest.tags(
+				prefill.tags.value.map((x) => x.text),
+				(recipe.value.tags || []).map((t) => (typeof t === "object" ? t.text : t)),
+			)
+				.filter((s) => !AutoTags.includes(s as AutoTag))
+				.map((x) => ({ text: x, color: "" }))
+		})
 
-    const categories = computed(() => {
-      return Suggest.categories(prefill.categories.value, recipe.value.category)
-    })
+		const categories = computed(() => {
+			return Suggest.categories(prefill.categories.value, recipe.value.category)
+		})
 
-    onMounted(() => {
-      if (!key) {
-        const state = localStorage.getItem('saveState')
-        if (state) {
-          recipe.value = JSON.parse(state) as Recipe
-        }
-      }
-    })
+		onMounted(() => {
+			if (!key) {
+				const state = localStorage.getItem("saveState")
+				if (state) {
+					recipe.value = JSON.parse(state) as Recipe
+				}
+			}
+		})
 
-    const savedStateAt = ref<Date>()
-    const savedStateAtPretty = computed(() => {
-      return savedStateAt.value
-        ? savedStateAt.value.toISOString()
-          .replace(/T/i, ' ')
-          .replace(/\.\d{3}Z/i, '')
-        : ''
-    })
+		const savedStateAt = ref<Date>()
+		const savedStateAtPretty = computed(() => {
+			return savedStateAt.value
+				? savedStateAt.value
+						.toISOString()
+						.replace(/T/i, " ")
+						.replace(/\.\d{3}Z/i, "")
+				: ""
+		})
 
-    const onChange = debounce(function () {
-      if (!key) {
-        localStorage.setItem('saveState', JSON.stringify(recipe.value))
-        savedStateAt.value = new Date()
-      }
-    }, 1000)
+		const onChange = debounce(() => {
+			if (!key) {
+				localStorage.setItem("saveState", JSON.stringify(recipe.value))
+				savedStateAt.value = new Date()
+			}
+		}, 1000)
 
-    const isEmpty = computed(() => {
-      const r = recipe.value || {} as Recipe
-      return !r || (r.ingredients || []).length === 0 || (r.title || '').trim().length === 0
-    })
+		const isEmpty = computed(() => {
+			const r = recipe.value || ({} as Recipe)
+			return !r || (r.ingredients || []).length === 0 || (r.title || "").trim().length === 0
+		})
 
-    async function save () {
-      try {
-        saving.value = true
-        const { savekey } = await onSave()
-        localStorage.removeItem('saveState')
-        router.push({ name: 'show', params: { key: savekey } })
-      } catch (err) {
-        console.error('Failed to save data')
-      } finally {
-        saving.value = false
-      }
-    }
+		async function save() {
+			try {
+				saving.value = true
+				const { savekey } = await onSave()
+				localStorage.removeItem("saveState")
+				router.push({ name: "show", params: { key: savekey } })
+			} catch (err) {
+				console.error("Failed to save data", err)
+			} finally {
+				saving.value = false
+			}
+		}
 
-    const pasteList = ref('')
+		const pasteList = ref("")
 
-    function onPasteList () {
-      try {
-        const ingredientsAdd = pasteList.value
-          .split(/\n/gi)
-          .filter(s => s.trim() !== '')
-          .map(parseIngredient)
-          .filter(i => i.name !== '')
-        addIngredientRows(ingredientsAdd)
-        onChange()
-        pasteList.value = ''
-      } catch (err) {
-        console.error('Failed to parse pasted list', err)
-      }
-    }
+		function onPasteList() {
+			try {
+				const ingredientsAdd = pasteList.value
+					.split(/\n/gi)
+					.filter((s) => s.trim() !== "")
+					.map(parseIngredient)
+					.filter((i) => i.name !== "")
+				addIngredientRows(ingredientsAdd)
+				onChange()
+				pasteList.value = ""
+			} catch (err) {
+				console.error("Failed to parse pasted list", err)
+			}
+		}
 
-    const { importUrl, onImport, isImporting, importText, importError } = useImport(recipe)
+		const { importUrl, onImport, isImporting, importText, importError } = useImport(recipe)
 
-    return {
-      importUrl,
-      importText,
-      importError,
-      onImport,
-      isImporting,
-      key,
-      recipe,
-      removeIngredientRow,
-      addIngredientRow,
-      save,
-      saving,
-      isEmpty,
-      savedStateAtPretty,
-      onChange,
-      pasteList,
-      onPasteList,
-      updateCategory,
-      updateTags,
-      tags,
-      categories,
-      user
-    }
-  }
+		return {
+			importUrl,
+			importText,
+			importError,
+			onImport,
+			isImporting,
+			key,
+			recipe,
+			removeIngredientRow,
+			addIngredientRow,
+			save,
+			saving,
+			isEmpty,
+			savedStateAtPretty,
+			onChange,
+			pasteList,
+			onPasteList,
+			updateCategory,
+			updateTags,
+			tags,
+			categories,
+			user,
+		}
+	},
 })
 </script>
 

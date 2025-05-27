@@ -45,43 +45,39 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent } from "vue"
 
-import RecipeTree from '@/components/RecipeTree.vue'
-import RecipeTags from '@/components/RecipeTags.vue'
+import RecipeTree from "@/components/RecipeTree.vue"
+import RecipeTags from "@/components/RecipeTags.vue"
 
-import { Recipes, useRecipes } from '../modules/use/recipes'
-import { useTagFilter } from '../modules/use/tag-filter'
-import { Recipe } from '../components/types'
-import { useAuth } from '@/modules/use/auth'
+import { type Recipes, useRecipes } from "../modules/use/recipes"
+import { useTagFilter } from "../modules/use/tag-filter"
+import type { Recipe } from "../components/types"
+import { useAuth } from "@/modules/use/auth"
 
 const Component = defineComponent({
-  components: {
-    RecipeTree,
-    RecipeTags
-  },
-  setup () {
-    function flatTags (r: Recipe): string[] {
-      return (r.tags || []).map(t => typeof t === 'object' ? t.text : t)
-    }
+	components: {
+		RecipeTree,
+		RecipeTags,
+	},
+	setup() {
+		function flatTags(r: Recipe): string[] {
+			return (r.tags || []).map((t) => (typeof t === "object" ? t.text : t))
+		}
 
-    const { recipes, remove } = useRecipes() as Recipes
-    const {
-      tags: tagValues,
-      filter: tagFilter,
-      filtered
-    } = useTagFilter<Recipe>(recipes, flatTags)
+		const { recipes, remove } = useRecipes() as Recipes
+		const { tags: tagValues, filter: tagFilter, filtered } = useTagFilter<Recipe>(recipes, flatTags)
 
-    const { user } = useAuth()
+		const { user } = useAuth()
 
-    return {
-      recipes: filtered,
-      tagValues,
-      tagFilter,
-      remove,
-      user
-    }
-  }
+		return {
+			recipes: filtered,
+			tagValues,
+			tagFilter,
+			remove,
+			user,
+		}
+	},
 })
 
 export default Component

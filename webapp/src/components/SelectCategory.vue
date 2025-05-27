@@ -55,45 +55,51 @@
 </template>
 
 <script lang="ts">
-import { BFormTag, BLink } from 'bootstrap-vue'
-import { remove } from 'lodash'
-import { defineComponent, PropType, ref } from 'vue'
-import { Category, Tag } from './types'
+import { BFormTag, BLink } from "bootstrap-vue"
+import { remove } from "lodash"
+import { defineComponent, type PropType, ref } from "vue"
+import { type Category, Tag } from "./types"
 
 export default defineComponent({
-  name: 'SelectCategory',
-  props: {
-    category: { type: Array as PropType<string[]> },
-    separator: { type: String, default: ' , ' },
-    suggestions: { required: true, type: Array as PropType<string[]> },
-    variant: { type: String, default: 'primary' }
-  },
-  setup (props, { emit }) {
-    const custom = ref<boolean>(false)
-    const newValue = ref<string>('')
-    const suggestion = ref<string>('')
+	name: "SelectCategory",
+	props: {
+		category: { type: Array as PropType<string[]> },
+		separator: { type: String, default: " , " },
+		suggestions: { required: true, type: Array as PropType<string[]> },
+		variant: { type: String, default: "primary" },
+	},
+	setup(props, { emit }) {
+		const custom = ref<boolean>(false)
+		const newValue = ref<string>("")
+		const suggestion = ref<string>("")
 
-    function complete () {
-      const addition = custom.value ? newValue.value : suggestion.value
-      if (!addition || addition.trim().length === 0) return
-      custom.value = false
+		function complete() {
+			const addition = custom.value ? newValue.value : suggestion.value
+			if (!addition || addition.trim().length === 0) {
+        return
+      }
+			custom.value = false
 
-      const out: Category[] = [...(props.category ?? []), addition]
-      emit('update:category', out)
+			const out: Category[] = [...(props.category ?? []), addition]
+			emit("update:category", out)
 
-      newValue.value = ''
-      suggestion.value = ''
-    }
+			newValue.value = ""
+			suggestion.value = ""
+		}
 
-    function remove (idx: number) {
-      const newValue = props.category?.filter((itm, i) => i !== idx) ?? []
-      emit('update:category', newValue)
-    }
+		function remove(idx: number) {
+			const newValue = props.category?.filter((_itm, i) => i !== idx) ?? []
+			emit("update:category", newValue)
+		}
 
-    return {
-      custom, complete, newValue, suggestion, remove
-    }
-  }
+		return {
+			custom,
+			complete,
+			newValue,
+			suggestion,
+			remove,
+		}
+	},
 })
 </script>
 
