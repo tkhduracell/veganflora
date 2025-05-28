@@ -120,7 +120,7 @@ export async function fetchAndSummarize(url: string): Promise<string> {
 export const importUrl = onCall({
 	 secrets: [apiKey],
 	 timeoutSeconds: 120,
-	 region: "europe-north2"
+	 region: "europe-north1"
 }, async ({ data }) => {
 		try {
 			const summary = await fetchAndSummarize(data.url);
@@ -135,7 +135,7 @@ export const importUrl = onCall({
 export const importText = onCall({
 	 secrets: [apiKey], 
 	 timeoutSeconds: 120,
-	 region: "europe-north2",
+	 region: "europe-north1",
 }, async () => {
 		try {
 			logger.info("Summarizing using LLM");
