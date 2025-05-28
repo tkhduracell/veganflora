@@ -13,19 +13,12 @@
       }
     ],
     "predeploy": [
-      "npm --prefix webapp/ run build"
+      "pnpm --filter ...webapp build"
     ]
   },
   "functions": {
     "predeploy": [
-      "jq \"del(.devDependencies)\" functions/package.json > functions/package.json.tmp",
-      "mv functions/package.json functions/package.json.old",
-      "mv functions/package.json.tmp functions/package.json",
-      "npm --prefix functions/ run build"
-    ],
-    "postdeploy": [
-      "mv functions/package.json.old functions/package.json",
-      "rm functions/package.json.*"
+      "pnpm --filter ...functions build"
     ],
     "ignore": [
       ".git",
