@@ -120,7 +120,7 @@ export async function fetchAndSummarize(url: string): Promise<string> {
 export const importUrl = onCall({
 	 secrets: [apiKey],
 	 timeoutSeconds: 120,
-	 region: "europe-west3"
+	 region: "europe-north2"
 }, async ({ data }) => {
 		try {
 			const summary = await fetchAndSummarize(data.url);
@@ -135,7 +135,7 @@ export const importUrl = onCall({
 export const importText = onCall({
 	 secrets: [apiKey], 
 	 timeoutSeconds: 120,
-	 region: "europe-west3",
+	 region: "europe-north2",
 }, async () => {
 		try {
 			logger.info("Summarizing using LLM");
@@ -147,7 +147,11 @@ export const importText = onCall({
 		return null;
 	});
 
-export const prefillUpdate = onDocumentWritten("/veganflora/root/recipies/{id}", async ({params}) => {
+export const prefillUpdate = onDocumentWritten({ 
+	document: "/veganflora/root/recipies/{id}", 
+	timeoutSeconds: 120,
+	region: 'europe-north2' 
+}, async ({params}) => {
 		logger.info(`${params.id}:onWrite()`);
 
 		type TagInfo = { text: string; color: string };
