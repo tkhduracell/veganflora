@@ -8,6 +8,9 @@ import { onCall } from "firebase-functions/https";
 import { onDocumentWritten } from "firebase-functions/v2/firestore";
 
 const apiKey = defineSecret("GEMINI_API_KEY");
+const region = "europe-north1";
+const timeoutSeconds = 120;
+const secrets = [apiKey];
 
 import OpenAI from "openai";
 
@@ -20,7 +23,7 @@ const randomColor = () =>
 	`#${Math.floor(Math.random() * 16777215).toString(16)}`;
 
 async function summarizeWithChatLLM(text: string): Promise<string> {
-	const apiKeyValue = apiKey.value() ?? process.env.GEMINI_API_KEY;
+	const apiKeyValue = apiKey.value();
 
 	const openai = new OpenAI({
 		apiKey: apiKeyValue,
@@ -117,108 +120,99 @@ export async function fetchAndSummarize(url: string): Promise<string> {
 	return await summarizeWithChatLLM(text);
 }
 
-export const importUrl = onCall({
-	 secrets: [apiKey],
-	 timeoutSeconds: 120,
-	 region: "europe-north1"
-}, async ({ data }) => {
-		try {
-			const summary = await fetchAndSummarize(data.url);
-			return summary;
-		} catch (error) {
-			console.error("Ett fel uppstod:", error);
-		}
-		return null;
-	});
+export const importUrl = onCall({ secrets, timeoutSeconds, region }, async ({ data }) => {
+	try {
+		const summary = await fetchAndSummarize(data.url);
+		return summary;
+	} catch (error) {
+		console.error("Ett fel uppstod:", error);
+	}
+	return null;
+});
 
 	
-export const importText = onCall({
-	 secrets: [apiKey], 
-	 timeoutSeconds: 120,
-	 region: "europe-north1",
-}, async () => {
-		try {
-			logger.info("Summarizing using LLM");
-			const summary = await summarizeWithChatLLM(apiKey.value());
-			return summary;
-		} catch (error) {
-			console.error("Ett fel uppstod:", error);
-		}
-		return null;
-	});
+export const importText = onCall({ secrets, timeoutSeconds, region }, async () => {
+	try {
+		logger.info("Summarizing using LLM");
+		const summary = await summarizeWithChatLLM(apiKey.value());
+		return summary;
+	} catch (error) {
+		console.error("Ett fel uppstod:", error);
+	}
+	return null;
+});
 
 export const prefillUpdate = onDocumentWritten({ 
 	document: "/veganflora/root/recipies/{id}", 
-	timeoutSeconds: 120,
-	region: 'europe-north2' 
+	timeoutSeconds, region 
 }, async ({params}) => {
-		logger.info(`${params.id}:onWrite()`);
+	logger.info(`${params.id}:onWrite()`);
 
-		type TagInfo = { text: string; color: string };
-		type TagKey = string;
+	type TagInfo = { text: string; color: string };
+	type TagKey = string;
 
-		type Category = string;
-		type CompatTags = (TagKey | TagInfo)[];
+	type Category = string;
+	type CompatTags = (TagKey | TagInfo)[];
 
-		const tagsByName = new Map<TagKey, TagInfo>();
-		const categorySet = new Set<Category>();
+	const tagsByName = new Map<TagKey, TagInfo>();
+	const categorySet = new Set<Category>();
 
-		{
-			const { prefill } = await root.get().then(
-				(itm) =>
-					itm.data() as {
-						prefill?: { tags: TagInfo[]; categories: Category[] };
-					},
-			);
-			if (prefill) {
-				prefill.tags.forEach((t) => tagsByName.set(t.text, t));
-				prefill.categories.forEach((c) => categorySet.add(c));
-			}
-		}
-
-		{
-			const current = await root
-				.collection("recipies")
-				.doc(params.id)
-				.get();
-			if (!current.exists)
-				return logger.warn(`Document ${params.id} does not exist`);
-
-			logger.info(`Updating updated doc with tags`, {});
-			const tags: TagKey[] = (current.data()!.tags as CompatTags).map((t) =>
-				typeof t === "string" ? t : t.text,
-			);
-			await current.ref.update({ tags });
-		}
-
-		const cursor = await root.collection("recipies").get();
-		cursor.forEach((doc) => {
-			const { tags, category } = doc.data() as {
-				tags?: CompatTags;
-				category?: Category[];
-			};
-
-			if (!category) return logger.error(`Document ${doc.id} has no category`);
-			categorySet.add(category.join(" / "));
-
-			if (!tags) return logger.warn(`Document ${doc.id} has no tags`);
-			tags
-				.map((t) => (typeof t === "string" ? t : (t.text ?? "")))
-				.filter((tag) => tag !== "")
-				.filter((tag) => !tagsByName.has(tag))
-				.forEach((tag) =>
-					tagsByName.set(tag, { text: tag, color: randomColor() }),
-				);
-		});
-
-		const tags = [...tagsByName.values()].sort((a, b) =>
-			a.text.localeCompare(b.text),
+	{
+		const { prefill } = await root.get().then(
+			(itm) =>
+				itm.data() as {
+					prefill?: { tags: TagInfo[]; categories: Category[] };
+				},
 		);
-		const categories = [...categorySet.values()].sort();
+		if (prefill) {
+			prefill.tags.forEach((t) => tagsByName.set(t.text, t));
+			prefill.categories.forEach((c) => categorySet.add(c));
+		}
+	}
 
-		logger.info(`Updating prefill`, { tags, categories });
-		await root.update({
-			"prefill.tags": tags,
-			"prefill.categories": categories,
-		});
+	{
+		const current = await root
+			.collection("recipies")
+			.doc(params.id)
+			.get();
+		if (!current.exists)
+			return logger.warn(`Document ${params.id} does not exist`);
+
+		logger.info(`Updating updated doc with tags`, {});
+		const tags: TagKey[] = (current.data()!.tags as CompatTags).map((t) =>
+			typeof t === "string" ? t : t.text,
+		);
+		await current.ref.update({ tags });
+	}
+
+	const cursor = await root.collection("recipies").get();
+	cursor.forEach((doc) => {
+		const { tags, category } = doc.data() as {
+			tags?: CompatTags;
+			category?: Category[];
+		};
+
+		if (!category) return logger.error(`Document ${doc.id} has no category`);
+		categorySet.add(category.join(" / "));
+
+		if (!tags) return logger.warn(`Document ${doc.id} has no tags`);
+		tags
+			.map((t) => (typeof t === "string" ? t : (t.text ?? "")))
+			.filter((tag) => tag !== "")
+			.filter((tag) => !tagsByName.has(tag))
+			.forEach((tag) =>
+				tagsByName.set(tag, { text: tag, color: randomColor() }),
+			);
 	});
+
+	const tags = [...tagsByName.values()].sort((a, b) =>
+		a.text.localeCompare(b.text),
+	);
+	const categories = [...categorySet.values()].sort();
+
+	logger.info(`Updating prefill`, { tags, categories });
+	await root.update({
+		"prefill.tags": tags,
+		"prefill.categories": categories,
+	});
+});
