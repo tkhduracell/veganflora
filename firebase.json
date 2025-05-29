@@ -22,10 +22,9 @@
       "mv functions/package.json functions/package.json.old",
       "mv functions/package.json.tmp functions/package.json",
       "pnpm --filter ...functions build"
-],
+    ],
     "postdeploy": [
-      "mv functions/package.json.old functions/package.json",
-      "rm functions/package.json.*"
+      "mv functions/package.json.old functions/package.json"
     ],
     "ignore": [
       ".git",
