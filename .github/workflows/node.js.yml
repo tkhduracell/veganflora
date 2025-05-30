@@ -95,5 +95,8 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         run: |
           YYYYMMDD=$(date '+%Y-%m-%d %H:%M:%S')
-          MESSAGE=" ☘️ Veganflora functions has been deployed at: \`${YYYYMMDD}\`"
-          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"${MESSAGE}\"}" ${SLACK_WEBHOOK}
+          GIT_MESSAGE=$(git log -1 --pretty=format:'%s')
+          if [ -z "${GIT_MESSAGE}" ]; then
+            GIT_MESSAGE="No commit message found."
+          fi
+          MESSAGE=" ☘️ Veganflora functions has been deployed at: \`${YYYYMMDD}\`\n\n\`\`\`${GIT_MESSAGE}\`\`\`"
