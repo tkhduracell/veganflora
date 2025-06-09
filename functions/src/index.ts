@@ -4,13 +4,14 @@ import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 
 import { defineSecret } from "firebase-functions/params";
-import { onCall } from "firebase-functions/https";
+import { HttpsOptions, onCall } from "firebase-functions/https";
 import { onDocumentWritten } from "firebase-functions/v2/firestore";
 
 const apiKey = defineSecret("GEMINI_API_KEY");
-const region = "europe-north1";
-const timeoutSeconds = 120;
-const secrets = [apiKey];
+const region: HttpsOptions['region'] = "europe-north1";
+const timeoutSeconds: HttpsOptions['timeoutSeconds'] = 120;
+const secrets: HttpsOptions['secrets'] = [apiKey];
+const cors: HttpsOptions['cors'] = 'https://veganflora.web.app';
 
 import OpenAI from "openai";
 
@@ -120,7 +121,7 @@ export async function fetchAndSummarize(url: string): Promise<string> {
 	return await summarizeWithChatLLM(text);
 }
 
-export const importUrl = onCall({ secrets, timeoutSeconds, region }, async ({ data }) => {
+export const importUrl = onCall({ secrets, timeoutSeconds, region, cors }, async ({ data }) => {
 	try {
 		const summary = await fetchAndSummarize(data.url);
 		return summary;
@@ -131,7 +132,7 @@ export const importUrl = onCall({ secrets, timeoutSeconds, region }, async ({ da
 });
 
 	
-export const importText = onCall({ secrets, timeoutSeconds, region }, async () => {
+export const importText = onCall({ secrets, timeoutSeconds, region, cors }, async () => {
 	try {
 		logger.info("Summarizing using LLM");
 		const summary = await summarizeWithChatLLM(apiKey.value());
