@@ -169,6 +169,7 @@
         <b-form-group class>
           Vilken url vill du importera?
           <b-form-input
+            :disable="importText.length > 0"
             v-model.trim="importUrl"
           />
         </b-form-group>
@@ -176,6 +177,7 @@
         <b-form-group class>
           Klista in receptet:
           <b-textarea
+            :disable="importUrl.length > 0"
             v-model.trim="importText"
             rows="16"
           />

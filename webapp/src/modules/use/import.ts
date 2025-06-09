@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid"
 
 export function useImportUrl(recipe: Ref<Recipe>) {
 	const app = getApp()
-	const functions = getFunctions(app, "europe-west3")
+	const functions = getFunctions(app, "europe-north1")
 
 	const isImporting = ref(false)
 	const importUrl = ref("")
@@ -34,9 +34,11 @@ export function useImportUrl(recipe: Ref<Recipe>) {
 			if (result.data === null) {
 				throw new Error("No data returned from API")
 			}
-			const imported = JSON.parse(result.data) as Pick<Recipe, "title" | "text" | "size"> & {
+			type RecipeDetails = Pick<Recipe, "title" | "text" | "size"> & {
 				ingredients: Omit<Ingredient, "id">[]
 			}
+
+			const imported = JSON.parse(result.data) as RecipeDetails
 
 			recipe.value = {
 				...recipe.value,
