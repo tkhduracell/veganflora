@@ -9,8 +9,8 @@ export function noEmpty(x: string) {
 	return !x.match(/^\s*$/gmu)
 }
 
-export function normalize(x: string) {
-	return x
+export function normalize(x: string | number): string {
+	return `${x}`
 		.replace(/1\s*[\\/]\s*2/gi, "½")
 		.replace(/1\s*[\\/]\s*3/gi, "⅓")
 		.replace(/2\s*[\\/]\s*3/gi, "⅔")

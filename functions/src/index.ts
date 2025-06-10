@@ -34,19 +34,28 @@ async function summarizeWithChatLLM(text: string): Promise<string> {
        You are a helpful AI assistant that can summarize recipes in Swedish
        and provide them in JSON format. 
        
-       Instructions: 
+       Instructions for the recipe text: 
         * Do not include ingredients used only for serving or granish in the ingredient list, mearly mention them in 
        the text at the last step. 
-        * The step by step text instruction should contain a list of steps in a Markdown language format.
-        * The step by step text instruction should not include any main header, but can contain several 
-          Markdown sections if there are natual parts to the recepie text instructions itself.
+        * Create a clear step by step text instruction, that should contain a list of steps in a bullet point format without any header.
+        * The text should not include any main header, and ONLY contain several Markdown sections if there are natural parts to the recipe text instructions itself.
         * Do not include "vegan" in the title or ingredients, since everything is assumed to be vegan.
+		* The title should be in Swedish, and should not include any brand names.
+		* The title should be a short and descriptive name for the recipe, e.g. "Lasagne" or "Chokladbollar".
+		* The text should not include any unit measurements, e.g. "1 dl mjölk" should be "mjölk".
+		* The text should not include any brand names, e.g. "Arla Ko® Standardmjöl" should be "mjölk".
+	   Instructions for the ingredient list:
+		* The ingredient list should be in Swedish, and use Swedish units (e.g. dl, tsk, msk, gram).
+	   	* Remove any brands from the ingredient list, e.g. "Arla Ko® Standardmjöl" should be "mjölk".
+		* Use items with {name: *Section*} to create a section separating the ingredients, e.g. {name: "Fyllning"} for a filling section.
+	   Instructions for the image:
+		* If the recipe has an image that you think represent the recipe, include the URL to the image in the JSON response. Else, use an empty string.
     `.replace(/\n/g, "");
 	const USER_PROMPT = `
       Summarize this recipe in Swedish with Swedish units: ${text}
     `.trim();
 	const response = await openai.chat.completions.create({
-		model: "gemini-2.0-flash",
+		model: "gemini-2.5-flash-preview-05-20",
 		messages: [
 			{ role: "system", content: [{ text: SYSTEM_PROMPT, type: "text" }] },
 			{ role: "user", content: [{ text: USER_PROMPT, type: "text" }] },
@@ -57,7 +66,7 @@ async function summarizeWithChatLLM(text: string): Promise<string> {
 				name: "recipe",
 				schema: {
 					type: "object",
-					required: ["ingredients", "title", "text", "size"],
+					required: ["ingredients", "title", "image", "text", "size"],
 					properties: {
 						text: {
 							type: "string",
@@ -71,6 +80,11 @@ async function summarizeWithChatLLM(text: string): Promise<string> {
 							type: "string",
 							description:
 								"Size of the recepie (e.g. 6 portioner, 12 bullar, 9 bars, 3 bitar)",
+						},
+						image: {
+							type: "string",
+							description:
+								"URL to an image of the recipe. Empty string if no image is available.",
 						},
 						ingredients: {
 							type: "array",
@@ -89,13 +103,13 @@ async function summarizeWithChatLLM(text: string): Promise<string> {
 									measure: {
 										type: "string",
 										description:
-											"The measurement unit for the ingredient (e.g., tsk, dl, cups, gram).",
+											"The measurement unit for the ingredient (e.g., dl, tsk, msk, gram).",
 									},
 								},
 								additionalProperties: false,
 							},
 							description:
-								"A list of ingredients used in the recipe, excluding optional items. Use items with {name: *Section*} to create a section.",
+								"A list of ingredients used in the recipe, excluding optional items.",
 						},
 					},
 					additionalProperties: false,

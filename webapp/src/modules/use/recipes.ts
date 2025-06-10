@@ -12,6 +12,7 @@ import {
 	serverTimestamp,
 	setDoc,
 	Timestamp,
+	updateDoc,
 } from "firebase/firestore"
 import { getStorage, ref as imageRef, uploadBytesResumable, type UploadTask } from "firebase/storage"
 
@@ -91,11 +92,26 @@ export function useRecipe(key: string) {
 		const savekey = key || safekey(data.title, data.category)
 
 		if (savekey) {
-			if (recipe.value.image) {
+			if (recipe.value.image && recipe.value.image instanceof File) {
 				const storage = getStorage()
 				const image = imageRef(storage, `images/${savekey}.jpg`)
 				imageUpload.value = uploadBytesResumable(image, recipe.value.image, {
 					contentType: "image/jpeg",
+				})
+				imageUpload.value.on('state_changed', (snapshot) => {
+					const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+					console.log(`Upload is ${progress}% done`)
+					if (snapshot.state === 'success') {
+						console.log('Upload successful!')
+						updateDoc(document, { image: snapshot.ref.fullPath })
+							.then(() => {
+								console.log("Image path updated in Firestore")
+							})
+							.catch((error) => {
+								console.error("Error updating image path in Firestore:", error)
+							})
+						
+					}
 				})
 			}
 
