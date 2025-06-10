@@ -107,6 +107,9 @@ export function useRecipe(key: string) {
 							.then(() => {
 								console.log("Image path updated in Firestore")
 							})
+							.catch((error) => {
+								console.error("Error updating image path in Firestore:", error)
+							})
 						
 					}
 				})
