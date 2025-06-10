@@ -38,7 +38,7 @@ async function summarizeWithChatLLM(text: string): Promise<string> {
         * Do not include ingredients used only for serving or granish in the ingredient list, mearly mention them in 
        the text at the last step. 
         * Create a clear step by step text instruction, that should contain a list of steps in a bullet point format without any header.
-        * The text should not include any main header, and ONLY contain several Markdown sections if there are natual parts to the recepie text instructions itself.
+        * The text should not include any main header, and ONLY contain several Markdown sections if there are natural parts to the recipe text instructions itself.
         * Do not include "vegan" in the title or ingredients, since everything is assumed to be vegan.
 		* The title should be in Swedish, and should not include any brand names.
 		* The title should be a short and descriptive name for the recipe, e.g. "Lasagne" or "Chokladbollar".
@@ -49,7 +49,7 @@ async function summarizeWithChatLLM(text: string): Promise<string> {
 	   	* Remove any brands from the ingredient list, e.g. "Arla Ko® Standardmjöl" should be "mjölk".
 		* Use items with {name: *Section*} to create a section separating the ingredients, e.g. {name: "Fyllning"} for a filling section.
 	   Instructions for the image:
-		* If the recipe has an image that you think represent the recepie, include the URL to the image in the JSON response. Else, use an empty string.
+		* If the recipe has an image that you think represent the recipe, include the URL to the image in the JSON response. Else, use an empty string.
     `.replace(/\n/g, "");
 	const USER_PROMPT = `
       Summarize this recipe in Swedish with Swedish units: ${text}
