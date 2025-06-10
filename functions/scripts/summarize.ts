@@ -14,6 +14,7 @@ interface Recipe {
 	title: string;
 	text: string;
 	ingredients: Ingredient[];
+	image: string
 }
 
 async function summarize(url: string): Promise<void> {
@@ -36,6 +37,9 @@ async function summarize(url: string): Promise<void> {
 		console.log(`- ${i.amount} ${i.measure} ${i.name}`);
 	});
 	console.log();
+	if (out.image) {
+		console.log("Image URL:", out.image);
+	}
 	console.log("----------------------------------------");
 	console.log();
 }

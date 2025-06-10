@@ -9,7 +9,6 @@
       <span
         v-for="(c, idx) in item.category"
         :key="JSON.stringify(c)"
-        class="mt-2"
       >
         <span
           v-if="idx > 0"
@@ -23,7 +22,6 @@
       <span
         v-for="(t, idx) in item.tags"
         :key="JSON.stringify(t)"
-        class="mt-2"
       >
         <span
           v-if="idx > 0"
@@ -34,44 +32,43 @@
       </span>
     </div>
 
+    <div class="image my-2" v-if="item.image && typeof item.image === 'string'">
+      <img
+        :src="item.image"
+        :alt="item.title"
+        class="img-fluid"
+      />
+    </div>
+
     <div class="size">
       <div>{{ item.size }}</div>
-      <div class="m-2">
-        •
-      </div>
-      <div class="multiplier">
-        <span class="value">{{ multiplier }}x</span>
-        <b-button
-          class="button"
-          variant="primary"
-          @click="plus"
-        >
-          +
-        </b-button>
-        <b-button
-          class="button"
-          variant="primary"
-          @click="minus"
-        >
-          ﹣
-        </b-button>
-      </div>
-      <b-checkbox
-        v-model="convertEnabled"
-        switch
-        class="convert d-block d-sm-none"
+      <div>✕</div>
+      <div class="multiplier">{{ multiplier }}</div>
+      <b-button
+        class="button"
+        variant="primary"
+        @click="plus"
       >
-        Prefer weight
-      </b-checkbox>
+        +
+      </b-button>
+      <b-button
+        class="button"
+        variant="primary"
+        @click="minus"
+      >
+        －
+      </b-button>
+      
       <b-checkbox
         v-model="convertEnabled"
         switch
-        class="convert d-none d-sm-block mt-5"
+        class="convert"
       >
         Prefer weight
       </b-checkbox>
     </div>
 
+    <b>Ingredienser</b>
     <ul class="ingredients">
       <div
         v-for="(i, idx) in item.ingredients"
@@ -79,7 +76,7 @@
       >
         <b
           v-if="i.name.match(/^\*.*\*$/gi)"
-          class="d-block mt-2"
+          class="d-block"
         >
           {{ i.name.replace(/^\*(.*)\*$/gi, '$1') }}
         </b>
@@ -90,7 +87,9 @@
         />
       </div>
     </ul>
-    <p class="breaking" v-html="itemRendered" />
+    
+    <b>Gör så här</b>
+    <div class="breaking" v-html="itemRendered" />
   </div>
   <div v-else>
     No Item
@@ -105,6 +104,7 @@ import { useMulti } from "../modules/use/multi"
 import RecipeIngredient from "./RecipeIngredient.vue"
 import type { Recipe } from "./types"
 import markdownit from "markdown-it"
+import { normalize } from "@/modules/ingredients"
 
 const md = markdownit("commonmark")
 
@@ -119,14 +119,21 @@ export default defineComponent({
 		const multi = useMulti()
 		const itemRendered = computed(() => md.render(props.item.text))
 
-		return { ...multi, convertEnabled, convert, itemRendered }
+		return { ...multi, convertEnabled, convert, itemRendered, normalize  }
 	},
 })
 </script>
 
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+.recipe {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5em;
+}
+
+.image img {
+  max-height: 300px;
 }
 
 .categories {
@@ -149,7 +156,19 @@ h3 {
   display: flex !important;
   flex-direction: row;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
+  gap: 0.5em;
+}
+
+.size .button {
+  width: 1.5em;
+  height: 1.5em;
+  padding: 0;
+  font-size: 1.5em;
+}
+
+.size .multiplier {
+  width: 1.2em;
 }
 
 .convert {
@@ -159,7 +178,10 @@ h3 {
 }
 
 .multiplier {
-  display: inline-block;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .multiplier .button {
@@ -171,8 +193,4 @@ h3 {
   display: inline-block;
 }
 
-.multiplier .value {
-  width: 2em;
-  display: inline-block;
-}
 </style>

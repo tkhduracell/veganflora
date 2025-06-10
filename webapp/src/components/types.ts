@@ -22,7 +22,7 @@ export type Recipe = {
 	ingredients: Ingredient[]
 	title: string
 	key: string
-	image?: File
+	image?: File | string
 	created_at?: Timestamp
 	updated_at?: Timestamp
 }

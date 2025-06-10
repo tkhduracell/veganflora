@@ -47,6 +47,9 @@ async function summarizeWithChatLLM(text: string): Promise<string> {
 	   Instructions for the ingredient list:
 		* The ingredient list should be in Swedish, and use Swedish units (e.g. dl, tsk, msk, gram).
 	   	* Remove any brands from the ingredient list, e.g. "Arla Ko® Standardmjöl" should be "mjölk".
+		* Use items with {name: *Section*} to create a section separating the ingredients, e.g. {name: "Fyllning"} for a filling section.
+	   Instructions for the image:
+		* If the recipe has an image that you think represent the recepie, include the URL to the image in the JSON response. Else, use an empty string.
     `.replace(/\n/g, "");
 	const USER_PROMPT = `
       Summarize this recipe in Swedish with Swedish units: ${text}
@@ -63,7 +66,7 @@ async function summarizeWithChatLLM(text: string): Promise<string> {
 				name: "recipe",
 				schema: {
 					type: "object",
-					required: ["ingredients", "title", "text", "size"],
+					required: ["ingredients", "title", "image", "text", "size"],
 					properties: {
 						text: {
 							type: "string",
@@ -77,6 +80,11 @@ async function summarizeWithChatLLM(text: string): Promise<string> {
 							type: "string",
 							description:
 								"Size of the recepie (e.g. 6 portioner, 12 bullar, 9 bars, 3 bitar)",
+						},
+						image: {
+							type: "string",
+							description:
+								"URL to an image of the recipe. Empty string if no image is available.",
 						},
 						ingredients: {
 							type: "array",
@@ -95,13 +103,13 @@ async function summarizeWithChatLLM(text: string): Promise<string> {
 									measure: {
 										type: "string",
 										description:
-											"The measurement unit for the ingredient (e.g., tsk, dl, cups, gram).",
+											"The measurement unit for the ingredient (e.g., dl, tsk, msk, gram).",
 									},
 								},
 								additionalProperties: false,
 							},
 							description:
-								"A list of ingredients used in the recipe, excluding optional items. Use items with {name: *Section*} to create a section.",
+								"A list of ingredients used in the recipe, excluding optional items.",
 						},
 					},
 					additionalProperties: false,
