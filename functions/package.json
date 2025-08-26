@@ -28,7 +28,7 @@
 		"@tsconfig/node22": "^22.0.2",
 		"dotenv": "^16.4.7",
 		"firebase-functions-test": "^3.4.1",
-		"tsx": "^4.19.4",
+		"tsx": "^4.20.5",
 		"typescript": "^5.8.3"
 	},
 	"private": true
