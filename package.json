@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "firebase-tools": "^14.4.0",
+    "firebase-tools": "^14.16.0",
     "turbo": "^2.5.3"
   },
   "scripts": {
