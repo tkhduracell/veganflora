@@ -146,10 +146,10 @@ export const importUrl = onCall({ secrets, timeoutSeconds, region, cors }, async
 });
 
 	
-export const importText = onCall({ secrets, timeoutSeconds, region, cors }, async () => {
+export const importText = onCall({ secrets, timeoutSeconds, region, cors }, async ({ data }) => {
 	try {
 		logger.info("Summarizing using LLM");
-		const summary = await summarizeWithChatLLM(apiKey.value());
+		const summary = await summarizeWithChatLLM(data.text);
 		return summary;
 	} catch (error) {
 		logger.error("An error in importText:", error);
