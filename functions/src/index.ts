@@ -55,7 +55,7 @@ async function summarizeWithChatLLM(text: string): Promise<string> {
       Summarize this recipe in Swedish with Swedish units: ${text}
     `.trim();
 	const response = await openai.chat.completions.create({
-		model: "gemini-2.5-flash-preview-05-20",
+		model: "gemini-3-pro-preview",
 		messages: [
 			{ role: "system", content: [{ text: SYSTEM_PROMPT, type: "text" }] },
 			{ role: "user", content: [{ text: USER_PROMPT, type: "text" }] },
@@ -140,9 +140,9 @@ export const importUrl = onCall({ secrets, timeoutSeconds, region, cors }, async
 		const summary = await fetchAndSummarize(data.url);
 		return summary;
 	} catch (error) {
-		console.error("Ett fel uppstod:", error);
+		logger.error("An error in importUrl:", error);
+		throw error;
 	}
-	return null;
 });
 
 	
@@ -152,9 +152,9 @@ export const importText = onCall({ secrets, timeoutSeconds, region, cors }, asyn
 		const summary = await summarizeWithChatLLM(apiKey.value());
 		return summary;
 	} catch (error) {
-		console.error("Ett fel uppstod:", error);
+		logger.error("An error in importText:", error);
+		throw error;
 	}
-	return null;
 });
 
 export const prefillUpdate = onDocumentWritten({ 
