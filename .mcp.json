@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "veganflora": {
+      "type": "url",
+      "url": "https://mcp-<hash>-europe-north1.a.run.app",
+      "headers": {
+        "Authorization": "Bearer ${VEGANFLORA_MCP_KEY}"
+      }
+    }
+  }
+}
