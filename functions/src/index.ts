@@ -13,7 +13,7 @@ const timeoutSeconds: HttpsOptions['timeoutSeconds'] = 120;
 const secrets: HttpsOptions['secrets'] = [apiKey];
 const cors: HttpsOptions['cors'] = 'https://veganflora.web.app';
 
-import OpenAI from "openai";
+import { GoogleGenAI, Type } from "@google/genai";
 
 initializeApp();
 
@@ -26,17 +26,15 @@ const randomColor = () =>
 async function summarizeWithChatLLM(text: string): Promise<string> {
 	const apiKeyValue = apiKey.value();
 
-	const openai = new OpenAI({
-		apiKey: apiKeyValue,
-		baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
-	});
+	const ai = new GoogleGenAI({ apiKey: apiKeyValue });
+
 	const SYSTEM_PROMPT = `
        You are a helpful AI assistant that can summarize recipes in Swedish
-       and provide them in JSON format. 
-       
-       Instructions for the recipe text: 
-        * Do not include ingredients used only for serving or granish in the ingredient list, mearly mention them in 
-       the text at the last step. 
+       and provide them in JSON format.
+
+       Instructions for the recipe text:
+        * Do not include ingredients used only for serving or granish in the ingredient list, mearly mention them in
+       the text at the last step.
         * Create a clear step by step text instruction, that should contain a list of steps in a bullet point format without any header.
         * The text should not include any main header, and ONLY contain several Markdown sections if there are natural parts to the recipe text instructions itself.
         * Do not include "vegan" in the title or ingredients, since everything is assumed to be vegan.
@@ -54,71 +52,61 @@ async function summarizeWithChatLLM(text: string): Promise<string> {
 	const USER_PROMPT = `
       Summarize this recipe in Swedish with Swedish units: ${text}
     `.trim();
-	const response = await openai.chat.completions.create({
+
+	const response = await ai.models.generateContent({
 		model: "gemini-3-pro-preview",
-		messages: [
-			{ role: "system", content: [{ text: SYSTEM_PROMPT, type: "text" }] },
-			{ role: "user", content: [{ text: USER_PROMPT, type: "text" }] },
-		],
-		response_format: {
-			type: "json_schema",
-			json_schema: {
-				name: "recipe",
-				schema: {
-					type: "object",
-					required: ["ingredients", "title", "image", "text", "size"],
-					properties: {
-						text: {
-							type: "string",
-							description: "Step-by-step instructions of the recipe.",
-						},
-						title: {
-							type: "string",
-							description: "The title of the recipe.",
-						},
-						size: {
-							type: "string",
-							description:
-								"Size of the recepie (e.g. 6 portioner, 12 bullar, 9 bars, 3 bitar)",
-						},
-						image: {
-							type: "string",
-							description:
-								"URL to an image of the recipe. Empty string if no image is available.",
-						},
-						ingredients: {
-							type: "array",
-							items: {
-								type: "object",
-								required: ["name", "amount", "measure"],
-								properties: {
-									name: {
-										type: "string",
-										description: "The name of the ingredient.",
-									},
-									amount: {
-										type: "string",
-										description: "The quantity of the ingredient needed.",
-									},
-									measure: {
-										type: "string",
-										description:
-											"The measurement unit for the ingredient (e.g., dl, tsk, msk, gram).",
-									},
+		contents: USER_PROMPT,
+		config: {
+			systemInstruction: SYSTEM_PROMPT,
+			responseMimeType: "application/json",
+			responseSchema: {
+				type: Type.OBJECT,
+				properties: {
+					text: {
+						type: Type.STRING,
+						description: "Step-by-step instructions of the recipe.",
+					},
+					title: {
+						type: Type.STRING,
+						description: "The title of the recipe.",
+					},
+					size: {
+						type: Type.STRING,
+						description: "Size of the recipe (e.g. 6 portioner, 12 bullar, 9 bars, 3 bitar)",
+					},
+					image: {
+						type: Type.STRING,
+						description: "URL to an image of the recipe. Empty string if no image is available.",
+					},
+					ingredients: {
+						type: Type.ARRAY,
+						description: "A list of ingredients used in the recipe, excluding optional items.",
+						items: {
+							type: Type.OBJECT,
+							properties: {
+								name: {
+									type: Type.STRING,
+									description: "The name of the ingredient.",
 								},
-								additionalProperties: false,
+								amount: {
+									type: Type.STRING,
+									description: "The quantity of the ingredient needed.",
+								},
+								measure: {
+									type: Type.STRING,
+									description: "The measurement unit for the ingredient (e.g., dl, tsk, msk, gram).",
+								},
 							},
-							description:
-								"A list of ingredients used in the recipe, excluding optional items.",
+							propertyOrdering: ["name", "amount", "measure"],
 						},
 					},
-					additionalProperties: false,
 				},
-				strict: true,
+				propertyOrdering: ["title", "size", "image", "text", "ingredients"],
 			},
 		},
 	});
-	return response.choices[0]?.message?.content ?? "";
+
+	return response.text ?? "";
 }
 
 export async function fetchAndSummarize(url: string): Promise<string> {
