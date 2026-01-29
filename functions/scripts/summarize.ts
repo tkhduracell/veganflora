@@ -1,7 +1,6 @@
 import * as readline from "node:readline/promises";
-import { fetchAndSummarize } from "../src/index";
-
 import "dotenv/config";
+import { fetchAndSummarize } from "../src/summarize.js";
 
 interface Ingredient {
 	name: string;
@@ -21,7 +20,7 @@ async function summarize(url: string): Promise<void> {
 	// Your summarize logic here
 	console.log(`Summarizing the content of: ${url}`);
 
-	const json = await fetchAndSummarize(url);
+	const json = await fetchAndSummarize(url, process.env.GEMINI_API_KEY!);
 	const out = JSON.parse(json) as Recipe;
 
 	console.log();
