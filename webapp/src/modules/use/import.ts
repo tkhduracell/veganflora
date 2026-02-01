@@ -64,7 +64,7 @@ export function useImportUrl(recipe: Ref<Recipe>) {
 			const importRecipie = httpsCallable<{ text: string }, string>(functions, "importText")
 
 			const result = await importRecipie({ text: importText.value })
-			const imported = JSON.parse(result.data) as Pick<Recipe, "title" | "text"> & {
+			const imported = JSON.parse(result.data) as Pick<Recipe, "title" | "text" | "size"> & {
 				ingredients: Omit<Ingredient, "id">[]
 			}
 
@@ -73,6 +73,7 @@ export function useImportUrl(recipe: Ref<Recipe>) {
 				ingredients: imported.ingredients.map((r) => ({ ...r, id: uuidv4() })),
 				title: imported.title,
 				text: imported.text,
+				size: imported.size,
 			}
 			importText.value = ""
 		} catch (e: unknown) {
