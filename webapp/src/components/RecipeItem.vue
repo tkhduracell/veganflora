@@ -119,7 +119,7 @@ export default defineComponent({
 		const multi = useMulti()
 		const itemRendered = computed(() => md.render(props.item.text))
 
-		return { ...multi, convertEnabled, convert, itemRendered, normalize  }
+		return { ...multi, convertEnabled, convert, itemRendered, normalize }
 	},
 })
 </script>

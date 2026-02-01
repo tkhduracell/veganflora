@@ -27,10 +27,10 @@
         v-if="recipe"
         >
         <b-spinner
-          v-if="isImporting"
+          v-if="isImporting && importPhase !== 'uploading'"
           class=""
         />
-        <div v-else>
+        <div v-else-if="!isImporting">
           <b-icon-file-earmark-arrow-down />
         </div>
       </b-button>
@@ -47,8 +47,17 @@
 
     </div>
 
-    <div>
+    <div v-if="importError">
       {{ importError }}
+    </div>
+
+    <div v-if="importPhase === 'uploading'" class="my-2">
+      <small>Laddar upp bild... {{ uploadProgress }}%</small>
+      <b-progress :value="uploadProgress" :max="100" animated variant="primary" height="8px" />
+    </div>
+    <div v-else-if="importPhase === 'processing'" class="my-2 d-flex align-items-center" style="gap: 0.5em">
+      <b-spinner small variant="primary" />
+      <small>Bearbetar recept...</small>
     </div>
 
     <b-form
@@ -169,7 +178,7 @@
         <b-form-group class>
           Vilken url vill du importera?
           <b-form-input
-            :disable="importText.length > 0"
+            :disabled="importText.length > 0 || !!importImageFile"
             v-model.trim="importUrl"
           />
         </b-form-group>
@@ -177,9 +186,20 @@
         <b-form-group class>
           Klista in receptet:
           <b-textarea
-            :disable="importUrl.length > 0"
+            :disabled="importUrl.length > 0 || !!importImageFile"
             v-model.trim="importText"
             rows="16"
+          />
+        </b-form-group>
+        <b>Eller</b>
+        <b-form-group class>
+          Ladda upp en bild på receptet:
+          <b-form-file
+            v-model="importImageFile"
+            accept="image/*"
+            capture="environment"
+            placeholder="Välj eller ta en bild"
+            :disabled="importUrl.length > 0 || importText.length > 0"
           />
         </b-form-group>
       </b-modal>
@@ -343,7 +363,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted } from "vue"
-import {debounce} from "lodash"
+import { debounce } from "lodash"
 
 import { BIconClipboard } from "bootstrap-vue"
 
@@ -449,12 +469,16 @@ export default defineComponent({
 			}
 		}
 
-		const { importUrl, onImport, isImporting, importText, importError } = useImport(recipe)
+		const { importUrl, onImport, isImporting, importText, importError, importImageFile, uploadProgress, importPhase } =
+			useImport(recipe)
 
 		return {
 			importUrl,
 			importText,
 			importError,
+			importImageFile,
+			uploadProgress,
+			importPhase,
 			onImport,
 			isImporting,
 			key,

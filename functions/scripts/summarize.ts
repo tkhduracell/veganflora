@@ -14,7 +14,7 @@ interface Recipe {
 	title: string;
 	text: string;
 	ingredients: Ingredient[];
-	image: string
+	image: string;
 }
 
 async function summarize(url: string): Promise<void> {
