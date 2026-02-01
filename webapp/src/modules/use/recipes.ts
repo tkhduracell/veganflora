@@ -98,11 +98,11 @@ export function useRecipe(key: string) {
 				imageUpload.value = uploadBytesResumable(image, recipe.value.image, {
 					contentType: "image/jpeg",
 				})
-				imageUpload.value.on('state_changed', (snapshot) => {
+				imageUpload.value.on("state_changed", (snapshot) => {
 					const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
 					console.log(`Upload is ${progress}% done`)
-					if (snapshot.state === 'success') {
-						console.log('Upload successful!')
+					if (snapshot.state === "success") {
+						console.log("Upload successful!")
 						updateDoc(document, { image: snapshot.ref.fullPath })
 							.then(() => {
 								console.log("Image path updated in Firestore")
@@ -110,7 +110,6 @@ export function useRecipe(key: string) {
 							.catch((error) => {
 								console.error("Error updating image path in Firestore:", error)
 							})
-						
 					}
 				})
 			}
