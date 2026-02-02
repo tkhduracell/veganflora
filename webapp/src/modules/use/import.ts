@@ -1,9 +1,22 @@
 import type { Recipe, Ingredient } from "@/components/types"
-import { ref, type Ref, unref } from "vue"
+import { ref, type Ref, unref, onUnmounted } from "vue"
 import { getFunctions, httpsCallable } from "firebase/functions"
 import { getApp } from "firebase/app"
 import { getStorage, ref as storageRef, uploadBytesResumable } from "firebase/storage"
 import { v4 as uuidv4 } from "uuid"
+
+const PROGRESS_MESSAGES = [
+	"Analyserar recept...",
+	"Identifierar ingredienser...",
+	"Konverterar till svenska mått...",
+	"Strukturerar instruktioner...",
+	"Rensar bort onödiga detaljer...",
+	"Formaterar receptet...",
+	"Sammanställer slutresultat...",
+	"Dubbelkollar mängder...",
+	"Finjusterar stegen...",
+	"Nästan klar...",
+]
 
 export function useImportUrl(recipe: Ref<Recipe>) {
 	const app = getApp()
@@ -16,6 +29,27 @@ export function useImportUrl(recipe: Ref<Recipe>) {
 	const importError = ref<Error>()
 	const uploadProgress = ref(0)
 	const importPhase = ref<"uploading" | "processing" | null>(null)
+	const progressMessage = ref<string | null>(null)
+	let progressInterval: ReturnType<typeof setInterval> | null = null
+
+	function startProgressMessages() {
+		let index = 0
+		progressMessage.value = PROGRESS_MESSAGES[0]
+		progressInterval = setInterval(() => {
+			index = (index + 1) % PROGRESS_MESSAGES.length
+			progressMessage.value = PROGRESS_MESSAGES[index]
+		}, 2500)
+	}
+
+	function stopProgressMessages() {
+		if (progressInterval) {
+			clearInterval(progressInterval)
+			progressInterval = null
+		}
+		progressMessage.value = null
+	}
+
+	onUnmounted(stopProgressMessages)
 
 	async function onImport() {
 		if (importUrl.value !== "") {
@@ -34,6 +68,8 @@ export function useImportUrl(recipe: Ref<Recipe>) {
 		if (isImporting.value) return console.warn("Already running...")
 		isImporting.value = true
 		importError.value = undefined
+		importPhase.value = "processing"
+		startProgressMessages()
 		try {
 			const importRecipie = httpsCallable<{ url: string }, string>(functions, "importUrl")
 
@@ -60,6 +96,8 @@ export function useImportUrl(recipe: Ref<Recipe>) {
 			console.error("Unable to import, propbably a backend error, check the logs...", e)
 		} finally {
 			isImporting.value = false
+			importPhase.value = null
+			stopProgressMessages()
 		}
 	}
 
@@ -67,6 +105,8 @@ export function useImportUrl(recipe: Ref<Recipe>) {
 		if (isImporting.value) return console.warn("Already running...")
 		isImporting.value = true
 		importError.value = undefined
+		importPhase.value = "processing"
+		startProgressMessages()
 		try {
 			const importRecipie = httpsCallable<{ text: string }, string>(functions, "importText")
 
@@ -88,6 +128,8 @@ export function useImportUrl(recipe: Ref<Recipe>) {
 			console.error("Unable to import", e)
 		} finally {
 			isImporting.value = false
+			importPhase.value = null
+			stopProgressMessages()
 		}
 	}
 
@@ -119,6 +161,7 @@ export function useImportUrl(recipe: Ref<Recipe>) {
 			})
 
 			importPhase.value = "processing"
+			startProgressMessages()
 
 			const importRecipie = httpsCallable<{ storagePath: string; mimeType: string }, string>(functions, "importImage")
 			const result = await importRecipie({ storagePath: path, mimeType: file.type })
@@ -143,8 +186,9 @@ export function useImportUrl(recipe: Ref<Recipe>) {
 			isImporting.value = false
 			importPhase.value = null
 			uploadProgress.value = 0
+			stopProgressMessages()
 		}
 	}
 
-	return { importUrl, isImporting, importText, importImageFile, onImport, importError, uploadProgress, importPhase }
+	return { importUrl, isImporting, importText, importImageFile, onImport, importError, uploadProgress, importPhase, progressMessage }
 }

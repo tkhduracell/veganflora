@@ -57,7 +57,7 @@
     </div>
     <div v-else-if="importPhase === 'processing'" class="my-2 d-flex align-items-center" style="gap: 0.5em">
       <b-spinner small variant="primary" />
-      <small>Bearbetar recept...</small>
+      <small>{{ progressMessage || 'Bearbetar recept...' }}</small>
     </div>
 
     <b-form
@@ -469,7 +469,7 @@ export default defineComponent({
 			}
 		}
 
-		const { importUrl, onImport, isImporting, importText, importError, importImageFile, uploadProgress, importPhase } =
+		const { importUrl, onImport, isImporting, importText, importError, importImageFile, uploadProgress, importPhase, progressMessage } =
 			useImport(recipe)
 
 		return {
@@ -479,6 +479,7 @@ export default defineComponent({
 			importImageFile,
 			uploadProgress,
 			importPhase,
+			progressMessage,
 			onImport,
 			isImporting,
 			key,
