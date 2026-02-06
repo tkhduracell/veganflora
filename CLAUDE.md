@@ -102,6 +102,9 @@ pnpm --filter ingest script:fixtags
     - `importUrl`: Callable function to fetch and summarize recipe URLs using Gemini
     - `importText`: Callable function for text summarization
     - `prefillUpdate`: Firestore trigger that maintains tag and category lists
+    - `mcp`: HTTP endpoint serving an MCP server for Claude Code integration
+  - `src/mcp.ts`: MCP server definition with recipe tools
+  - `src/summarize.ts`: Shared AI summarization logic (Gemini via OpenAI-compatible API)
   - `scripts/summarize.ts`: CLI tool for testing recipe summarization
 
 - **ingest/**: Scripts for importing recipes from markdown files to Firestore
@@ -174,8 +177,40 @@ The `firebase.json` predeploy hooks handle:
 
 ## Environment Variables
 
-- **Functions**: `GEMINI_API_KEY` secret defined via Firebase Secret Manager
+- **Functions**: `GEMINI_API_KEY` and `MCP_API_KEY` secrets defined via Firebase Secret Manager
 - **Webapp**: Firebase config is hardcoded in `firebase-plugin.ts` (public API key)
+- **Local**: `VEGANFLORA_MCP_KEY` env var for Claude Code MCP authentication
+
+## MCP Server Setup (Claude Code)
+
+The project includes an MCP server deployed as a Firebase Cloud Function. It gives Claude Code direct access to the recipe database.
+
+### Available tools
+
+- `search_recipes` — search by title, tag, category, or ingredient
+- `get_recipe` — get a full recipe by document key
+- `list_tags` — list all tags
+- `list_categories` — list all categories
+- `import_recipe_from_url` — fetch and summarize a recipe from a URL via Gemini
+- `import_recipe_from_text` — summarize raw recipe text via Gemini
+
+### First-time deployment
+
+1. Generate a secret and set it in Firebase:
+   ```bash
+   export VEGANFLORA_MCP_KEY=$(openssl rand -hex 32) && echo "$VEGANFLORA_MCP_KEY" | firebase functions:secrets:set MCP_API_KEY --data-file -
+   ```
+2. Save the key to your shell profile:
+   ```bash
+   echo "export VEGANFLORA_MCP_KEY=\"$VEGANFLORA_MCP_KEY\"" >> ~/.zshrc
+   ```
+3. Deploy:
+   ```bash
+   firebase deploy --only functions
+   ```
+4. Copy the `mcp` function URL from the deploy output and update the `url` field in `.mcp.json`.
+
+The `.mcp.json` in the project root configures the MCP server automatically. Start Claude Code from the project directory and the veganflora tools will be available.
 
 ## Testing Recipe Import
 

@@ -1,20 +1,21 @@
-import { logger } from "firebase-functions";
-
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
-
+import { logger } from "firebase-functions";
+import { HttpsOptions, onCall, onRequest } from "firebase-functions/https";
 import { defineSecret } from "firebase-functions/params";
-import { HttpsOptions, onCall } from "firebase-functions/https";
 import { onDocumentWritten } from "firebase-functions/v2/firestore";
+import { GoogleGenAI, Type } from "@google/genai";
+import { createMcpServer } from "./mcp.js";
+import { fetchAndSummarize, summarizeWithChatLLM } from "./summarize.js";
 
 const apiKey = defineSecret("GEMINI_API_KEY");
+const mcpApiKey = defineSecret("MCP_API_KEY");
 const region: HttpsOptions["region"] = "europe-north1";
 const timeoutSeconds: HttpsOptions["timeoutSeconds"] = 120;
 const secrets: HttpsOptions["secrets"] = [apiKey];
 const cors: HttpsOptions["cors"] = "https://veganflora.web.app";
-
-import { GoogleGenAI, Type } from "@google/genai";
 
 initializeApp();
 
@@ -95,22 +96,6 @@ const recipeResponseSchema = {
 	propertyOrdering: ["title", "size", "image", "text", "ingredients"],
 } as const;
 
-async function summarizeWithChatLLM(text: string): Promise<string> {
-	const ai = new GoogleGenAI({ apiKey: apiKey.value() });
-
-	const response = await ai.models.generateContent({
-		model: "gemini-3-pro-preview",
-		contents: `Summarize this recipe in Swedish with Swedish units: ${text}`,
-		config: {
-			systemInstruction: SYSTEM_PROMPT,
-			responseMimeType: "application/json",
-			responseSchema: recipeResponseSchema,
-		},
-	});
-
-	return response.text ?? "";
-}
-
 async function summarizeImageWithChatLLM(
 	storagePath: string,
 	mimeType: string,
@@ -144,25 +129,11 @@ async function summarizeImageWithChatLLM(
 	return response.text ?? "";
 }
 
-export async function fetchAndSummarize(url: string): Promise<string> {
-	// Hämta innehållet från URL
-	logger.info("Fetching url", url);
-	const response = await fetch(url);
-	if (!response.ok) {
-		throw new Error(`HTTP-fel! Status: ${response.status}`);
-	}
-	const text = await response.text();
-
-	// Sammanfatta innehållet
-	logger.info("Summarizing using LLM", url);
-	return await summarizeWithChatLLM(text);
-}
-
 export const importUrl = onCall(
 	{ secrets, timeoutSeconds, region, cors },
 	async ({ data }) => {
 		try {
-			const summary = await fetchAndSummarize(data.url);
+			const summary = await fetchAndSummarize(data.url, apiKey.value());
 			return summary;
 		} catch (error) {
 			logger.error("An error in importUrl:", error);
@@ -176,7 +147,7 @@ export const importText = onCall(
 	async ({ data }) => {
 		try {
 			logger.info("Summarizing using LLM");
-			const summary = await summarizeWithChatLLM(data.text);
+			const summary = await summarizeWithChatLLM(data.text, apiKey.value());
 			return summary;
 		} catch (error) {
 			logger.error("An error in importText:", error);
@@ -277,5 +248,54 @@ export const prefillUpdate = onDocumentWritten(
 			"prefill.tags": tags,
 			"prefill.categories": categories,
 		});
+	},
+);
+
+export const mcp = onRequest(
+	{ region, timeoutSeconds, secrets: [mcpApiKey, apiKey] },
+	async (req, res) => {
+		const auth = req.headers.authorization;
+		if (!auth || auth !== `Bearer ${mcpApiKey.value()}`) {
+			res.status(401).json({
+				jsonrpc: "2.0",
+				error: { code: -32000, message: "Unauthorized" },
+				id: null,
+			});
+			return;
+		}
+
+		if (req.method !== "POST") {
+			res.status(405).json({
+				jsonrpc: "2.0",
+				error: { code: -32000, message: "Method not allowed." },
+				id: null,
+			});
+			return;
+		}
+
+		try {
+			const server = createMcpServer(apiKey.value());
+			const transport = new StreamableHTTPServerTransport({
+				sessionIdGenerator: undefined,
+				enableJsonResponse: true,
+			});
+
+			res.on("close", () => {
+				transport.close();
+				server.close();
+			});
+
+			await server.connect(transport);
+			await transport.handleRequest(req, res, req.body);
+		} catch (error) {
+			logger.error("Error handling MCP request:", error);
+			if (!res.headersSent) {
+				res.status(500).json({
+					jsonrpc: "2.0",
+					error: { code: -32603, message: "Internal server error" },
+					id: null,
+				});
+			}
+		}
 	},
 );
