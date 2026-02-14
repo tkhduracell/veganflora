@@ -147,7 +147,12 @@ async function summarizeImageWithChatLLM(
 export async function fetchAndSummarize(url: string): Promise<string> {
 	// Hämta innehållet från URL
 	logger.info("Fetching url", url);
-	const response = await fetch(url);
+	const response = await fetch(url, {
+		headers: {
+			"User-Agent": "Mozilla/5.0 (compatible; Veganflora/1.0)",
+			Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+		},
+	});
 	if (!response.ok) {
 		throw new Error(`HTTP-fel! Status: ${response.status}`);
 	}
