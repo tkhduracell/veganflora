@@ -132,7 +132,7 @@ Recipes contain:
 
 ### AI Recipe Summarization
 
-The `importUrl` function uses Gemini 3 Pro via OpenAI-compatible API to:
+The `importUrl` function uses Gemini 3.6 Flash via OpenAI-compatible API to:
 1. Fetch recipe content from a URL
 2. Parse and convert to Swedish with Swedish units (dl, tsk, msk, gram)
 3. Extract structured JSON with title, ingredients, instructions, portion size, and image
