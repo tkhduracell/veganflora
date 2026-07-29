@@ -194,13 +194,53 @@
         <b>Eller</b>
         <b-form-group class>
           Ladda upp en bild på receptet:
-          <b-form-file
-            v-model="importImageFile"
+          <div class="d-flex flex-wrap mt-1" style="gap: 0.5em">
+            <b-button
+              size="sm"
+              variant="outline-secondary"
+              :disabled="importUrl.length > 0 || importText.length > 0"
+              @click="openImagePicker"
+            >
+              <b-icon-image />
+              Välj en bild
+            </b-button>
+            <b-button
+              size="sm"
+              variant="outline-secondary"
+              :disabled="importUrl.length > 0 || importText.length > 0"
+              @click="openCamera"
+            >
+              <b-icon-camera />
+              Ta en bild
+            </b-button>
+          </div>
+          <input
+            ref="imageInput"
+            type="file"
+            accept="image/*"
+            class="d-none"
+            @change="onImageSelected"
+          >
+          <input
+            ref="cameraInput"
+            type="file"
             accept="image/*"
             capture="environment"
-            placeholder="Välj eller ta en bild"
-            :disabled="importUrl.length > 0 || importText.length > 0"
-          />
+            class="d-none"
+            @change="onImageSelected"
+          >
+          <div
+            v-if="importImageFile"
+            class="small mt-1"
+          >
+            {{ importImageFile.name }}
+            <b-link
+              class="ml-1"
+              @click="importImageFile = null"
+            >
+              Rensa
+            </b-link>
+          </div>
         </b-form-group>
       </b-modal>
 
@@ -472,7 +512,30 @@ export default defineComponent({
 		const { importUrl, onImport, isImporting, importText, importError, importImageFile, uploadProgress, importPhase, progressMessage } =
 			useImport(recipe)
 
+		const imageInput = ref<HTMLInputElement | null>(null)
+		const cameraInput = ref<HTMLInputElement | null>(null)
+
+		function openImagePicker() {
+			imageInput.value?.click()
+		}
+
+		function openCamera() {
+			cameraInput.value?.click()
+		}
+
+		function onImageSelected(event: Event) {
+			const input = event.target as HTMLInputElement
+			importImageFile.value = input.files?.[0] || null
+			// Allow picking the same file again after a reset
+			input.value = ""
+		}
+
 		return {
+			imageInput,
+			cameraInput,
+			openImagePicker,
+			openCamera,
+			onImageSelected,
 			importUrl,
 			importText,
 			importError,
