@@ -99,7 +99,7 @@ async function summarizeWithChatLLM(text: string): Promise<string> {
 	const ai = new GoogleGenAI({ apiKey: apiKey.value() });
 
 	const response = await ai.models.generateContent({
-		model: "gemini-3-pro-preview",
+		model: "gemini-3.1-pro-preview",
 		contents: `Summarize this recipe in Swedish with Swedish units: ${text}`,
 		config: {
 			systemInstruction: SYSTEM_PROMPT,
@@ -122,7 +122,7 @@ async function summarizeImageWithChatLLM(
 	const base64 = buffer.toString("base64");
 
 	const response = await ai.models.generateContent({
-		model: "gemini-3-pro-preview",
+		model: "gemini-3.1-pro-preview",
 		contents: [
 			{ inlineData: { data: base64, mimeType } },
 			"Summarize this recipe in Swedish with Swedish units",
