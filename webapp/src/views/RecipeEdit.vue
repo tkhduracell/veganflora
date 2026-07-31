@@ -47,9 +47,13 @@
 
     </div>
 
-    <div v-if="importError">
-      {{ importError }}
-    </div>
+    <b-alert
+      :show="!!importErrorMessage"
+      variant="danger"
+      class="my-2"
+    >
+      {{ importErrorMessage }}
+    </b-alert>
 
     <div v-if="importPhase === 'uploading'" class="my-2">
       <small>Laddar upp bild... {{ uploadProgress }}%</small>
@@ -509,8 +513,18 @@ export default defineComponent({
 			}
 		}
 
-		const { importUrl, onImport, isImporting, importText, importError, importImageFile, uploadProgress, importPhase, progressMessage } =
-			useImport(recipe)
+		const {
+			importUrl,
+			onImport,
+			isImporting,
+			importText,
+			importError,
+			importErrorMessage,
+			importImageFile,
+			uploadProgress,
+			importPhase,
+			progressMessage,
+		} = useImport(recipe)
 
 		const imageInput = ref<HTMLInputElement | null>(null)
 		const cameraInput = ref<HTMLInputElement | null>(null)
@@ -539,6 +553,7 @@ export default defineComponent({
 			importUrl,
 			importText,
 			importError,
+			importErrorMessage,
 			importImageFile,
 			uploadProgress,
 			importPhase,
