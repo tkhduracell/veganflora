@@ -144,6 +144,15 @@ export default defineComponent({
   white-space: pre-line;
 }
 
+/* markdown-it puts a newline between every </li> and <li>. Under pre-line each
+   of those renders as a blank line, double-spacing the list. v-html output sits
+   outside the scope attribute, so this needs ::v-deep to reach it. */
+.breaking ::v-deep ul,
+.breaking ::v-deep ol,
+.breaking ::v-deep li {
+  white-space: normal;
+}
+
 .separator {
   display: inline-block;
   width: 1em;
