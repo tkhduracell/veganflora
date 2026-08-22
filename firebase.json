@@ -21,6 +21,7 @@
   },
   "functions": {
     "predeploy": [
+      "bash functions/scripts/gen-lockfile.sh --check",
       "jq \"del(.devDependencies)\" functions/package.json > functions/package.json.tmp",
       "mv functions/package.json functions/package.json.old",
       "mv functions/package.json.tmp functions/package.json",
