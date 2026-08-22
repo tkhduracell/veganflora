@@ -1,0 +1,3 @@
+# Machine-local Claude Code settings and scratch worktrees.
+settings.local.json
+worktrees/
