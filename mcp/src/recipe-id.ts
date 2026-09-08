@@ -9,7 +9,7 @@ export function slugify(title: string): string {
 		.replace(/ö/gi, "oe")
 		.replace(/ä/gi, "ae")
 		.replace(/å/gi, "aa")
-		.replace(/[\W]+/gi, "_")
+		.replace(/[\W]+/gi, "_");
 }
 
 /**
@@ -18,6 +18,6 @@ export function slugify(title: string): string {
  * ingest/json-gen.ts.
  */
 export function recipeDocId(category: string[], title: string): string {
-	const prefix = category.map((s) => s.replace(/[^\wåäö]+/gi, "_")).join("\\")
-	return `${prefix}\\${slugify(title)}`
+	const prefix = category.map((s) => s.replace(/[^\wåäö]+/gi, "_")).join("\\");
+	return `${prefix}\\${slugify(title)}`;
 }

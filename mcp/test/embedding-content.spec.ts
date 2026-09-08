@@ -1,4 +1,4 @@
-import { contentHash, embeddingText } from "../src/embedding-content.js"
+import { contentHash, embeddingText } from "../src/embedding-content.js";
 
 const recipe = {
 	title: "Linssoppa",
@@ -7,32 +7,36 @@ const recipe = {
 		{ name: "morot", amount: "1", measure: "st" },
 	],
 	text: "Koka linserna.\nTillsätt morot.",
-}
+};
 
 describe("embeddingText", () => {
 	it("combines title, ingredient names and text", () => {
-		expect(embeddingText(recipe)).toBe("Linssoppa\nröda linser, morot\nKoka linserna.\nTillsätt morot.")
-	})
+		expect(embeddingText(recipe)).toBe(
+			"Linssoppa\nröda linser, morot\nKoka linserna.\nTillsätt morot.",
+		);
+	});
 
 	it("omits amounts and measures", () => {
-		expect(embeddingText(recipe)).not.toContain("dl")
-	})
+		expect(embeddingText(recipe)).not.toContain("dl");
+	});
 
 	it("handles a recipe with no ingredients", () => {
-		expect(embeddingText({ title: "Vatten", ingredients: [], text: "Häll upp." })).toBe("Vatten\n\nHäll upp.")
-	})
-})
+		expect(
+			embeddingText({ title: "Vatten", ingredients: [], text: "Häll upp." }),
+		).toBe("Vatten\n\nHäll upp.");
+	});
+});
 
 describe("contentHash", () => {
 	it("is stable for the same input", () => {
-		expect(contentHash("abc")).toBe(contentHash("abc"))
-	})
+		expect(contentHash("abc")).toBe(contentHash("abc"));
+	});
 
 	it("differs for different input", () => {
-		expect(contentHash("abc")).not.toBe(contentHash("abd"))
-	})
+		expect(contentHash("abc")).not.toBe(contentHash("abd"));
+	});
 
 	it("returns a hex sha256 digest", () => {
-		expect(contentHash("abc")).toMatch(/^[0-9a-f]{64}$/)
-	})
-})
+		expect(contentHash("abc")).toMatch(/^[0-9a-f]{64}$/);
+	});
+});
