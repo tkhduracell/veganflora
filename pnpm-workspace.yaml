@@ -2,6 +2,7 @@ packages:
   - webapp
   - ingest
   - functions
+  - mcp
 
 onlyBuiltDependencies:
   - '@biomejs/biome'

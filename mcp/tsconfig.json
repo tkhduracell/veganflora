@@ -1,0 +1,10 @@
+{
+	"extends": "@tsconfig/node22/tsconfig.json",
+	"compilerOptions": {
+		"preserveConstEnums": true,
+		"outDir": "dist",
+		"rootDir": "."
+	},
+	"include": ["src/**/*", "test/**/*", "scripts/**/*"],
+	"exclude": ["dist"]
+}

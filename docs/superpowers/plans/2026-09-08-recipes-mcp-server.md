@@ -896,8 +896,7 @@ Create `mcp/test/tools.spec.ts`. It drives the tools through an in-memory MCP cl
 
 ```typescript
 import { Client } from "@modelcontextprotocol/client"
-import { InMemoryTransport } from "@modelcontextprotocol/server/inMemory.js"
-import { McpServer } from "@modelcontextprotocol/server"
+import { InMemoryTransport, McpServer } from "@modelcontextprotocol/server"
 import type { Firestore } from "firebase-admin/firestore"
 
 import { RecipeRepository } from "../src/repository.js"
