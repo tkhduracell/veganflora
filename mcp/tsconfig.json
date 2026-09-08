@@ -4,8 +4,8 @@
 		"preserveConstEnums": true,
 		"isolatedModules": true,
 		"outDir": "dist",
-		"rootDir": "."
+		"noEmit": true
 	},
-	"include": ["src/**/*", "test/**/*", "scripts/**/*"],
+	"include": ["src/**/*", "test/**/*", "scripts/**/*", "../functions/src/embedding.ts"],
 	"exclude": ["dist"]
 }

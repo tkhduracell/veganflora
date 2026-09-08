@@ -1,7 +1,7 @@
 import { logger } from "firebase-functions";
 
 import { initializeApp } from "firebase-admin/app";
-import { getFirestore } from "firebase-admin/firestore";
+import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 
 import { defineSecret } from "firebase-functions/params";
@@ -15,6 +15,8 @@ const secrets: HttpsOptions["secrets"] = [apiKey];
 const cors: HttpsOptions["cors"] = "https://veganflora.web.app";
 
 import { GoogleGenAI, Type } from "@google/genai";
+
+import { contentHash, embed, embeddingText } from "./embedding.js";
 
 initializeApp();
 
@@ -282,5 +284,56 @@ export const prefillUpdate = onDocumentWritten(
 			"prefill.tags": tags,
 			"prefill.categories": categories,
 		});
+	},
+);
+
+export const recipeEmbeddingUpdate = onDocumentWritten(
+	{
+		document: "/veganflora/root/recipies/{id}",
+		timeoutSeconds,
+		region,
+		secrets,
+	},
+	async ({ params, data }) => {
+		const after = data?.after;
+		if (!after?.exists) return logger.info(`${params.id}: deleted, nothing to embed`);
+
+		const recipe = after.data() as {
+			title?: string;
+			ingredients?: { name: string }[];
+			text?: string;
+			embeddingHash?: string;
+		};
+		if (!recipe.title || !recipe.text) {
+			return logger.warn(`${params.id}: missing title or text, skipping embedding`);
+		}
+
+		const text = embeddingText({
+			title: recipe.title,
+			ingredients: recipe.ingredients ?? [],
+			text: recipe.text,
+		});
+		const hash = contentHash(text);
+
+		// REQUIRED: the update() below retriggers this same function. Without this
+		// early return the trigger recurses indefinitely.
+		if (recipe.embeddingHash === hash) {
+			return logger.info(`${params.id}: embedding up to date`);
+		}
+
+		try {
+			const vector = await embed(apiKey.value(), text);
+			// embedding and embeddingHash must be written together — writing only
+			// the vector would leave the hash stale and recompute forever.
+			await after.ref.update({
+				embedding: FieldValue.vector(vector),
+				embeddingHash: hash,
+			});
+			logger.info(`${params.id}: embedding updated`);
+		} catch (err) {
+			// Swallowed on purpose: a Gemini outage must not block recipe writes.
+			// mcp's script:backfill recovers anything missed here.
+			logger.error(`${params.id}: embedding failed`, err);
+		}
 	},
 );
