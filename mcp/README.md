@@ -96,6 +96,40 @@ locally; production still needs the index above.
 
 ## Deployment
 
-Not yet deployed. Hosting (Cloud Run service, Secret Manager wiring for
-`MCP_BEARER_TOKEN`, pointing the consuming harness at the deployed URL) is a
-separate change.
+The `recipeEmbeddingUpdate` trigger **is deployed** to `europe-north1`, and the
+vector index is `READY`. The MCP server itself is **not yet hosted** — Cloud Run
+service, Secret Manager wiring for `MCP_BEARER_TOKEN`, and pointing the consuming
+harness at the deployed URL are a separate change.
+
+## Verification (2026-09-08)
+
+Executed against the live `veganflora` project.
+
+| Check | Result |
+|---|---|
+| Vector index | `READY` (`__name__`, `embedding`) |
+| Backfill | `embedded=144 skipped=0 failed=0` |
+| Backfill re-run | `embedded=0 skipped=144 failed=0` — idempotent |
+| Trigger deploy | `recipeEmbeddingUpdate(europe-north1)` created |
+| Trigger fires on content change | hash `1c12cf2b` -> `8a3561a5` |
+| **No recursion** | hash stable across 9 polls / 54s after the write-back |
+| Revert round-trip | hash returned to `1c12cf2b`, text restored to 854 chars |
+| Local suite | 50 tests, 7 suites, all passing |
+
+### Search quality, measured
+
+Real queries against the live index, cosine distance (lower is closer):
+
+- `"snabb vardagsmiddag med tofu"` -> Tofustroganoff (0.236), Tofu stroganoff
+  (0.245), Fräsch wok med sticky tofu (0.257). **Strong** — all five hits were
+  tofu weeknight dishes.
+- `"recept med kikärtor"` -> Hummus (0.256), Kikärtsomelett (0.259), Biffar med
+  kikärtor (0.260). **Good, with the expected caveat**: 4 of 5 genuinely contain
+  chickpeas, but "Pasta med pesto och valnötter" (0.267) does not — vector search
+  ranks on similarity, not membership.
+- `"något värmande till en kall kväll"` -> Kalljästa morgonbullar (0.366),
+  Kålpudding (0.369), Black bean chili (0.372). **Weakest.** Distances cluster
+  around 0.37 (nothing strongly matched) and the top hit is a false friend —
+  "kall" matching "kalljästa". Abstract mood queries are the real limitation.
+
+For exact ingredient or tag questions, prefer `list_recipes` with a filter.
