@@ -110,21 +110,21 @@ gcloud secrets versions access latest --secret=MCP_BEARER_TOKEN --project=veganf
 
 ### Redeploying
 
-`gcloud run deploy --source` does **not** work here. It looks for a Dockerfile at
-the build root, finds none, and falls back to Buildpacks, which cannot install
-this pnpm workspace. Build via Cloud Build with an explicit Dockerfile instead:
-
-```bash
-IMAGE=europe-north1-docker.pkg.dev/veganflora/cloud-run-source-deploy/veganflora-mcp:$(git rev-parse --short HEAD)
-gcloud builds submit --config=cloudbuild.mcp.yaml --substitutions=_IMAGE="$IMAGE" --project=veganflora --region=europe-north1
-gcloud run deploy veganflora-mcp --image="$IMAGE" --project=veganflora --region=europe-north1 --allow-unauthenticated --set-secrets="MCP_BEARER_TOKEN=MCP_BEARER_TOKEN:latest,GEMINI_API_KEY=GEMINI_API_KEY:latest" --service-account=520915943790-compute@developer.gserviceaccount.com
-```
+Automatic. The `deploy-mcp` job in `.github/workflows/node.js.yml` builds the
+image on every PR and, on push to `master`, pushes it to Artifact Registry and
+deploys to Cloud Run — the same shape as `deploy-functions` and `deploy-webapp`.
+CI authenticates via Workload Identity Federation (no long-lived key), using the
+`github-deploy-auth-pool` provider scoped to this repository.
 
 `mcp/Dockerfile` builds from the **repo root** (`-f mcp/Dockerfile .`) because pnpm
 needs the root lockfile and `pnpm-workspace.yaml` to resolve the `catalog:`
 protocol. Both the install and the `pnpm deploy` step pass `--ignore-scripts`:
 pnpm blocks unapproved postinstall scripts by default, and none of the offenders
 (biome, esbuild, protobufjs, re2) are needed to run the server.
+
+Note that `gcloud run deploy --source` does **not** work for this service: it
+looks for a Dockerfile at the build root, finds none, and falls back to
+Buildpacks, which cannot install this pnpm workspace.
 
 ### Rotating the token
 

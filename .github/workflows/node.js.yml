@@ -63,6 +63,48 @@ jobs:
       - name: Build ingest
         run: pnpm --filter ingest... typecheck
       
+  deploy-mcp:
+    concurrency:
+      group: 'mcp'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build image
+        # Context is the repo root, not mcp/: pnpm needs the root lockfile and
+        # pnpm-workspace.yaml to resolve the `catalog:` protocol.
+        run: docker build -f mcp/Dockerfile -t veganflora-mcp:${{ github.sha }} .
+      - name: Authenticate to Google Cloud
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/520915943790/locations/global/workloadIdentityPools/github-deploy-auth-pool/providers/github-deploy-auth-provider
+          service_account: 520915943790-compute@developer.gserviceaccount.com
+      - name: Set up gcloud
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Push image
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        env:
+          IMAGE: europe-north1-docker.pkg.dev/veganflora/cloud-run-source-deploy/veganflora-mcp:${{ github.sha }}
+        run: |
+          gcloud auth configure-docker europe-north1-docker.pkg.dev --quiet
+          docker tag veganflora-mcp:${{ github.sha }} "$IMAGE"
+          docker push "$IMAGE"
+      - name: Cloud Run Deploy (mcp)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        env:
+          IMAGE: europe-north1-docker.pkg.dev/veganflora/cloud-run-source-deploy/veganflora-mcp:${{ github.sha }}
+        run: |
+          gcloud run deploy veganflora-mcp \
+            --image="$IMAGE" \
+            --project=veganflora \
+            --region=europe-north1 \
+            --allow-unauthenticated \
+            --set-secrets="MCP_BEARER_TOKEN=MCP_BEARER_TOKEN:latest,GEMINI_API_KEY=GEMINI_API_KEY:latest" \
+            --service-account=520915943790-compute@developer.gserviceaccount.com \
+            --memory=512Mi --cpu=1 --min-instances=0 --max-instances=3 \
+            --quiet
+
   deploy-webapp:
     concurrency:
       group: 'web'
