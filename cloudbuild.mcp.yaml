@@ -1,0 +1,17 @@
+# Builds the MCP server image from the repo root so pnpm can see the workspace
+# lockfile. Cloud Run's --source flag cannot be used here: it looks for a
+# Dockerfile at the build root and otherwise falls back to Buildpacks, which
+# cannot install this pnpm workspace.
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -f
+      - mcp/Dockerfile
+      - -t
+      - ${_IMAGE}
+      - .
+images:
+  - ${_IMAGE}
+options:
+  logging: CLOUD_LOGGING_ONLY
