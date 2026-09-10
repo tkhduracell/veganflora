@@ -33,7 +33,7 @@ function errorResult(message: string) {
 	return { content: [{ type: "text" as const, text: message }], isError: true };
 }
 
-function okResult(payload: Record<string, unknown>) {
+function okResult<T extends object>(payload: T) {
 	return {
 		content: [{ type: "text" as const, text: JSON.stringify(payload) }],
 		structuredContent: payload,
@@ -112,7 +112,7 @@ export function registerRecipeTools(
 					limit: limit ?? 20,
 					cursor,
 				});
-				return okResult(page as unknown as Record<string, unknown>);
+				return okResult(page);
 			} catch (err) {
 				return errorResult(`List failed: ${(err as Error).message}`);
 			}
@@ -144,17 +144,10 @@ export function registerRecipeTools(
 			description:
 				"Update named fields of an existing recipe. Omitted fields are left unchanged. " +
 				"Cannot delete a recipe and cannot write search embeddings.",
+			// Derived from recipeFields so a new recipe field cannot silently become
+			// non-updatable by being forgotten here.
 			inputSchema: z
-				.object({
-					id: z.string(),
-					title: recipeFields.title.optional(),
-					size: recipeFields.size.optional(),
-					ingredients: recipeFields.ingredients.optional(),
-					text: recipeFields.text.optional(),
-					category: recipeFields.category.optional(),
-					tags: recipeFields.tags.optional(),
-					image: recipeFields.image,
-				})
+				.object({ id: z.string(), ...z.object(recipeFields).partial().shape })
 				.strict(),
 		},
 		async ({ id, ...patch }) => {

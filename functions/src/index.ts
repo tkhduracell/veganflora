@@ -16,7 +16,7 @@ const cors: HttpsOptions["cors"] = "https://veganflora.web.app";
 
 import { GoogleGenAI, Type } from "@google/genai";
 
-import { contentHash, embed, embeddingText } from "./embedding.js";
+import { contentHash, embed, embeddingText, needsEmbedding } from "./embedding.js";
 
 initializeApp();
 
@@ -316,8 +316,9 @@ export const recipeEmbeddingUpdate = onDocumentWritten(
 		const hash = contentHash(text);
 
 		// REQUIRED: the update() below retriggers this same function. Without this
-		// early return the trigger recurses indefinitely.
-		if (recipe.embeddingHash === hash) {
+		// early return the trigger recurses indefinitely. The decision lives in
+		// needsEmbedding() so it can be tested directly.
+		if (!needsEmbedding(recipe)) {
 			return logger.info(`${params.id}: embedding up to date`);
 		}
 
