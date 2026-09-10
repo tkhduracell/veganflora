@@ -96,10 +96,51 @@ locally; production still needs the index above.
 
 ## Deployment
 
-The `recipeEmbeddingUpdate` trigger **is deployed** to `europe-north1`, and the
-vector index is `READY`. The MCP server itself is **not yet hosted** — Cloud Run
-service, Secret Manager wiring for `MCP_BEARER_TOKEN`, and pointing the consuming
-harness at the deployed URL are a separate change.
+Deployed to Cloud Run in `europe-north1`, alongside the `recipeEmbeddingUpdate`
+trigger and the `READY` vector index.
+
+**Endpoint:** `https://veganflora-mcp-520915943790.europe-north1.run.app/mcp`
+**Transport:** Streamable HTTP · **Auth:** `Authorization: Bearer <MCP_BEARER_TOKEN>`
+
+Fetch the token (do not paste it into a chat or commit it):
+
+```bash
+gcloud secrets versions access latest --secret=MCP_BEARER_TOKEN --project=veganflora
+```
+
+### Redeploying
+
+Automatic. The `deploy-mcp` job in `.github/workflows/node.js.yml` builds the
+image on every PR and, on push to `master`, pushes it to Artifact Registry and
+deploys to Cloud Run — the same shape as `deploy-functions` and `deploy-webapp`.
+CI authenticates via Workload Identity Federation (no long-lived key), using the
+`github-deploy-auth-pool` provider scoped to this repository.
+
+`mcp/Dockerfile` builds from the **repo root** (`-f mcp/Dockerfile .`) because pnpm
+needs the root lockfile and `pnpm-workspace.yaml` to resolve the `catalog:`
+protocol. Both the install and the `pnpm deploy` step pass `--ignore-scripts`:
+pnpm blocks unapproved postinstall scripts by default, and none of the offenders
+(biome, esbuild, protobufjs, re2) are needed to run the server.
+
+Note that `gcloud run deploy --source` does **not** work for this service: it
+looks for a Dockerfile at the build root, finds none, and falls back to
+Buildpacks, which cannot install this pnpm workspace.
+
+### Rotating the token
+
+```bash
+openssl rand -base64 32 | tr -d '\n' | gcloud secrets versions add MCP_BEARER_TOKEN --data-file=- --project=veganflora
+gcloud run services update veganflora-mcp --project=veganflora --region=europe-north1 --set-secrets="MCP_BEARER_TOKEN=MCP_BEARER_TOKEN:latest,GEMINI_API_KEY=GEMINI_API_KEY:latest"
+```
+
+### Security posture
+
+The service has **public ingress** (`--allow-unauthenticated` at the network
+layer), so the bearer token is the sole access control on a read/write endpoint.
+Cloud Run IAM invoker auth would be stronger but requires a Google-signed token
+most MCP clients cannot produce. The runtime service account is the shared
+default compute account, which means every function in the project can also read
+`MCP_BEARER_TOKEN`; a dedicated service account would narrow that.
 
 ## Verification (2026-09-08)
 
