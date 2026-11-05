@@ -1,23 +1,17 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
-
+# Dependabot version updates.
+#
+# This repo is a pnpm workspace (webapp, functions, ingest, mcp) with a single
+# lockfile at the repo root. Dependabot must run against the workspace root so
+# it updates pnpm-lock.yaml together with each package.json. Per-package
+# entries (e.g. /functions, /webapp) leave the root lockfile stale, which makes
+# `pnpm install --frozen-lockfile` fail in CI (ERR_PNPM_OUTDATED_LOCKFILE).
 version: 2
 updates:
-  - package-ecosystem: npm # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: npm
+    directory: "/"
     schedule:
       interval: "weekly"
-  - package-ecosystem: npm # See documentation for possible values
-    directory: "/functions" # Location of package manifests
-    schedule:
-      interval: "weekly"
-  - package-ecosystem: npm # See documentation for possible values
-    directory: "/webapp" # Location of package manifests
-    schedule:
-      interval: "weekly"
-  - package-ecosystem: github-actions # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: github-actions
+    directory: "/"
     schedule:
       interval: "weekly"
