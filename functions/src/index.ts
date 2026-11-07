@@ -102,11 +102,16 @@ const recipeResponseSchema = {
 // Constrains the model to the folders that already exist, so an import lands in the
 // collection's structure instead of inventing a new folder.
 async function recipeSchemaWithCategories() {
-	const snapshot = await root.get();
+	// Category is a nice-to-have: if Firestore is unreachable (e.g. the local summarize
+	// script without credentials), import without it instead of failing.
+	const snapshot = await root.get().catch((err: unknown) => {
+		logger.warn("Could not load categories, importing without", err);
+		return undefined;
+	});
 	// prefillUpdate no longer writes "", but a stored prefill may still hold one until the
 	// next recipe write, and Gemini rejects an empty enum value.
 	const categories = (
-		(snapshot.data()?.prefill?.categories ?? []) as string[]
+		(snapshot?.data()?.prefill?.categories ?? []) as string[]
 	).filter(Boolean);
 	if (categories.length === 0) return recipeResponseSchema;
 
@@ -149,7 +154,10 @@ async function summarizeImageWithChatLLM(
 	const ai = new GoogleGenAI({ apiKey: apiKey.value() });
 
 	const bucket = getStorage().bucket();
-	const [buffer] = await bucket.file(storagePath).download();
+	const [[buffer], responseSchema] = await Promise.all([
+		bucket.file(storagePath).download(),
+		recipeSchemaWithCategories(),
+	]);
 	const base64 = buffer.toString("base64");
 
 	const response = await ai.models.generateContent({
@@ -161,7 +169,7 @@ async function summarizeImageWithChatLLM(
 		config: {
 			systemInstruction: SYSTEM_PROMPT,
 			responseMimeType: "application/json",
-			responseSchema: await recipeSchemaWithCategories(),
+			responseSchema,
 		},
 	});
 
