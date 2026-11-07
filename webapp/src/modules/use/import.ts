@@ -1,5 +1,5 @@
 import type { Recipe, Ingredient } from "@/components/types"
-import { ref, computed, type Ref, unref, onUnmounted } from "vue"
+import { ref, computed, type Ref, onUnmounted } from "vue"
 import { getFunctions, httpsCallable } from "firebase/functions"
 import { getApp } from "firebase/app"
 import { getStorage, ref as storageRef, uploadBytesResumable } from "firebase/storage"
@@ -29,21 +29,21 @@ type ImportedRecipe = Pick<Recipe, "title" | "text" | "size"> & {
 	category?: string
 }
 
-export function useImportUrl(recipe: Ref<Recipe>) {
-	function applyImport(json: string) {
-		const imported = JSON.parse(json) as ImportedRecipe
-		const current = recipe.value.category
-		recipe.value = {
-			...recipe.value,
-			ingredients: imported.ingredients.map((r) => ({ ...r, id: uuidv4() })),
-			title: imported.title,
-			text: imported.text,
-			size: imported.size,
-			// Keep a folder the user already picked; only fill it in when empty.
-			category: current?.length ? current : (imported.category?.split(" / ") ?? []),
-		}
+function mergeImport(recipe: Recipe, json: string | null): Recipe {
+	if (!json) throw new Error("No data returned from API")
+	const imported = JSON.parse(json) as ImportedRecipe
+	return {
+		...recipe,
+		ingredients: imported.ingredients.map((r) => ({ ...r, id: uuidv4() })),
+		title: imported.title,
+		text: imported.text,
+		size: imported.size,
+		// Keep a folder the user already picked; only fill it in when empty.
+		category: recipe.category?.length ? recipe.category : (imported.category?.split(" / ") ?? []),
 	}
+}
 
+export function useImportUrl(recipe: Ref<Recipe>) {
 	const app = getApp()
 	const functions = getFunctions(app, "europe-north1")
 
@@ -118,10 +118,7 @@ export function useImportUrl(recipe: Ref<Recipe>) {
 			const importRecipie = httpsCallable<{ url: string }, string>(functions, "importUrl")
 
 			const result = await importRecipie({ url: importUrl.value })
-			if (result.data === null) {
-				throw new Error("No data returned from API")
-			}
-			applyImport(result.data)
+			recipe.value = mergeImport(recipe.value, result.data)
 			importUrl.value = ""
 		} catch (e: unknown) {
 			importError.value = e as Error
@@ -143,7 +140,7 @@ export function useImportUrl(recipe: Ref<Recipe>) {
 			const importRecipie = httpsCallable<{ text: string }, string>(functions, "importText")
 
 			const result = await importRecipie({ text: importText.value })
-			applyImport(result.data)
+			recipe.value = mergeImport(recipe.value, result.data)
 			importText.value = ""
 		} catch (e: unknown) {
 			importError.value = e as Error
@@ -205,7 +202,7 @@ export function useImportUrl(recipe: Ref<Recipe>) {
 
 			const importRecipie = httpsCallable<{ storagePath: string; mimeType: string }, string>(functions, "importImage")
 			const result = await importRecipie({ storagePath: path, mimeType: file.type })
-			applyImport(result.data)
+			recipe.value = mergeImport(recipe.value, result.data)
 			importImageFile.value = null
 		} catch (e: unknown) {
 			importError.value = e as Error

@@ -103,10 +103,11 @@ const recipeResponseSchema = {
 // collection's structure instead of inventing a new folder.
 async function recipeSchemaWithCategories() {
 	const snapshot = await root.get();
-	// Recipes without a category contribute "" to prefill, which Gemini rejects as an enum value.
-	const categories = ((snapshot.data()?.prefill?.categories ?? []) as string[]).filter(
-		(c) => c.trim() !== "",
-	);
+	// prefillUpdate no longer writes "", but a stored prefill may still hold one until the
+	// next recipe write, and Gemini rejects an empty enum value.
+	const categories = (
+		(snapshot.data()?.prefill?.categories ?? []) as string[]
+	).filter(Boolean);
 	if (categories.length === 0) return recipeResponseSchema;
 
 	return {
@@ -266,7 +267,7 @@ export const prefillUpdate = onDocumentWritten(
 			);
 			if (prefill) {
 				prefill.tags.forEach((t) => tagsByName.set(t.text, t));
-				prefill.categories.forEach((c) => categorySet.add(c));
+				prefill.categories.filter(Boolean).forEach((c) => categorySet.add(c));
 			}
 		}
 
@@ -290,7 +291,7 @@ export const prefillUpdate = onDocumentWritten(
 			};
 
 			if (!category) return logger.error(`Document ${doc.id} has no category`);
-			categorySet.add(category.join(" / "));
+			if (category.length > 0) categorySet.add(category.join(" / "));
 
 			if (!tags) return logger.warn(`Document ${doc.id} has no tags`);
 			tags
