@@ -25,13 +25,34 @@ and weak at exact membership ("recept med kikärtor"). Use `list_recipes` with a
 
 | Variable | Required | Purpose |
 |---|---|---|
-| `MCP_BEARER_TOKEN` | yes | The only access control on `/mcp` |
 | `GEMINI_API_KEY` | yes | Generates query embeddings at search time |
+| `MCP_PUBLIC_URL` | yes | Public URL of `/mcp`; the OAuth `resource` identifier |
+| `GOOGLE_OAUTH_CLIENT_IDS` | one of these two | Comma-separated Google OAuth client ids whose access tokens are accepted |
+| `MCP_ALLOWED_EMAILS` | with the above | Comma-separated Google accounts allowed in |
+| `MCP_BEARER_TOKEN` | one of these two | Legacy static token, accepted alongside Google OAuth |
 | `PORT` | no | Listen port, defaults to `8080` |
 
-**The bearer token is the entire security boundary.** Anyone holding it has full
-read and write access to the recipe collection. Use a long random value, keep it
-in Secret Manager, and rotate it by changing the secret and restarting.
+## Authentication
+
+The server is an OAuth 2.1 **resource server** (MCP authorization spec), and
+Google is its authorization server. Anyone with full access gets read and write
+access to the whole recipe collection, so the access checks are strict:
+
+1. An unauthenticated `/mcp` request gets `401` with
+   `WWW-Authenticate: Bearer resource_metadata=".../.well-known/oauth-protected-resource/mcp"`.
+2. That document (RFC 9728) names `https://accounts.google.com` as the
+   authorization server. The client signs the user in with Google (PKCE, scopes
+   `openid email`).
+3. Every Google access token is checked against Google's `tokeninfo`. The
+   token's `aud` must be one of `GOOGLE_OAUTH_CLIENT_IDS`, so a token minted for
+   any other app is rejected. The email must be verified and listed in
+   `MCP_ALLOWED_EMAILS`. A verified token is cached until it expires.
+
+Google has **no dynamic client registration**, so every MCP client must be
+configured with our client id and secret (see [Connecting a client](#connecting-a-client)).
+
+`MCP_BEARER_TOKEN` still works as a static credential while clients migrate.
+Leave it unset to require Google sign-in only.
 
 `/health` is intentionally unauthenticated so uptime probes need no credential.
 Every `/mcp` request is rejected with `401` before touching Firestore.
@@ -87,7 +108,7 @@ pnpm --filter mcp test
 pnpm --filter mcp typecheck
 pnpm --filter mcp check
 
-GEMINI_API_KEY=<key> MCP_BEARER_TOKEN=<token> pnpm --filter mcp dev
+GEMINI_API_KEY=<key> MCP_BEARER_TOKEN=<token> MCP_PUBLIC_URL=http://localhost:8080/mcp pnpm --filter mcp dev
 ```
 
 Tests run against the Firestore emulator on `127.0.0.1:8080`. The emulator
@@ -100,9 +121,43 @@ Deployed to Cloud Run in `europe-north1`, alongside the `recipeEmbeddingUpdate`
 trigger and the `READY` vector index.
 
 **Endpoint:** `https://veganflora-mcp-520915943790.europe-north1.run.app/mcp`
-**Transport:** Streamable HTTP · **Auth:** `Authorization: Bearer <MCP_BEARER_TOKEN>`
+**Transport:** Streamable HTTP · **Auth:** Google OAuth (or legacy `Authorization: Bearer <MCP_BEARER_TOKEN>`)
 
-Fetch the token (do not paste it into a chat or commit it):
+### Google OAuth setup (one-time)
+
+1. In the `veganflora` project, open **Google Auth Platform**. Configure the
+   consent screen as **External**, keep it in **Testing**, and add the allowed
+   accounts as test users. Scopes: `openid`, `.../auth/userinfo.email`.
+2. Under **Clients**, create a **Web application** client with these
+   authorized redirect URIs:
+   - `https://claude.ai/api/mcp/auth_callback` (claude.ai connectors)
+   - `http://localhost:33418/callback` (Claude Code, fixed `--callback-port`)
+3. Store the client id and the allowlist. The deploy job mounts both:
+
+```bash
+printf '%s' '<client-id>.apps.googleusercontent.com' | gcloud secrets create GOOGLE_OAUTH_CLIENT_IDS --data-file=- --project=veganflora
+printf '%s' 'you@gmail.com' | gcloud secrets create MCP_ALLOWED_EMAILS --data-file=- --project=veganflora
+```
+
+The client secret is never given to the server; only MCP clients use it.
+
+### Connecting a client
+
+Claude Code:
+
+```bash
+claude mcp add --transport http --client-id <client-id> --client-secret --callback-port 33418 \
+  veganflora-recipes https://veganflora-mcp-520915943790.europe-north1.run.app/mcp
+```
+
+Then run `/mcp` → `veganflora-recipes` → **Authenticate**.
+
+claude.ai: **Settings → Connectors → Add custom connector**, paste the endpoint,
+choose **Sign in now**, then **Use your own OAuth client** with the client id and
+secret. Google supports neither CIMD nor dynamic registration, so the other OAuth
+client options fail.
+
+Legacy token (do not paste it into a chat or commit it):
 
 ```bash
 gcloud secrets versions access latest --secret=MCP_BEARER_TOKEN --project=veganflora
@@ -130,15 +185,16 @@ Buildpacks, which cannot install this pnpm workspace.
 
 ```bash
 openssl rand -base64 32 | tr -d '\n' | gcloud secrets versions add MCP_BEARER_TOKEN --data-file=- --project=veganflora
-gcloud run services update veganflora-mcp --project=veganflora --region=europe-north1 --set-secrets="MCP_BEARER_TOKEN=MCP_BEARER_TOKEN:latest,GEMINI_API_KEY=GEMINI_API_KEY:latest"
+gcloud run services update veganflora-mcp --project=veganflora --region=europe-north1 --update-secrets="MCP_BEARER_TOKEN=MCP_BEARER_TOKEN:latest"
 ```
 
 ### Security posture
 
 The service has **public ingress** (`--allow-unauthenticated` at the network
-layer), so the bearer token is the sole access control on a read/write endpoint.
-Cloud Run IAM invoker auth would be stronger but requires a Google-signed token
-most MCP clients cannot produce. The runtime service account is the shared
+layer), so application-level auth is the only access control on a read/write
+endpoint: Google OAuth plus the email allowlist, and the legacy bearer token
+while it remains set. Cloud Run IAM invoker auth would be stronger but requires
+a Google-signed ID token most MCP clients cannot produce. The runtime service account is the shared
 default compute account, which means every function in the project can also read
 `MCP_BEARER_TOKEN`; a dedicated service account would narrow that.
 

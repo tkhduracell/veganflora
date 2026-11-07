@@ -8,6 +8,7 @@ import RecipeEdit from "@/views/RecipeEdit.vue"
 import RecipeShow from "@/views/RecipeShow.vue"
 import Groceries from "@/views/Groceries.vue"
 import Units from "@/views/Units.vue"
+import Mcp from "@/views/Mcp.vue"
 
 Vue.use(VueRouter)
 
@@ -51,6 +52,11 @@ const routes: Array<RouteConfig> = [
 		path: "/units",
 		name: "units",
 		component: Units,
+	},
+	{
+		path: "/mcp",
+		name: "mcp",
+		component: Mcp,
 	},
 ]
 
