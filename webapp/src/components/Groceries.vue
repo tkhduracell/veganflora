@@ -40,7 +40,7 @@ export default defineComponent({
 		menu: { required: true, type: Object as PropType<Menu> },
 		findRecipe: {
 			required: true,
-			type: Function as PropType<(r: string) => Recipe>,
+			type: Function as PropType<(r: string) => Recipe | undefined>,
 		},
 		canEdit: { type: Boolean },
 	},
@@ -50,8 +50,9 @@ export default defineComponent({
 		}
 
 		function toIngredientWithContext(key: string, week: number, weekday: WeekDay, meal: Meal): IngredientWithContext[] {
+			// The menu can reference a recipe that was since deleted or renamed, or not loaded yet.
 			const source = props.findRecipe(key)
-			return source.ingredients ? source?.ingredients?.map((i) => ({ week, weekday, meal, source, ...i })) : []
+			return source?.ingredients?.map((i) => ({ week, weekday, meal, source, ...i })) ?? []
 		}
 
 		const itemsRaw = computed<IngredientWithContext[]>(() => {
