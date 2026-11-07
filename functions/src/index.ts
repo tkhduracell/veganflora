@@ -44,6 +44,8 @@ const SYSTEM_PROMPT = `
 		* The ingredient list should be in Swedish, and use Swedish units (e.g. dl, tsk, msk, gram).
 	   	* Remove any brands from the ingredient list, e.g. "Arla Ko® Standardmjöl" should be "mjölk".
 		* Use items with {name: *Section*} to create a section separating the ingredients, e.g. {name: "Fyllning"} for a filling section.
+	   Instructions for the category:
+		* Pick the existing category that best matches the kind of dish (e.g. bread, dessert, main course). Prefer the most specific matching path.
 	   Instructions for the image:
 		* If the recipe has an image that you think represent the recipe, include the URL to the image in the JSON response. Else, use an empty string.
     `.replace(/\n/g, "");
@@ -97,6 +99,38 @@ const recipeResponseSchema = {
 	propertyOrdering: ["title", "size", "image", "text", "ingredients"],
 } as const;
 
+// Constrains the model to the folders that already exist, so an import lands in the
+// collection's structure instead of inventing a new folder.
+async function recipeSchemaWithCategories() {
+	// Category is a nice-to-have: if Firestore is unreachable (e.g. the local summarize
+	// script without credentials), import without it instead of failing.
+	const snapshot = await root.get().catch((err: unknown) => {
+		logger.warn("Could not load categories, importing without", err);
+		return undefined;
+	});
+	// prefillUpdate no longer writes "", but a stored prefill may still hold one until the
+	// next recipe write, and Gemini rejects an empty enum value.
+	const categories = (
+		(snapshot?.data()?.prefill?.categories ?? []) as string[]
+	).filter(Boolean);
+	if (categories.length === 0) return recipeResponseSchema;
+
+	return {
+		...recipeResponseSchema,
+		properties: {
+			...recipeResponseSchema.properties,
+			category: {
+				type: Type.STRING,
+				format: "enum",
+				enum: categories,
+				description:
+					"The existing folder this recipe fits best, as a ' / '-separated path.",
+			},
+		},
+		propertyOrdering: [...recipeResponseSchema.propertyOrdering, "category"],
+	};
+}
+
 async function summarizeWithChatLLM(text: string): Promise<string> {
 	const ai = new GoogleGenAI({ apiKey: apiKey.value() });
 
@@ -106,7 +140,7 @@ async function summarizeWithChatLLM(text: string): Promise<string> {
 		config: {
 			systemInstruction: SYSTEM_PROMPT,
 			responseMimeType: "application/json",
-			responseSchema: recipeResponseSchema,
+			responseSchema: await recipeSchemaWithCategories(),
 		},
 	});
 
@@ -120,7 +154,10 @@ async function summarizeImageWithChatLLM(
 	const ai = new GoogleGenAI({ apiKey: apiKey.value() });
 
 	const bucket = getStorage().bucket();
-	const [buffer] = await bucket.file(storagePath).download();
+	const [[buffer], responseSchema] = await Promise.all([
+		bucket.file(storagePath).download(),
+		recipeSchemaWithCategories(),
+	]);
 	const base64 = buffer.toString("base64");
 
 	const response = await ai.models.generateContent({
@@ -132,7 +169,7 @@ async function summarizeImageWithChatLLM(
 		config: {
 			systemInstruction: SYSTEM_PROMPT,
 			responseMimeType: "application/json",
-			responseSchema: recipeResponseSchema,
+			responseSchema,
 		},
 	});
 
@@ -238,7 +275,7 @@ export const prefillUpdate = onDocumentWritten(
 			);
 			if (prefill) {
 				prefill.tags.forEach((t) => tagsByName.set(t.text, t));
-				prefill.categories.forEach((c) => categorySet.add(c));
+				prefill.categories.filter(Boolean).forEach((c) => categorySet.add(c));
 			}
 		}
 
@@ -262,7 +299,7 @@ export const prefillUpdate = onDocumentWritten(
 			};
 
 			if (!category) return logger.error(`Document ${doc.id} has no category`);
-			categorySet.add(category.join(" / "));
+			if (category.length > 0) categorySet.add(category.join(" / "));
 
 			if (!tags) return logger.warn(`Document ${doc.id} has no tags`);
 			tags
