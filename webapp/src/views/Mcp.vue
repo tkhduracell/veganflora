@@ -25,7 +25,8 @@
     <ol>
       <li><em>Settings → Connectors → Add custom connector</em></li>
       <li>Klistra in adressen ovan</li>
-      <li>Under <em>Advanced settings</em>: OAuth Client ID <code>{{ clientId }}</code> och klienthemligheten</li>
+      <li>Authentication: <em>Sign in now</em></li>
+      <li>OAuth client: <em>Use your own OAuth client</em>, Client ID <code>{{ clientId }}</code> och klienthemligheten</li>
     </ol>
 
     <p class="text-muted mt-4">

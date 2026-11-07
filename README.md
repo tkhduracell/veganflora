@@ -23,7 +23,8 @@ claude mcp add --transport http \
 
 Enter the OAuth client secret when prompted, then run `/mcp` → `veganflora-recipes` → **Authenticate**.
 
-claude.ai: **Settings → Connectors → Add custom connector**, paste the endpoint, and enter the
-client id and secret under **Advanced settings**.
+claude.ai: **Settings → Connectors → Add custom connector**, paste the endpoint, choose
+**Sign in now**, then **Use your own OAuth client** with the client id and secret. Google supports
+neither CIMD nor dynamic registration, so the other OAuth client options fail.
 
 Server details, setup and deployment: [`mcp/README.md`](mcp/README.md).
