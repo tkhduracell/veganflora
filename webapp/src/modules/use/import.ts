@@ -23,7 +23,27 @@ const UPLOAD_RETRY_TIMEOUT_MS = 30_000
 /** How long the upload may run without any progress before we treat it as stuck. */
 const UPLOAD_STALL_TIMEOUT_MS = 45_000
 
+type ImportedRecipe = Pick<Recipe, "title" | "text" | "size"> & {
+	ingredients: Omit<Ingredient, "id">[]
+	/** Existing folder path chosen by the model, e.g. "Middag / Gryta". */
+	category?: string
+}
+
 export function useImportUrl(recipe: Ref<Recipe>) {
+	function applyImport(json: string) {
+		const imported = JSON.parse(json) as ImportedRecipe
+		const current = recipe.value.category
+		recipe.value = {
+			...recipe.value,
+			ingredients: imported.ingredients.map((r) => ({ ...r, id: uuidv4() })),
+			title: imported.title,
+			text: imported.text,
+			size: imported.size,
+			// Keep a folder the user already picked; only fill it in when empty.
+			category: current?.length ? current : (imported.category?.split(" / ") ?? []),
+		}
+	}
+
 	const app = getApp()
 	const functions = getFunctions(app, "europe-north1")
 
@@ -101,19 +121,7 @@ export function useImportUrl(recipe: Ref<Recipe>) {
 			if (result.data === null) {
 				throw new Error("No data returned from API")
 			}
-			type RecipeDetails = Pick<Recipe, "title" | "text" | "size"> & {
-				ingredients: Omit<Ingredient, "id">[]
-			}
-
-			const imported = JSON.parse(result.data) as RecipeDetails
-
-			recipe.value = {
-				...recipe.value,
-				ingredients: imported.ingredients.map((r) => ({ ...r, id: uuidv4() })),
-				title: imported.title,
-				text: imported.text,
-				size: imported.size,
-			}
+			applyImport(result.data)
 			importUrl.value = ""
 		} catch (e: unknown) {
 			importError.value = e as Error
@@ -135,17 +143,7 @@ export function useImportUrl(recipe: Ref<Recipe>) {
 			const importRecipie = httpsCallable<{ text: string }, string>(functions, "importText")
 
 			const result = await importRecipie({ text: importText.value })
-			const imported = JSON.parse(result.data) as Pick<Recipe, "title" | "text" | "size"> & {
-				ingredients: Omit<Ingredient, "id">[]
-			}
-
-			recipe.value = {
-				...recipe.value,
-				ingredients: imported.ingredients.map((r) => ({ ...r, id: uuidv4() })),
-				title: imported.title,
-				text: imported.text,
-				size: imported.size,
-			}
+			applyImport(result.data)
 			importText.value = ""
 		} catch (e: unknown) {
 			importError.value = e as Error
@@ -207,19 +205,7 @@ export function useImportUrl(recipe: Ref<Recipe>) {
 
 			const importRecipie = httpsCallable<{ storagePath: string; mimeType: string }, string>(functions, "importImage")
 			const result = await importRecipie({ storagePath: path, mimeType: file.type })
-
-			type RecipeDetails = Pick<Recipe, "title" | "text" | "size"> & {
-				ingredients: Omit<Ingredient, "id">[]
-			}
-			const imported = JSON.parse(result.data) as RecipeDetails
-
-			recipe.value = {
-				...recipe.value,
-				ingredients: imported.ingredients.map((r) => ({ ...r, id: uuidv4() })),
-				title: imported.title,
-				text: imported.text,
-				size: imported.size,
-			}
+			applyImport(result.data)
 			importImageFile.value = null
 		} catch (e: unknown) {
 			importError.value = e as Error
