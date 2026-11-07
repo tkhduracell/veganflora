@@ -100,7 +100,8 @@ jobs:
             --project=veganflora \
             --region=europe-north1 \
             --allow-unauthenticated \
-            --set-secrets="MCP_BEARER_TOKEN=MCP_BEARER_TOKEN:latest,GEMINI_API_KEY=GEMINI_API_KEY:latest" \
+            --set-secrets="MCP_BEARER_TOKEN=MCP_BEARER_TOKEN:latest,GEMINI_API_KEY=GEMINI_API_KEY:latest,GOOGLE_OAUTH_CLIENT_IDS=GOOGLE_OAUTH_CLIENT_IDS:latest,MCP_ALLOWED_EMAILS=MCP_ALLOWED_EMAILS:latest" \
+            --set-env-vars="MCP_PUBLIC_URL=https://veganflora-mcp-520915943790.europe-north1.run.app/mcp" \
             --service-account=520915943790-compute@developer.gserviceaccount.com \
             --memory=512Mi --cpu=1 --min-instances=0 --max-instances=3 \
             --quiet
