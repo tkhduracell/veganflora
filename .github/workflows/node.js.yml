@@ -21,7 +21,7 @@ jobs:
       matrix:
         node-version: [22]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Install pnpm
         uses: pnpm/action-setup@v3
         with:
@@ -47,7 +47,7 @@ jobs:
       matrix:
         node-version: [22]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Install pnpm
         uses: pnpm/action-setup@v3
         with:
@@ -68,7 +68,7 @@ jobs:
       group: 'mcp'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Build image
         # Context is the repo root, not mcp/: pnpm needs the root lockfile and
         # pnpm-workspace.yaml to resolve the `catalog:` protocol.
@@ -114,7 +114,7 @@ jobs:
       matrix:
         node-version: [22]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Install pnpm
         uses: pnpm/action-setup@v3
         with:
