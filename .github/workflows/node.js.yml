@@ -81,7 +81,7 @@ jobs:
           service_account: 520915943790-compute@developer.gserviceaccount.com
       - name: Set up gcloud
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-        uses: google-github-actions/setup-gcloud@v2
+        uses: google-github-actions/setup-gcloud@v3
       - name: Push image
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         env:
