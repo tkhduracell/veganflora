@@ -21,7 +21,7 @@
 	"dependencies": {
 		"@modelcontextprotocol/server": "^2.3.0",
 		"@modelcontextprotocol/node": "^2.1.0",
-		"@modelcontextprotocol/express": "^2.0.0",
+		"@modelcontextprotocol/express": "^2.0.2",
 		"@google/genai": "^1.37.0",
 		"express": "^5.1.0",
 		"firebase-admin": "^13.4.0",
