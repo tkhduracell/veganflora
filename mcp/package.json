@@ -30,7 +30,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "catalog:",
 		"@modelcontextprotocol/client": "^2.2.0",
-		"@tsconfig/node22": "^22.0.2",
+		"@tsconfig/node22": "^22.0.7",
 		"@types/express": "^5.0.0",
 		"@types/jest": "^30.0.0",
 		"@types/node": "^22.15.30",
